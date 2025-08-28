@@ -1,0 +1,75 @@
+name: sermon
+description: "A new Flutter project."
+publish_to: 'none'
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.3
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  dio: ^5.8.0+1
+  flutter_svg: ^2.2.0
+  iconly: ^1.0.1
+  flutter_keyboard_visibility: ^6.0.0
+  connectivity_plus: ^6.1.4
+  lottie: ^3.3.1
+  pin_code_fields: ^8.0.1
+  auto_size_text: ^3.0.0
+  cached_network_image: ^3.4.1
+  sensors_plus: ^6.1.1
+  chewie: ^1.12.1
+  video_player: ^2.10.0
+  google_fonts: ^6.2.1
+  firebase_core: ^3.15.1
+  firebase_crashlytics: ^4.3.9
+  firebase_analytics: ^11.5.2
+  facebook_app_events: ^0.20.1
+  carousel_slider: ^5.1.1
+  firebase_auth: ^5.6.2
+  cloud_firestore: ^5.6.11
+  email_validator: ^3.0.0
+  hive: ^2.2.3
+  path_provider: ^2.1.5
+  change_app_package_name: ^1.5.0
+  smooth_page_indicator: ^1.2.1
+  url_launcher: ^6.3.1
+  amplitude_flutter: ^4.3.2
+  razorpay_flutter: ^1.4.0
+  uuid: ^4.5.1
+  intl: ^0.20.2
+  truecaller_sdk: ^1.0.1
+  wakelock_plus: ^1.3.2
+  firebase_messaging: ^15.0.1
+  flutter_local_notifications: ^17.2.1
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  change_app_package_name: ^1.5.0
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/png_assets/icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts_assets/
+    - assets/lottie_assets/
+    - assets/png_assets/
+    - assets/svg_assets/
+
+  #  ./gradlew bundleRelease \
+  #  -Pandroid.injected.signing.store.file=/Users/prashantranjansingh/Flutter/Projects/sermon/playstore_things/sermon_ai.jks \
+  #  -Pandroid.injected.signing.store.password=sermon_ai \
+  #  -Pandroid.injected.signing.key.alias=sermon_ai \
+  #  -Pandroid.injected.signing.key.password=sermon_ai

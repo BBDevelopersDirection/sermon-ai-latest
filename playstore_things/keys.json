@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "sermon-ai-test",
+  "private_key_id": "6f0d723d2b33bb5033195adfd42b8b5e1cd175da",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDaJmupm4L4eNEc\nU7p9Xermm7r7iTbVPPOSd5l26pqhda5SiujEXxI5k8mjPY+gNZeylBWcH/JaZnxB\nEHX3eL0c2KGn/AW1kCyPF+YcDA4zzrNix3IinzRg4+4arEJ3gMssMtWxqphkzWnt\n3HribKoV9S4z/U+cxqC88HlX3UM1HSaOvp0ygbHjM6FnEJ2CN3itGG0NUPa8B6IP\nvwsfEAw8ppe856bhLPCmeWVQC0Wban5TU3P+Ku0dyJJlU85dh3RcHYdq6AKdhjBK\nioHoV/Gf1+Qh/PLh0si8Cj1v91zgjdSBg2cG82OMnLZCPhXLIQOcU1Arb33u8XGr\nwB9OTGABAgMBAAECggEAAcACp5jrh05C0TEbwyM0ffacXKW4ZqQHSTLD7KgLpwVw\naVGbde3UUdltae2VwCGF7sUQ2lCIS3DciNIWvC5ACCH1xAj5y7/VF63Hpwxytbgw\nCLgUYpI345oYgCbHHrnOB3P98l+tustKEQIuiy/3elcd8IVU9OtEAVgFhS6tehjW\nufN2xVS0Zit0wmumSr5CHcpoZeGwXsXaWGW2DI0hMlV9tS6C4xE4vaQud3XLiV08\nCOVA9l5MDYqwSjtnYNc/dyjGEohbIIJLvqe2FHwdOZQJvBDeUvjCHJ5W8zHPxHX+\nAPsDZpHe44h2LW7P94hkA+MsGc90tTGcrSd93EH+1QKBgQDz69/FujcpruVLgy1m\niqhFPw0cxw0CCcVcWALsW+Wvl2iWjuEvPrju4fOnJif/YE62AqhjTpdawv9TsWcw\nnzcIjf4kbsO8jOJuWsIFzWRvmzXSpypz/2e5+ivM2t0ofmba3vmwPDXdlg53nr9K\nBLysouLIjgPOVc6CJvask2a6hQKBgQDk89m+IMdQ4L9WEm7buJmdzH7dtOBhDi3D\nllple2EFI4Ho/jM7GJnWQTZxhqQY/b7zd1whjAbEduj6FdLBacV/sUcUcOqeBTwK\ngxlSQZErQISzVMrCKF+TBFuLtjUgKkXpdT7oS8PAcNikNqxAGnSg2fEVUW7XkyM+\nBvUFS1cOTQKBgQCyu4XvBvJg0s0ltetQlg2TIA5lpd18PtilP8B0nSoCrnluySds\nTROJx3uYYTcxw8opSG1Gx1HUqcoZ84ZfdGsJE7LD034N7VYF8u70/Xm45gxcXS2Y\nbe/9sLjjlQQ1JdoMSxK+9n+p7MiREnusqyftgDWZK6bSTMHTUOWzsxa1WQKBgQCs\nKLESxpMZveYiUroJfkYE4kCDdf9C++ZtrCFNLflGY+zLxlm/lkAXW/IUa6n5INT1\nPkuI7kIoeUG2y7IuvdpEqolIVaAWMtlzDiF8ONFwNJOURa4xUSqM4jn0VI6eIStw\n4TjsdAw+KJy+3l2n1jzctwURgqpWb82QVqrn0D8mAQKBgQDIAVlT2VRNHCJYh3OK\ndp4Z9fPZ2YVTeeAMs+GCk2FHqSYv7RsHU5y8ryS4m1ACufsqyYLwmU7wbFdIw5rh\n6UcwAw0GITmsIDbRZaTOy0kGd5npdDvFlg9i8E4UEgHOLvXmlOO1S9+YqqVHFb8W\nwUby+2WFiEimi4CZJaG/ur7oKQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "revenuecat-sermon-ai@sermon-ai-test.iam.gserviceaccount.com",
+  "client_id": "113572076869664279698",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/revenuecat-sermon-ai%40sermon-ai-test.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
