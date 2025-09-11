@@ -10,6 +10,7 @@ class LogEventsName{
   String regestredUser = 'regestredUser';
   String regestrationEmail = 'regestrationEmail';
 
+  String reelsScreenButton = 'reelsScreenButton';
   String homeScreenButton = 'homeScreenButton';
   String profileScreenButton = 'profileScreenButton';
   String logoutEvent = 'logoutEvent';

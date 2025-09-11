@@ -67,7 +67,13 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
                 StreamBuilder<List<SectionDetail>>(
                   stream: VideoFunctions().getSectionsStream(),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    if (!snapshot.hasData) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
                     final sections = snapshot.data!;
                     return ListView.builder(
                       itemCount: sections.length,
