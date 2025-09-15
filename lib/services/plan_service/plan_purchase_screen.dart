@@ -12,35 +12,49 @@ import 'package:sermon/services/plan_service/widgets/trail_message.dart';
 import 'package:sermon/services/plan_service/widgets/trial_image_row.dart';
 import 'package:sermon/services/plan_service/widgets/trial_price_info.dart';
 import 'package:sermon/utils/app_assets.dart';
+import 'package:video_player/video_player.dart';
 
 import '../firebase/utils_management/utils_functions.dart';
 import '../razorpay_service.dart';
 import 'widgets/header_close_button.dart';
 
 class SubscriptionTrialScreen extends StatelessWidget {
-  const SubscriptionTrialScreen({super.key});
+  final VideoPlayerController? controller;
+  SubscriptionTrialScreen({super.key, this.controller});
+
+  Future<bool> _onWillPop(BuildContext context) async {
+    // 👉 Your custom function here
+    debugPrint("Back button pressed! Run cleanup or analytics here.");
+
+    // Example: Resume video if controller exists
+    if (controller != null && !controller!.value.isPlaying) {
+      controller!.play();
+    }
+
+    // Return true to allow pop, false to block
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PlanPurchaseCubit, PlanPurchaseState>(
-      listener: (context, state) {
-        // if (state.errorCode != planPurchaseErrorCode.noError) {
-        //   MyAppDialogs().info_dialog(
-        //     context: context,
-        //     title: 'Error Occur',
-        //     body: "Error is: ${state.errorCode.toString()}",
-        //   );
-        // }
-      },
-      child: PaywallScreen()
+    return WillPopScope(
+      onWillPop: () => _onWillPop(context),
+      child: BlocListener<PlanPurchaseCubit, PlanPurchaseState>(
+        listener: (context, state) {
+          // Handle subscription state changes if needed
+        },
+        child: PaywallScreen(controller: controller),
+      ),
     );
   }
 }
 
 
 
+
 class PaywallScreen extends StatelessWidget {
-  const PaywallScreen({super.key});
+  final VideoPlayerController? controller;
+  const PaywallScreen({super.key, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +65,9 @@ class PaywallScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TrialImageRow(
+              onTap: () {
+                controller?.play();
+              },
               imagePaths: [
                 MyAppAssets.png_paywall_1, // Replace with your image paths
                 MyAppAssets.png_paywall_2,

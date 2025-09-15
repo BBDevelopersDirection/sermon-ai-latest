@@ -4,6 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
+import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
+import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
+import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -30,7 +35,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
     _cubit = BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions());
     _cubit.fetchReels();
 
-        WakelockPlus.enable();
+    WakelockPlus.enable();
 
     // Hide system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -78,7 +83,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
       c.dispose();
     }
 
-        WakelockPlus.disable();
+    WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
@@ -96,7 +101,10 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
             }
             if (state.reels.isEmpty) {
               return const Center(
-                child: Text("No Reels Found", style: TextStyle(color: Colors.white)),
+                child: Text(
+                  "No Reels Found",
+                  style: TextStyle(color: Colors.white),
+                ),
               );
             }
 
@@ -104,9 +112,47 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
               controller: _pageController,
               scrollDirection: Axis.vertical,
               itemCount: state.reels.length,
-              onPageChanged: (index) {
-                if (index == state.reels.length - 2 && state.hasMore) {
-                  context.read<BottomNavZeroCubit>().fetchReels(loadMore: true);
+              onPageChanged: (index) async {
+                if (index >= 2) {
+                  // Move back to index 1
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (_pageController.hasClients) {
+                      _pageController.jumpToPage(index - 1);
+                      _controllers[index - 1]?.pause();
+                    }
+                  });
+
+                  // Check paywall condition
+                  final canUseVideo = await UtilsFunctions().canUseVideo();
+                  print('I can use video: $canUseVideo');
+
+                  if (!canUseVideo) {
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => BlocProvider(
+                            create: (context) => PlanPurchaseCubit(),
+                            child: SubscriptionTrialScreen(
+                              controller: _controllers[index - 1],
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return;
+                  }
+
+                  // Fetch more reels if near the end
+                  if (index == state.reels.length - 2 && state.hasMore) {
+                    context.read<BottomNavZeroCubit>().fetchReels(
+                      loadMore: true,
+                    );
+                  }
+
+                  // Log reel watched event
+                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                    event: LogEventsName.instance().reel_watched,
+                  );
                 }
               },
               itemBuilder: (context, index) {
@@ -124,7 +170,6 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
     );
   }
 }
-
 
 class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
@@ -149,12 +194,13 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(widget.reelsModel.reelLink)
-      ..initialize().then((_) {
-        if (mounted) setState(() {});
-        widget.onControllerReady(widget.index, _controller);
-      })
-      ..setLooping(true);
+    _controller =
+        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
+          ..initialize().then((_) {
+            if (mounted) setState(() {});
+            widget.onControllerReady(widget.index, _controller);
+          })
+          ..setLooping(true);
   }
 
   @override
@@ -214,7 +260,10 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                    event: LogEventsName.instance().watch_full_video_reel,
+                  );
                   _controller.pause(); // ⏸ Pause before pushing new screen
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -237,7 +286,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Text(
-                        'Watch Full Sermon',
+                        'Watch Full Video',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

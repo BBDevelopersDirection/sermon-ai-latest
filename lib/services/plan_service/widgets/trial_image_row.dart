@@ -5,7 +5,41 @@ import 'package:sermon/services/plan_service/widgets/header_close_button.dart';
 
 class TrialImageRow extends StatelessWidget {
   final List<String> imagePaths;
-  const TrialImageRow({super.key, required this.imagePaths});
+  final VoidCallback? onTap;
+
+  const TrialImageRow({super.key, required this.imagePaths, this.onTap});
+
+  Widget _buildImage(BuildContext context, String? path, double width, double height, {double rotation = 0}) {
+    if (path == null) {
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade800,
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
+    }
+
+    return Transform.rotate(
+      angle: rotation,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset(
+          path,
+          fit: BoxFit.cover,
+          width: width,
+          height: height,
+          errorBuilder: (ctx, err, stack) => Container(
+            width: width,
+            height: height,
+            color: Colors.grey.shade800,
+            child: const Center(child: Icon(Icons.broken_image, color: Colors.white70)),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +47,25 @@ class TrialImageRow extends StatelessWidget {
     final double imageWidth = MediaQuery.of(context).size.width * 0.6;
     final double sideVisibleWidth = imageWidth / 2;
     final double gapBetweenImages = 22; // gap only between images
+
+    // Safe accessors: fallback to nearest available image or null
+    String? leftImage;
+    String? centerImage;
+    String? rightImage;
+
+    if (imagePaths.isEmpty) {
+      leftImage = centerImage = rightImage = null;
+    } else if (imagePaths.length == 1) {
+      leftImage = centerImage = rightImage = imagePaths[0];
+    } else if (imagePaths.length == 2) {
+      leftImage = imagePaths[0];
+      centerImage = imagePaths[1];
+      rightImage = imagePaths[1];
+    } else {
+      leftImage = imagePaths[0];
+      centerImage = imagePaths[1];
+      rightImage = imagePaths[2];
+    }
 
     return SizedBox(
       height: imageHeight,
@@ -22,57 +75,28 @@ class TrialImageRow extends StatelessWidget {
         children: [
           // Left image (half visible, tilted)
           Positioned(
-            left: (MediaQuery.of(context).size.width / 2) -
-                imageWidth -
-                gapBetweenImages,
-            child: Transform.rotate(
-              angle: 8 * math.pi / 180, // rotate left image
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: sideVisibleWidth,
-                  height: imageHeight,
-                  child: Image.asset(
-                    imagePaths[0],
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+            left: (MediaQuery.of(context).size.width / 2) - imageWidth - gapBetweenImages,
+            child: SizedBox(
+              width: sideVisibleWidth,
+              height: imageHeight,
+              child: _buildImage(context, leftImage, sideVisibleWidth, imageHeight, rotation: -8 * math.pi / 180),
             ),
           ),
 
           // Center image (straight)
-          Transform.rotate(
-            angle: 8 * math.pi / 180,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                imagePaths[1],
-                fit: BoxFit.cover,
-                width: imageWidth,
-                height: imageHeight,
-              ),
-            ),
+          SizedBox(
+            width: imageWidth,
+            height: imageHeight,
+            child: _buildImage(context, centerImage, imageWidth, imageHeight, rotation: 0),
           ),
 
           // Right image (half visible, tilted)
           Positioned(
-            right: (MediaQuery.of(context).size.width / 2) -
-                imageWidth -
-                gapBetweenImages,
-            child: Transform.rotate(
-              angle: 8 * math.pi / 180, // rotate right image
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: sideVisibleWidth,
-                  height: imageHeight,
-                  child: Image.asset(
-                    imagePaths[2],
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+            right: (MediaQuery.of(context).size.width / 2) - imageWidth - gapBetweenImages,
+            child: SizedBox(
+              width: sideVisibleWidth,
+              height: imageHeight,
+              child: _buildImage(context, rightImage, sideVisibleWidth, imageHeight, rotation: 8 * math.pi / 180),
             ),
           ),
 
@@ -81,7 +105,7 @@ class TrialImageRow extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height*0.15,
+            height: MediaQuery.of(context).size.height * 0.15,
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -98,7 +122,7 @@ class TrialImageRow extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.of(context).size.height*0.15,
+            height: MediaQuery.of(context).size.height * 0.15,
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -109,11 +133,13 @@ class TrialImageRow extends StatelessWidget {
               ),
             ),
           ),
+
+          // Close button
           Positioned(
-  top: MediaQuery.of(context).padding.top + 8, // safe area + small margin
-  left: 8,
-  child: const HeaderCloseButton(),
-),
+            top: MediaQuery.of(context).padding.top + 8, // safe area + small margin
+            left: 8,
+            child: HeaderCloseButton(onTap: onTap),
+          ),
         ],
       ),
     );
