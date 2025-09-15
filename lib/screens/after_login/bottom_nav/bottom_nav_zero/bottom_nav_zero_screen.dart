@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'bottom_nav_zero_cubit.dart';
 import 'bottom_nav_zero_state.dart';
@@ -27,6 +29,11 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
     super.initState();
     _cubit = BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions());
     _cubit.fetchReels();
+
+        WakelockPlus.enable();
+
+    // Hide system UI
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _pageController.addListener(_onScroll);
   }
@@ -70,6 +77,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
     for (final c in _controllers.values) {
       c.dispose();
     }
+
+        WakelockPlus.disable();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
