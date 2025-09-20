@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
+import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import '../../main.dart';
 import '../../models/playlist_and_episode_model_old.dart';

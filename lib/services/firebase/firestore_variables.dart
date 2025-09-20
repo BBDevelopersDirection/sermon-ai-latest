@@ -18,6 +18,8 @@ class FirestoreVariables {
 
   static const String videosCollection = 'Videos';
 
+  static const String reelsCollection = 'reels';
+
   static const String rechargeEndDate = 'RECHARGE_END_DATE';
   static const String rechargeStartDate = 'RECHARGE_START_DATE';
 
