@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/shared_pref/shared_preference.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
 import 'services/firebase_notification_mine.dart';
@@ -28,18 +29,18 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await NotificationService.instance.initialize();
-    debugPrint('🔥 Firebase Core initialized successfully');
+  await NotificationService.instance.initialize();
+  AppLogger.d('🔥 Firebase Core initialized successfully');
 
     // Initialize Firebase Analytics
     final analytics = FirebaseAnalytics.instance;
-    await analytics.setAnalyticsCollectionEnabled(true);
-    debugPrint('📊 Firebase Analytics initialized and enabled');
+  await analytics.setAnalyticsCollectionEnabled(true);
+  AppLogger.d('📊 Firebase Analytics initialized and enabled');
 
     await MyAppAmplitudeAndFirebaseAnalitics().init();
-    debugPrint('📱 App analytics services initialized');
+    AppLogger.d('📱 App analytics services initialized');
   } catch (e) {
-    debugPrint('❌ Error initializing Firebase: $e');
+    AppLogger.e('❌ Error initializing Firebase: $e');
   }
 
   FlutterError.onError = (errorDetails) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class ReelsResult {
   final List<ReelsModel> reels;
@@ -66,28 +67,28 @@ class ReelsFirestoreFunctions {
     required int limit,
     String? startAfterDocId,
   }) async {
-    print("🔥 Fetching reels | limit: $limit | startAfterDocId: $startAfterDocId");
+  AppLogger.d("🔥 Fetching reels | limit: $limit | startAfterDocId: $startAfterDocId");
 
     Query query = _firestore.collection('reels').limit(limit);
 
     if (startAfterDocId != null) {
-      print("👉 Getting startAfterDoc: $startAfterDocId");
+  AppLogger.d("👉 Getting startAfterDoc: $startAfterDocId");
       final startDoc =
           await _firestore.collection('reels').doc(startAfterDocId).get();
       if (startDoc.exists) {
         query = query.startAfterDocument(startDoc);
-        print("✅ startAfterDoc found, continuing query");
+  AppLogger.d("✅ startAfterDoc found, continuing query");
       } else {
-        print("⚠️ startAfterDoc NOT found in Firestore");
+  AppLogger.w("⚠️ startAfterDoc NOT found in Firestore");
       }
     }
 
     final snapshot = await query.get();
-    print("📦 Query returned ${snapshot.docs.length} docs");
+  AppLogger.d("📦 Query returned ${snapshot.docs.length} docs");
 
     final reels = snapshot.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
-      print("🎬 Reel fetched: ${doc.id} | data: $data");
+  AppLogger.d("🎬 Reel fetched: ${doc.id} | data: $data");
       return ReelsModel.fromMap({
         'id': doc.id,
         ...data,
@@ -97,7 +98,7 @@ class ReelsFirestoreFunctions {
     final lastDocId =
         snapshot.docs.isNotEmpty ? snapshot.docs.last.id : startAfterDocId;
 
-    print("🔚 Last doc id: $lastDocId | hasMore: ${snapshot.docs.length == limit}");
+  AppLogger.d("🔚 Last doc id: $lastDocId | hasMore: ${snapshot.docs.length == limit}");
 
     return ReelsResult(
       reels: reels,

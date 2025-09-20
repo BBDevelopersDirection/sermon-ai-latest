@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class AnalyticsEngine {
   AnalyticsEngine._();
@@ -16,11 +17,11 @@ class AnalyticsEngine {
         name: FirebaseEventName,
       );
       if (kDebugMode) {
-        print('Firebase Analytics Event Logged: $FirebaseEventName');
+        AppLogger.d('Firebase Analytics Event Logged: $FirebaseEventName');
       }
     } catch (e) {
       if (kDebugMode) {
-        print('Firebase Analytics Error: $e');
+        AppLogger.e('Firebase Analytics Error: $e');
       }
     }
   }
