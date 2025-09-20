@@ -227,4 +227,6 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     // Launch WhatsApp with the message
     await AppOpener.launchAppUsingUrl(link: whatsappUrl);
   }
+
+  void otp_ver_screen({required String number}) {}
 }
