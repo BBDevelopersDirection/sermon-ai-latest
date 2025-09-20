@@ -27,6 +27,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
   final PageController _pageController = PageController();
   late BottomNavZeroCubit _cubit;
   int _currentPage = 0;
+  int _maxFreeIndex = 1;
   final Map<int, VideoPlayerController> _controllers = {};
 
   @override
@@ -113,27 +114,38 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
               scrollDirection: Axis.vertical,
               itemCount: state.reels.length,
               onPageChanged: (index) async {
-                if (index >= 2) {
-                  // Move back to index 1
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_pageController.hasClients) {
-                      _pageController.jumpToPage(index - 1);
-                      _controllers[index - 1]?.pause();
-                    }
-                  });
-
-                  // Check paywall condition
-                  final canUseVideo = await UtilsFunctions().canUseVideo();
-                  print('I can use video: $canUseVideo');
+                // If scrolling beyond allowed free index
+                if (index > _maxFreeIndex) {
+                  var canUseVideo = await UtilsFunctions().canUseReel(index: index);
 
                   if (!canUseVideo) {
+                    // Snap back to last free index
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (_pageController.hasClients) {
+                        _pageController.animateToPage(
+                          _maxFreeIndex,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    });
+
+                    final controller = _controllers[_maxFreeIndex];
+                    if (controller != null) {
+                      controller.pause();
+                      controller.setVolume(
+                        0,
+                      ); // optional safety, avoids background audio
+                    }
+
                     if (context.mounted) {
+                      _controllers[_maxFreeIndex]?.pause();
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => BlocProvider(
                             create: (context) => PlanPurchaseCubit(),
                             child: SubscriptionTrialScreen(
-                              controller: _controllers[index - 1],
+                              controller: _controllers[_maxFreeIndex],
                             ),
                           ),
                         ),
@@ -141,19 +153,17 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                     }
                     return;
                   }
-
-                  // Fetch more reels if near the end
-                  if (index == state.reels.length - 2 && state.hasMore) {
-                    context.read<BottomNavZeroCubit>().fetchReels(
-                      loadMore: true,
-                    );
-                  }
-
-                  // Log reel watched event
-                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                    event: LogEventsName.instance().reel_watched,
-                  );
                 }
+
+                // ✅ Only fetch more reels if user actually has access
+                if (index == state.reels.length - 2 && state.hasMore) {
+                  context.read<BottomNavZeroCubit>().fetchReels(loadMore: true);
+                }
+
+                // ✅ Log reel watch
+                MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  event: LogEventsName.instance().reel_watched,
+                );
               },
               itemBuilder: (context, index) {
                 final reel = state.reels[index];

@@ -29,6 +29,7 @@ class SubscriptionTrialScreen extends StatelessWidget {
     // Example: Resume video if controller exists
     if (controller != null && !controller!.value.isPlaying) {
       controller!.play();
+      controller!.setVolume(1);
     }
 
     // Return true to allow pop, false to block
@@ -67,6 +68,7 @@ class PaywallScreen extends StatelessWidget {
             TrialImageRow(
               onTap: () {
                 controller?.play();
+                controller?.setVolume(1);
               },
               imagePaths: [
                 MyAppAssets.png_paywall_1, // Replace with your image paths
