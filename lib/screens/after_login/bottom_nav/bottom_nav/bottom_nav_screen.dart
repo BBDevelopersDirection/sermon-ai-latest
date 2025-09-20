@@ -4,12 +4,13 @@ import 'package:iconly/iconly.dart';
 import 'package:sermon/models/video_data_model.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/reusable/bottom_nav_container.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/bottom_nav_first_cubit.dart';
-import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/bottom_nav_first_screen_old.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_second/bottom_nav_second_cubit.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_second/bottom_nav_second_screen.dart';
+import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_screen.dart';
+import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_cubit.dart';
+import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
 import '../../../../services/log_service/log_service.dart';
 import '../../../../services/log_service/log_variables.dart';
-import '../../../../utils/app_assets.dart';
 import '../../../../utils/app_color.dart';
 import '../../../../services/firebase_notification_mine.dart';
 import '../bottom_nav_first/bottom_nav_first_screen.dart';
@@ -31,6 +32,11 @@ class _BottomNavScreenState extends State<BottomNavScreen>
 
   // List of screen widgets to show based on the index
   final List<Widget> _screens = [
+
+    BlocProvider(
+      create: (context) => BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions()),
+      child: BottomNavZeroScreen(),
+    ),
     BlocProvider(
       create: (context) => BottomNavFirstCubit(),
       child: BottomNavFirstScreen(),
@@ -44,9 +50,13 @@ class _BottomNavScreenState extends State<BottomNavScreen>
   void _onItemTapped(int index) {
     if (_selectedIndex == 0) {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsScreenButton,
+      );
+    } else if(_selectedIndex == 1) {
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().homeScreenButton,
       );
-    } else {
+    } else if(_selectedIndex == 2) {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().profileScreenButton,
       );
@@ -121,13 +131,19 @@ class _BottomNavScreenState extends State<BottomNavScreen>
                     items: [
                       BottomNavigationBarItem(
                         icon: _selectedIndex == 0
-                            ? BottomNavContainer(asset: IconlyBold.home)
+                            ? BottomNavContainer(asset: IconlyLight.home, isActive: true)
                             : BottomNavContainer(asset: IconlyLight.home),
                         label: '',
                       ),
                       BottomNavigationBarItem(
                         icon: _selectedIndex == 1
-                            ? BottomNavContainer(asset: IconlyBold.profile)
+                            ? BottomNavContainer(asset: IconlyLight.video, isActive: true)
+                            : BottomNavContainer(asset: IconlyLight.video),
+                        label: '',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: _selectedIndex == 2
+                            ? BottomNavContainer(asset: IconlyLight.profile, isActive: true)
                             : BottomNavContainer(asset: IconlyLight.profile),
                         label: '',
                       ),
