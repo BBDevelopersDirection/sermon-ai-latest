@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -25,7 +26,7 @@ class NotificationService {
       await _setupMessageHandlers();
       await setupFlutterNotifications();
     } catch (e) {
-      print('Error initializing notifications: $e');
+      AppLogger.e('Error initializing notifications: $e');
     }
   }
 
@@ -33,7 +34,7 @@ class NotificationService {
     await _requestPermission();
     final token = await _messaging.getToken();
     await _messaging.subscribeToTopic('all');
-    print('Fcm token: $token');
+    AppLogger.d('Fcm token: $token');
   }
 
   Future<void> _requestPermission() async {
@@ -46,7 +47,7 @@ class NotificationService {
       carPlay: true,
       criticalAlert: false,
     );
-    print('Permission status: ${settings.authorizationStatus}');
+    AppLogger.d('Permission status: ${settings.authorizationStatus}');
   }
 
   Future<void> setupFlutterNotifications() async {
@@ -116,7 +117,7 @@ class NotificationService {
           iosAttachments = [DarwinNotificationAttachment(filePath)];
         }
       } catch (e) {
-        print('Failed to fetch image: $e');
+        AppLogger.e('Failed to fetch image: $e');
       }
     }
 
@@ -151,26 +152,26 @@ class NotificationService {
   Future<void> _setupMessageHandlers() async {
     // Foreground
     FirebaseMessaging.onMessage.listen((message) async {
-      print('[Foreground] Notification: ${message.notification?.title}');
+      AppLogger.d('[Foreground] Notification: ${message.notification?.title}');
       await showNotification(message);
     });
 
     // Background tapped
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      print('[Background - Tapped] Data: ${message.data}');
+      AppLogger.d('[Background - Tapped] Data: ${message.data}');
       _handleBackgroundMessage(message);
     });
 
     // App opened via notification
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
-      print('[App Opened via Notification] Data: ${initialMessage.data}');
+      AppLogger.d('[App Opened via Notification] Data: ${initialMessage.data}');
       _handleBackgroundMessage(initialMessage);
     }
   }
 
   void _handleBackgroundMessage(RemoteMessage message) {
-    print('Handling background notification: ${message.data}');
+  AppLogger.d('Handling background notification: ${message.data}');
     if (message.data['type'] == 'chat') {
       // Handle chat-specific logic here
     }

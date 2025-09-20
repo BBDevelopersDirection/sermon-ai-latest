@@ -5,6 +5,7 @@ import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.
 import 'package:sermon/utils/string_extensions.dart';
 
 import 'dio_client.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class MyAppEndpoints {
   MyAppEndpoints._();
@@ -24,7 +25,7 @@ class MyAppEndpoints {
   Future<Response> createCustomer({required FirebaseUser firebaseUser}) async {
     try {
       String emailIs = "69bbe1ae-c3f3-54a5-ab9b-86b8202d193d".toGmail();
-      print("Email is: $emailIs");
+  AppLogger.d("Email is: $emailIs");
       var data = {
               'name': firebaseUser.name,
               'email': firebaseUser.email == ''
@@ -33,7 +34,7 @@ class MyAppEndpoints {
               'contact': firebaseUser.phoneNumber,
               'userId': firebaseUser.uid,
             };
-      print("data is: ${data}");
+  AppLogger.d("data is: ${data}");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-customer',
         data: data,
@@ -56,7 +57,7 @@ class MyAppEndpoints {
               'totalCount': 12,
               'customerNotify': 1,
             };
-      print("Data for subscription: $data");
+  AppLogger.d("Data for subscription: $data");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-subscription',
         data: data,
@@ -79,7 +80,7 @@ class MyAppEndpoints {
         }
       }
     } catch (e) {
-      debugPrint('⚠️ Failed to fetch network time: $e');
+        AppLogger.e('⚠️ Failed to fetch network time: $e');
     }
 
     return null; // fallback on failure

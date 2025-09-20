@@ -1,4 +1,5 @@
 import 'package:facebook_app_events/facebook_app_events.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 import 'AnalyticsEngine.dart';
 
@@ -13,15 +14,14 @@ class MyAppAnalitics {
 
   Future<void> logEvent({required String event}) async {
     try{
-      await AnalyticsEngine.instance.logFirebaseEvent(FirebaseEventName: event);
-      print('Logged firebase event: ${event}');
+  await AnalyticsEngine.instance.logFirebaseEvent(FirebaseEventName: event);
+  AppLogger.d('Logged firebase event: ${event}');
 
 
-      _facebookAppEvents.logEvent(name: event);
-      print('Logged Facebook event: ${event}');
-
+  _facebookAppEvents.logEvent(name: event);
+  AppLogger.d('Logged Facebook event: ${event}');
     }catch (e){
-      print('Error while logging firebase event: ${event}');
+      AppLogger.e('Error while logging firebase event: ${event}');
     }
   }
 }

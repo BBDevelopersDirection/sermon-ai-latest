@@ -18,6 +18,7 @@ import 'package:sermon/services/hive_box/hive_box_variables.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 import '../../main.dart';
 import '../../reusable/app_dialogs.dart';
@@ -82,15 +83,15 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         },
         onVerificationCompleted: (credential) {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-          print("Auto-verification completed. User signed in.");
+          AppLogger.d("Auto-verification completed. User signed in.");
         },
         onVerificationFailed: (e) {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-          print("Verification failed: ${e.message}");
+          AppLogger.e("Verification failed: ${e.message}");
         },
         onAutoRetrievalTimeout: () {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-          print("OTP auto retrieval timeout.");
+          AppLogger.d("OTP auto retrieval timeout.");
         },
       );
       // Show an error message or handle invalid input
@@ -105,7 +106,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   }) async {
     String unverifiedOtp = controller.text.toString();
 
-    print(unverifiedOtp.length);
+  AppLogger.d(unverifiedOtp.length.toString());
 
     if (unverifiedOtp.length != 6) {
       // never reach here
@@ -166,7 +167,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               );
             });
       } catch (e) {
-        // print("OTP verification failed: $e");
+  // AppLogger.d("OTP verification failed: $e");
         emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
         MyAppDialogs().info_dialog(
           context: context,
@@ -232,7 +233,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       bool isUsable = await TcSdk.isOAuthFlowUsable;
 
       if (!isUsable) {
-        print('⚠️ OAuth flow not usable');
+        AppLogger.w('⚠️ OAuth flow not usable');
         return;
       }
 
@@ -250,13 +251,13 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       _streamSubscription?.cancel();
       _codeVerifier = await TcSdk.generateRandomCodeVerifier;
       if (_codeVerifier == null) {
-        print('❌ Failed to generate code verifier');
+        AppLogger.e('❌ Failed to generate code verifier');
         return;
       }
 
       final codeChallenge = await TcSdk.generateCodeChallenge(_codeVerifier!);
       if (codeChallenge == null) {
-        print('❌ Code challenge NULL. Device not supported');
+        AppLogger.e('❌ Code challenge NULL. Device not supported');
         return;
       }
 
@@ -275,11 +276,11 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                   _codeVerifier != null &&
                   _codeVerifier!.isNotEmpty &&
                   authCode.isNotEmpty) {
-                print('✅ Auth Code: $authCode');
-                print('🔐 Code Verifier: $_codeVerifier');
-                print("🔄 Requesting access token 1...");
+                AppLogger.d('✅ Auth Code: $authCode');
+                AppLogger.d('🔐 Code Verifier: $_codeVerifier');
+                AppLogger.d("🔄 Requesting access token 1...");
                 getData(authCode: authCode);
-                print(
+                AppLogger.d(
                   '⚠️ Note: Profile will be null in OPTION_VERIFY_ALL_USERS',
                 );
               }
@@ -294,11 +295,11 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                   _codeVerifier != null &&
                   _codeVerifier!.isNotEmpty &&
                   authCode.isNotEmpty) {
-                print('✅ Auth Code: $authCode');
-                print('🔐 Code Verifier: $_codeVerifier');
-                print("🔄 Requesting access token 2...");
+                AppLogger.d('✅ Auth Code: $authCode');
+                AppLogger.d('🔐 Code Verifier: $_codeVerifier');
+                AppLogger.d("🔄 Requesting access token 2...");
                 getData(authCode: authCode);
-                print(
+                AppLogger.d(
                   '⚠️ Note: Profile will be null in OPTION_VERIFY_ALL_USERS',
                 );
               }
@@ -306,7 +307,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
             case TcSdkCallbackResult.failure:
               final error = tcSdkCallback.error!;
-              print(
+              AppLogger.e(
                 '❌ ErrorCode: ${error.code}, Reason: ${error.message ?? "Unknown"}',
               );
               break;
@@ -316,11 +317,11 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               break;
 
             default:
-              print('❌ Invalid callback result');
+              AppLogger.e('❌ Invalid callback result');
           }
         },
         onError: (e) {
-          print('❌ SDK Error: $e');
+          AppLogger.e('❌ SDK Error: $e');
         },
       );
 
@@ -328,7 +329,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       // Attempting to isolate the call to prevent NoSuchMethodError
       await Future.value(TcSdk.getAuthorizationCode());
     } catch (e) {
-      print('❌ Exception: $e');
+      AppLogger.e('❌ Exception: $e');
     }
   }
 
@@ -336,10 +337,10 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     final dio = Dio();
     try {
       if (_codeVerifier == null || _codeVerifier!.isEmpty) {
-        print('❌ Stored Code Verifier is missing!');
+        AppLogger.e('❌ Stored Code Verifier is missing!');
         return;
       }
-      print("🔄 Requesting access token...");
+      AppLogger.d("🔄 Requesting access token...");
 
       final tokenResponse = await dio.post(
         'https://oauth-account-noneu.truecaller.com/v1/token',
@@ -353,24 +354,24 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         options: Options(contentType: Headers.formUrlEncodedContentType),
       );
 
-      print("✅ Token Response: ${tokenResponse.data}");
+  AppLogger.d("✅ Token Response: ${tokenResponse.data}");
 
       final accessToken = tokenResponse.data['access_token'];
       if (accessToken == null || accessToken.isEmpty) {
-        print("❗ Access token not found.");
+        AppLogger.w("❗ Access token not found.");
         return;
       }
 
-      print("🔐 Access Token: $accessToken");
-      print("📡 Requesting user info...");
+      AppLogger.d("🔐 Access Token: $accessToken");
+      AppLogger.d("📡 Requesting user info...");
 
       final profileResponse = await dio.get(
         'https://oauth-account-noneu.truecaller.com/v1/userinfo',
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      final profile = profileResponse.data;
-      print("👤 Full User Profile: $profile");
+  final profile = profileResponse.data;
+  AppLogger.d("👤 Full User Profile: $profile");
 
       final fullName =
           '${profile['given_name'] ?? ''} ${profile['family_name'] ?? ''}'
@@ -382,9 +383,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         throw Exception('Phone number not available from Truecaller');
       }
 
-      print("✅ Name: $fullName");
-      print("📞 Phone: $phone");
-      print("📧 Email: $email");
+  AppLogger.d("✅ Name: $fullName");
+  AppLogger.d("📞 Phone: $phone");
+  AppLogger.d("📧 Email: $email");
 
       // in phone number add + in front of the phone number
       final phoneNumber = '+$phone';
@@ -396,9 +397,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
       // First, check if user exists in Firestore by phone number
     } on DioException catch (e) {
-      print("❌ Dio error: ${e.response?.data ?? e.message}");
+      AppLogger.e("❌ Dio error: ${e.response?.data ?? e.message}");
     } catch (e) {
-      print("❌ Error: $e");
+      AppLogger.e("❌ Error: $e");
     }
   }
 
@@ -413,7 +414,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-      debugPrint("👤 User exists in Firestore");
+  AppLogger.d("👤 User exists in Firestore");
       final userData = querySnapshot.docs.first.data();
       final existingUser = FirebaseUser.fromJson(userData);
 
@@ -424,7 +425,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         name: userData[FirestoreVariables.nameField],
       );
 
-      print("👤 Existing User: $data");
+  AppLogger.d("👤 Existing User: $data");
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
 
@@ -435,7 +436,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
     } else {
       // User doesn't exist - proceed with registration
-      debugPrint("👤 User doesn't exist - proceeding with registration");
+  AppLogger.d("👤 User doesn't exist - proceeding with registration");
       userRegistrationSignUpButton(
         context: navigatorKey.currentContext!,
         name: fullName,
@@ -462,7 +463,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     } else if (email.isEmpty || EmailValidator.validate(email)) {
       // Email is either empty or valid — and name is not empty
 
-      debugPrint('proceeding with registration');
+  AppLogger.d('proceeding with registration');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -474,18 +475,18 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
     emit(state.copyWith(loadingStatus: LoadingStatus.userRegestrationLoading));
 
-    print('👤 name: $name');
-    print('👤 email: $email');
-    print('👤 unverifiedMobNum: $unverifiedMobNum');
-    print('👤 isTruecaller: $isTruecaller');
-    print('👤 uid: ${FirebaseAuth.instance.currentUser?.uid}');
-    print('👤 uuid: ${HiveBoxFunctions().getUuid()}');
+  AppLogger.d('👤 name: $name');
+  AppLogger.d('👤 email: $email');
+  AppLogger.d('👤 unverifiedMobNum: $unverifiedMobNum');
+  AppLogger.d('👤 isTruecaller: $isTruecaller');
+  AppLogger.d('👤 uid: ${FirebaseAuth.instance.currentUser?.uid}');
+  AppLogger.d('👤 uuid: ${HiveBoxFunctions().getUuid()}');
 
     // if truecaller is true then get uuid by phone number
     String? uuid;
     if (isTruecaller) {
-      uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
-      print('👤 uuid: $uuid');
+  uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
+  AppLogger.d('👤 uuid: $uuid');
     }
 
     FirestoreFunctions()

@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 
 import 'log_service/log_service.dart';
 import 'log_service/log_variables.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class RazorpayService {
   final Razorpay _razorpay = Razorpay();
@@ -55,12 +56,12 @@ class RazorpayService {
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Razorpay error: $e');
+      AppLogger.e('Razorpay error: $e');
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    debugPrint("Payment Success: ${response.paymentId}");
+  AppLogger.d("Payment Success: ${response.paymentId}");
     final String transactionId = response.paymentId ?? const Uuid().v4();
 
     TransistionFirestoreFunctions().newFirebaseTransitionData(
@@ -78,7 +79,7 @@ class RazorpayService {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) async {
-    debugPrint("Payment Error: ${response.code} - ${response.message}");
+  AppLogger.e("Payment Error: ${response.code} - ${response.message}");
     TransistionFirestoreFunctions().newFirebaseTransitionData(
       firebaseTransition: TransactionModelFirebase(
         transactionId: const Uuid().v4(),
@@ -96,7 +97,7 @@ class RazorpayService {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    debugPrint("External Wallet selected: ${response.walletName}");
+  AppLogger.d("External Wallet selected: ${response.walletName}");
   }
 
   void dispose() {

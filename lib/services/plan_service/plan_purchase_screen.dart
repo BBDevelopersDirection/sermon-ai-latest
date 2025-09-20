@@ -17,16 +17,15 @@ import 'package:video_player/video_player.dart';
 import '../firebase/utils_management/utils_functions.dart';
 import '../razorpay_service.dart';
 import 'widgets/header_close_button.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class SubscriptionTrialScreen extends StatelessWidget {
   final VideoPlayerController? controller;
   SubscriptionTrialScreen({super.key, this.controller});
 
   Future<bool> _onWillPop(BuildContext context) async {
-    // 👉 Your custom function here
-    debugPrint("Back button pressed! Run cleanup or analytics here.");
-
-    // Example: Resume video if controller exists
+  // 👉 Your custom function here
+  AppLogger.d("Back button pressed! Run cleanup or analytics here.");
     if (controller != null && !controller!.value.isPlaying) {
       controller!.play();
       controller!.setVolume(1);

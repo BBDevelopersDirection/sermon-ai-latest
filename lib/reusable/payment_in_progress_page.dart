@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:lottie/lottie.dart'; // Add in pubspec.yaml for animations
 import 'package:sermon/utils/app_assets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,7 +40,7 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
         final status = data['status'] as String?;
         if (status != null) {
           final s = status.toLowerCase();
-          debugPrint('PaymentInProgressPage: subscription status -> $s');
+          AppLogger.d('PaymentInProgressPage: subscription status -> $s');
           if (s == 'active' || s == 'payment_captured') {
             // update cubit and pop the page
             try {
