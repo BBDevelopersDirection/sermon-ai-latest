@@ -74,6 +74,25 @@ class UtilsFunctions {
   Future<bool> canUseVideo() async {
     final user = FirebaseAuth.instance.currentUser;
 
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
+      return false; // User not logged in
+    }
+
+    final utility = await getFirebaseUtility(
+      userId: user?.uid ?? HiveBoxFunctions().getUuid(),
+    );
+
+    if (utility == null) return false;
+
+    if (utility.isRecharged) return true;
+
+    return utility.videoCountToCheckSub <=
+        FirestoreVariables.totalVideoCountUserCanSee;
+  }
+
+  Future<bool> canUseReel({required int index}) async {
+    final user = FirebaseAuth.instance.currentUser;
+
     if (user == null && HiveBoxFunctions().getUuid().isEmpty)
       return false; // User not logged in
 
@@ -85,8 +104,7 @@ class UtilsFunctions {
 
     if (utility.isRecharged) return true;
 
-    return utility.videoCountToCheckSub <
-        FirestoreVariables.totalVideoCountUserCanSee;
+    return index < FirestoreVariables.totalReelCountUserCanSee;
   }
 
   Future<void> increaseVideoCount() async {

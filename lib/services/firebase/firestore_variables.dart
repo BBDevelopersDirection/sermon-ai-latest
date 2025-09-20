@@ -24,4 +24,5 @@ class FirestoreVariables {
   static const String rechargeStartDate = 'RECHARGE_START_DATE';
 
   static const int totalVideoCountUserCanSee = 1;
+  static const int totalReelCountUserCanSee = 2;
 }

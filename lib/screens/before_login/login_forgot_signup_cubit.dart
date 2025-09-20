@@ -388,49 +388,61 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
       // in phone number add + in front of the phone number
       final phoneNumber = '+$phone';
+      userRegisteration(
+        phoneNumber: phoneNumber,
+        fullName: fullName.isNotEmpty ? fullName : 'No Name',
+        email: email,
+      );
 
       // First, check if user exists in Firestore by phone number
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection(FirestoreVariables.usersCollection)
-          .where(FirestoreVariables.phoneField, isEqualTo: phoneNumber)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        debugPrint("👤 User exists in Firestore");
-        final userData = querySnapshot.docs.first.data();
-        final existingUser = FirebaseUser.fromJson(userData);
-
-        var data = FirebaseUser(
-          uid: userData[FirestoreVariables.userIdField],
-          email: userData[FirestoreVariables.emailField],
-          phoneNumber: userData[FirestoreVariables.phoneField],
-          name: userData[FirestoreVariables.nameField],
-        );
-
-        print("👤 Existing User: $data");
-        // Save login details to Hive
-        await HiveBoxFunctions().saveLoginDetails(data);
-
-        // Navigate to login check screen
-        Navigator.of(navigatorKey.currentContext!).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => LoginCheckScreen()),
-          (route) => false,
-        );
-      } else {
-        // User doesn't exist - proceed with registration
-        debugPrint("👤 User doesn't exist - proceeding with registration");
-        userRegistrationSignUpButton(
-          context: navigatorKey.currentContext!,
-          name: fullName,
-          unverifiedMobNum: phoneNumber,
-          email: email,
-          isTruecaller: true,
-        );
-      }
     } on DioException catch (e) {
       print("❌ Dio error: ${e.response?.data ?? e.message}");
     } catch (e) {
       print("❌ Error: $e");
+    }
+  }
+
+  Future<void> userRegisteration({
+    required String phoneNumber,
+    required String fullName,
+    required String email,
+  }) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreVariables.usersCollection)
+        .where(FirestoreVariables.phoneField, isEqualTo: phoneNumber)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      debugPrint("👤 User exists in Firestore");
+      final userData = querySnapshot.docs.first.data();
+      final existingUser = FirebaseUser.fromJson(userData);
+
+      var data = FirebaseUser(
+        uid: userData[FirestoreVariables.userIdField],
+        email: userData[FirestoreVariables.emailField],
+        phoneNumber: userData[FirestoreVariables.phoneField],
+        name: userData[FirestoreVariables.nameField],
+      );
+
+      print("👤 Existing User: $data");
+      // Save login details to Hive
+      await HiveBoxFunctions().saveLoginDetails(data);
+
+      // Navigate to login check screen
+      Navigator.of(navigatorKey.currentContext!).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+        (route) => false,
+      );
+    } else {
+      // User doesn't exist - proceed with registration
+      debugPrint("👤 User doesn't exist - proceeding with registration");
+      userRegistrationSignUpButton(
+        context: navigatorKey.currentContext!,
+        name: fullName,
+        unverifiedMobNum: phoneNumber,
+        email: email,
+        isTruecaller: true,
+      );
     }
   }
 
