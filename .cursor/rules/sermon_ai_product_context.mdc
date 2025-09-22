@@ -1,0 +1,138 @@
+---
+description: Product context and development guidelines for Sermon AI - Christian video streaming platform
+globs: lib/**/*.dart, android/**/*, ios/**/*, pubspec.yaml, firebase_options.dart
+alwaysApply: true
+---
+
+# Sermon AI - Product Context & Development Guidelines
+
+## **Product Overview**
+Sermon AI is a Christian-focused video streaming platform combining Instagram Reels format with YouTube-style comprehensive content. The app serves Christians seeking spiritual content through both short-form sermon highlights and full-length sermon videos.
+
+## **Core Product Features**
+
+### **Primary Content Types**
+- **Sermon Reels**: Short-form video content (Instagram Reels style) featuring sermon highlights and key messages
+- **Full Video Sermons**: Complete sermon videos for comprehensive spiritual learning
+- **Seamless Integration**: All full sermons automatically segmented into digestible reels
+- **"Watch Full Video" Feature**: Direct access to complete sermons from reel content
+- **Subscription-based Access**: Premium paywall for unlimited access to both content types
+
+### **User Experience Goals**
+- **Quick Spiritual Nourishment**: Bite-sized sermon highlights for busy Christians
+- **Deep Spiritual Growth**: Full sermon access for comprehensive study
+- **Curated Christian Content**: Focused platform without secular distractions
+- **Mobile-Optimized**: Designed for on-the-go spiritual consumption
+- **Pastor Discovery**: Easy access to sermons from favorite Christian leaders
+
+## **Technical Architecture Context**
+
+### **Technology Stack**
+- **Frontend**: Flutter (cross-platform mobile app)
+- **Backend**: Firebase ecosystem
+  - Firestore for data storage
+  - Firebase Authentication for user management
+  - Firebase Analytics for user insights
+  - Firebase Crashlytics for error monitoring
+- **Payment Processing**: Razorpay integration
+- **Video Management**: Custom video player with offline caching
+- **State Management**: Flutter BLoC pattern
+
+### **Architecture Principles**
+- **Offline-First Design**: Firebase Firestore with offline persistence enabled
+- **Real-time Data**: Stream-based data fetching for live content updates
+- **Modular Structure**: Separate management services for videos, reels, users, and transactions
+- **Analytics Integration**: Comprehensive tracking with Firebase Analytics
+- **Push Notifications**: Firebase Cloud Messaging for content updates
+
+### **Data Structure Context**
+- **Reels Collection**: Short-form sermon segments with links to full videos
+- **Videos Collection**: Complete sermon content organized by sections/categories
+- **User Management**: Authentication, subscription status, and preferences
+- **Transaction Management**: Payment processing and subscription tracking
+
+## **Development Guidelines**
+
+### **Content-First Approach**
+- **Always consider both content formats**: Every feature should work seamlessly for both reels and full videos
+- **User journey optimization**: Ensure smooth transitions between short-form and long-form content
+- **Spiritual context awareness**: All features should enhance rather than distract from spiritual experience
+
+### **Performance Requirements**
+- **Video streaming optimization**: Implement efficient video loading and caching
+- **Offline capability**: Ensure core functionality works without internet connection
+- **Smooth navigation**: Optimize for quick content discovery and consumption
+
+### **User Experience Priorities**
+- **Accessibility**: Ensure content is accessible to users of all technical abilities
+- **Spiritual focus**: Maintain clean, distraction-free interface
+- **Mobile-first**: Optimize all interactions for mobile devices
+- **Subscription flow**: Make premium access clear and valuable
+
+### **Technical Considerations**
+- **Scalability**: Design for growing content library and user base
+- **Content management**: Support efficient upload and organization of sermon content
+- **Analytics**: Track meaningful engagement metrics for spiritual content
+- **Security**: Protect user data and ensure secure payment processing
+
+## **Feature Development Context**
+
+### **When Building Video Features**
+- Consider both short-form (reels) and long-form (full sermons) use cases
+- Implement seamless transitions between content types
+- Optimize for mobile video consumption patterns
+- Ensure offline viewing capabilities
+
+### **When Building User Features**
+- Focus on spiritual content discovery and personalization
+- Implement subscription management with clear value proposition
+- Support user preferences for content types and pastors
+- Enable social sharing of meaningful content
+
+### **When Building Content Management**
+- Support efficient sermon upload and segmentation
+- Enable automatic reel generation from full videos
+- Implement content categorization and search
+- Ensure content quality and spiritual appropriateness
+
+### **When Building Payment Features**
+- Integrate Razorpay for subscription management
+- Provide clear value proposition for premium access
+- Support multiple subscription tiers if needed
+- Ensure secure transaction processing
+
+## **Code Quality Standards**
+
+### **Flutter Best Practices**
+- Follow BLoC pattern for state management as established in the codebase
+- Use proper widget composition and reusability
+- Implement proper error handling and loading states
+- Follow Flutter performance optimization guidelines
+
+### **Firebase Integration**
+- Use Firestore collections as defined in [firestore_variables.dart](mdc:lib/services/firebase/firestore_variables.dart)
+- Implement proper offline persistence
+- Use Firebase Analytics for meaningful spiritual content metrics
+- Follow Firebase security best practices
+
+### **Code Organization**
+- Maintain modular structure with separate services for different concerns
+- Use consistent naming conventions for Christian/spiritual content
+- Implement proper error handling for network and authentication issues
+- Follow established patterns in the existing codebase
+
+## **Testing Considerations**
+- Test both content formats (reels and full videos)
+- Verify offline functionality
+- Test subscription and payment flows
+- Ensure accessibility compliance
+- Test on various device sizes and orientations
+
+## **Deployment & Monitoring**
+- Monitor user engagement with spiritual content
+- Track subscription conversion rates
+- Monitor video streaming performance
+- Ensure content delivery optimization
+- Track user retention and spiritual engagement metrics
+
+This context should guide all development decisions to ensure features align with the spiritual mission and technical requirements of the Sermon AI platform.
