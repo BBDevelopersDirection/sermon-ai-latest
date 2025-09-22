@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:sermon/services/firebase/firestore_variables.dart';
 import 'package:uuid/uuid.dart';
@@ -25,6 +26,10 @@ class HiveBoxFunctions {
   Future<void> removeLoginDetails() async {
     final box = Hive.box<Map>(HiveBoxVariables.boxName);
     await box.delete(HiveBoxVariables.key);
+
+    if (FirebaseAuth.instance.currentUser?.uid != null) {
+      FirebaseAuth.instance.signOut();
+    }
   }
 
   bool isLoginPresent() {

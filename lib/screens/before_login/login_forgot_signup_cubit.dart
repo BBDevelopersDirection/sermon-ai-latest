@@ -106,7 +106,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   }) async {
     String unverifiedOtp = controller.text.toString();
 
-  AppLogger.d(unverifiedOtp.length.toString());
+    AppLogger.d(unverifiedOtp.length.toString());
 
     if (unverifiedOtp.length != 6) {
       // never reach here
@@ -167,7 +167,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               );
             });
       } catch (e) {
-  // AppLogger.d("OTP verification failed: $e");
+        // AppLogger.d("OTP verification failed: $e");
         emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
         MyAppDialogs().info_dialog(
           context: context,
@@ -354,7 +354,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         options: Options(contentType: Headers.formUrlEncodedContentType),
       );
 
-  AppLogger.d("✅ Token Response: ${tokenResponse.data}");
+      AppLogger.d("✅ Token Response: ${tokenResponse.data}");
 
       final accessToken = tokenResponse.data['access_token'];
       if (accessToken == null || accessToken.isEmpty) {
@@ -370,8 +370,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-  final profile = profileResponse.data;
-  AppLogger.d("👤 Full User Profile: $profile");
+      final profile = profileResponse.data;
+      AppLogger.d("👤 Full User Profile: $profile");
 
       final fullName =
           '${profile['given_name'] ?? ''} ${profile['family_name'] ?? ''}'
@@ -383,9 +383,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         throw Exception('Phone number not available from Truecaller');
       }
 
-  AppLogger.d("✅ Name: $fullName");
-  AppLogger.d("📞 Phone: $phone");
-  AppLogger.d("📧 Email: $email");
+      AppLogger.d("✅ Name: $fullName");
+      AppLogger.d("📞 Phone: $phone");
+      AppLogger.d("📧 Email: $email");
 
       // in phone number add + in front of the phone number
       final phoneNumber = '+$phone';
@@ -414,7 +414,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
-  AppLogger.d("👤 User exists in Firestore");
+      AppLogger.d("👤 User exists in Firestore");
       final userData = querySnapshot.docs.first.data();
       final existingUser = FirebaseUser.fromJson(userData);
 
@@ -425,7 +425,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         name: userData[FirestoreVariables.nameField],
       );
 
-  AppLogger.d("👤 Existing User: $data");
+      AppLogger.d("👤 Existing User: $data");
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
 
@@ -436,7 +436,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
     } else {
       // User doesn't exist - proceed with registration
-  AppLogger.d("👤 User doesn't exist - proceeding with registration");
+      AppLogger.d("👤 User doesn't exist - proceeding with registration");
       userRegistrationSignUpButton(
         context: navigatorKey.currentContext!,
         name: fullName,
@@ -463,7 +463,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     } else if (email.isEmpty || EmailValidator.validate(email)) {
       // Email is either empty or valid — and name is not empty
 
-  AppLogger.d('proceeding with registration');
+      AppLogger.d('proceeding with registration');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -475,86 +475,90 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
     emit(state.copyWith(loadingStatus: LoadingStatus.userRegestrationLoading));
 
-  AppLogger.d('👤 name: $name');
-  AppLogger.d('👤 email: $email');
-  AppLogger.d('👤 unverifiedMobNum: $unverifiedMobNum');
-  AppLogger.d('👤 isTruecaller: $isTruecaller');
-  AppLogger.d('👤 uid: ${FirebaseAuth.instance.currentUser?.uid}');
-  AppLogger.d('👤 uuid: ${HiveBoxFunctions().getUuid()}');
+    AppLogger.d('👤 name: $name');
+    AppLogger.d('👤 email: $email');
+    AppLogger.d('👤 unverifiedMobNum: $unverifiedMobNum');
+    AppLogger.d('👤 isTruecaller: $isTruecaller');
+    AppLogger.d('👤 uid: ${FirebaseAuth.instance.currentUser?.uid}');
+    AppLogger.d('👤 uuid: ${HiveBoxFunctions().getUuid()}');
 
     // if truecaller is true then get uuid by phone number
     String? uuid;
     if (isTruecaller) {
-  uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
-  AppLogger.d('👤 uuid: $uuid');
+      uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
+      AppLogger.d('👤 uuid: $uuid');
     }
 
-    FirestoreFunctions()
-        .newFirebaseUserData(
-          firebaseUser: FirebaseUser(
-            uid:
-                uuid ??
-                FirebaseAuth.instance.currentUser?.uid ??
-                HiveBoxFunctions().getUuid(),
-            phoneNumber: isTruecaller
-                ? unverifiedMobNum
-                : "+91$unverifiedMobNum",
-            name: name,
-            email: email.isNotEmpty ? email : '',
-          ),
-        )
-        .then((value) async {
-          Future.wait([
-            MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().regestrationName,
-            ),
-            MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().regestredUser,
-            ),
-            UtilsFunctions().createFirebaseUtilityData(
-              utilityModel: UtilityModel(
-                userId: isTruecaller
-                    ? HiveBoxFunctions().getUuidByPhone(
-                        phoneNumber: unverifiedMobNum,
-                      )
-                    : FirebaseAuth.instance.currentUser!.uid,
-                totalVideoCount: 0,
-                isRecharged: false,
-                videoCountToCheckSub: 0,
-              ),
-            ),
-            if (email.isNotEmpty)
-              MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                event: LogEventsName.instance().regestrationEmail,
-              ),
-            HiveBoxFunctions().saveLoginDetails(
-              FirebaseUser(
-                uid: isTruecaller
-                    ? HiveBoxFunctions().getUuidByPhone(
-                        phoneNumber: unverifiedMobNum,
-                      )
-                    : FirebaseAuth.instance.currentUser!.uid,
-                phoneNumber: isTruecaller
-                    ? unverifiedMobNum
-                    : "+91$unverifiedMobNum",
-                name: name,
-                email: email.isNotEmpty ? email : '',
-              ),
-            ),
-          ]);
+    MyAppAmplitudeAndFirebaseAnalitics()
+        .logEvent(event: LogEventsName.instance().truecallerLoginEvent)
+        .then((_) {
+          FirestoreFunctions()
+              .newFirebaseUserData(
+                firebaseUser: FirebaseUser(
+                  uid:
+                      uuid ??
+                      FirebaseAuth.instance.currentUser?.uid ??
+                      HiveBoxFunctions().getUuid(),
+                  phoneNumber: isTruecaller
+                      ? unverifiedMobNum
+                      : "+91$unverifiedMobNum",
+                  name: name,
+                  email: email.isNotEmpty ? email : '',
+                ),
+              )
+              .then((value) async {
+                Future.wait([
+                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                    event: LogEventsName.instance().regestrationName,
+                  ),
+                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                    event: LogEventsName.instance().regestredUser,
+                  ),
+                  UtilsFunctions().createFirebaseUtilityData(
+                    utilityModel: UtilityModel(
+                      userId: isTruecaller
+                          ? HiveBoxFunctions().getUuidByPhone(
+                              phoneNumber: unverifiedMobNum,
+                            )
+                          : FirebaseAuth.instance.currentUser!.uid,
+                      totalVideoCount: 0,
+                      isRecharged: false,
+                      videoCountToCheckSub: 0,
+                    ),
+                  ),
+                  if (email.isNotEmpty)
+                    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                      event: LogEventsName.instance().regestrationEmail,
+                    ),
+                  HiveBoxFunctions().saveLoginDetails(
+                    FirebaseUser(
+                      uid: isTruecaller
+                          ? HiveBoxFunctions().getUuidByPhone(
+                              phoneNumber: unverifiedMobNum,
+                            )
+                          : FirebaseAuth.instance.currentUser!.uid,
+                      phoneNumber: isTruecaller
+                          ? unverifiedMobNum
+                          : "+91$unverifiedMobNum",
+                      name: name,
+                      email: email.isNotEmpty ? email : '',
+                    ),
+                  ),
+                ]);
 
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => LoginCheckScreen()),
-            (route) => false,
-          );
-        })
-        .catchError((error) {
-          emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-          MyAppDialogs().info_dialog(
-            context: context,
-            title: 'Failed',
-            body: error.toString(),
-          );
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+                  (route) => false,
+                );
+              })
+              .catchError((error) {
+                emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+                MyAppDialogs().info_dialog(
+                  context: context,
+                  title: 'Failed',
+                  body: error.toString(),
+                );
+              });
         });
   }
 }

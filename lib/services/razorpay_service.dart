@@ -92,7 +92,7 @@ class RazorpayService {
       ),
     );
     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-      event: LogEventsName.instance().transistionFailEvent,
+      event: LogEventsName.instance().subscriptionFailEvent,
     );
   }
 

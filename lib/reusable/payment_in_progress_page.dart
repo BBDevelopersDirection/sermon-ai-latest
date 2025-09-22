@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:lottie/lottie.dart'; // Add in pubspec.yaml for animations
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/utils/app_assets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/token_check_service/login_check_cubit.dart';
@@ -42,6 +44,9 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
           final s = status.toLowerCase();
           AppLogger.d('PaymentInProgressPage: subscription status -> $s');
           if (s == 'active' || s == 'payment_captured') {
+            MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().subscriptionCompleteEvent,
+            );
             // update cubit and pop the page
             try {
               final rootCtx = navigatorKey.currentState?.context;
