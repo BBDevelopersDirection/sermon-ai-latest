@@ -24,6 +24,6 @@ class MyAppLogEventsName{
 
   MyAppLogEventsName._privateConstructor();
   static MyAppLogEventsName instance(){
-    return MyAppLogEventsName._privateConstructor();;
+    return MyAppLogEventsName._privateConstructor();
   }
 }

@@ -53,6 +53,11 @@ class MyAppAmplitudeAndFirebaseAnalitics {
             'name': firebaseUser?.name,
             'phone_number': firebaseUser?.phoneNumber,
           },
+          userProperties: {
+            'uuid': firebaseUser?.uid,
+            'name': firebaseUser?.name,
+            'phone_number': firebaseUser?.phoneNumber,
+          },
         ),
       );
       AppLogger.d('🚀🔥 "$event" event logged successfully in Amplitude! 🎉✅');

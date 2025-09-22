@@ -18,8 +18,13 @@ class LogEventsName{
   String videoOfTheDayEvent = 'videoOfTheDayEvent';
   String videoOpenEvent = 'videoOpenedEvent';
 
-  String transistionCompleteEvent = 'transistionCompleteEvent';
-  String transistionFailEvent = 'transistionFailEvent';
+  // String transistionCompleteEvent = 'transistionCompleteEvent';
+  // String transistionFailEvent = 'transistionFailEvent';
+
+  String subscriptionCompleteEvent = 'subscriptionCompleteEvent';
+  String subscriptionFailEvent = 'subscriptionFailEvent';
+
+  String truecallerLoginEvent = 'truecallerLoginEvent';
 
 
   String chat_support = 'chatSupport';

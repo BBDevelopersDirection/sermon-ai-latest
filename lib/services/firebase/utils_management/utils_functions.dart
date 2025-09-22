@@ -154,10 +154,6 @@ class UtilsFunctions {
         fieldName: FirestoreVariables.rechargeStartDate,
         newValue: FieldValue.serverTimestamp(),
       ),
-
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().transistionCompleteEvent,
-      ),
     ]);
 
   AppLogger.d("first future block passed");
@@ -202,8 +198,9 @@ class UtilsFunctions {
     if (utility == null) return;
 
     try {
+      var userId = user?.uid ?? HiveBoxFunctions().getUuid();
       var data = await MyAppEndpoints.instance().subscriptionStatus(
-        userId: user?.uid ?? HiveBoxFunctions().getUuid(),
+        userId: userId,
       );
 
       bool hasSubscription =
