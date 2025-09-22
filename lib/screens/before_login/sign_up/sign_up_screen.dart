@@ -113,13 +113,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     controller: mobile_num,
                                   );
                               // context
-                              //   .read<LoginForgotSignupCubit>()
-                              //   .otp_ver_screen(
-                              //     isSubmit: true,
-                              //     context: context,
-                              //     controller: mobile_num,
-                              //     number: mobile_num.text,
-                              //   );
+                              //     .read<LoginForgotSignupCubit>()
+                              //     .userRegisteration(
+                              //       phoneNumber: "+91${mobile_num.text}",
+                              //       fullName: '',
+                              //       email: '',
+                              //     );
                             },
                             child:
                                 state.loadingStatus !=

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 import 'package:sermon/reusable/pulsing_icon_anim.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../services/log_service/log_service.dart';
@@ -42,7 +43,7 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
     );
 
     UtilsFunctions().canUseVideo().then((canUseVideo) async {
-      print('I can use video: $canUseVideo');
+      AppLogger.d('I can use video: $canUseVideo');
 
       if (!canUseVideo) {
         Navigator.of(context).pushReplacement(

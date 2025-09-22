@@ -12,6 +12,7 @@ import 'package:amplitude_flutter/events/base_event.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/services/shared_pref/shared_preference.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 import '../../reusable/my_app_firebase_analytics/AnalyticsEngine.dart';
 
@@ -52,26 +53,31 @@ class MyAppAmplitudeAndFirebaseAnalitics {
             'name': firebaseUser?.name,
             'phone_number': firebaseUser?.phoneNumber,
           },
+          userProperties: {
+            'uuid': firebaseUser?.uid,
+            'name': firebaseUser?.name,
+            'phone_number': firebaseUser?.phoneNumber,
+          },
         ),
       );
-      debugPrint('🚀🔥 "$event" event logged successfully in Amplitude! 🎉✅');
+      AppLogger.d('🚀🔥 "$event" event logged successfully in Amplitude! 🎉✅');
     } catch (e) {
-      log('Error logging Amplitude event: $e');
+      AppLogger.e('Error logging Amplitude event: $e');
     }
 
     // Firebase
     try {
       await AnalyticsEngine.instance.logFirebaseEvent(FirebaseEventName: event);
-      debugPrint('🚀🔥 "$event" event logged successfully in Firebase! 🎉✅');
+      AppLogger.d('🚀🔥 "$event" event logged successfully in Firebase! 🎉✅');
     } catch (e) {
-      debugPrint('Error logging Firebase event: $e');
+      AppLogger.e('Error logging Firebase event: $e');
     }
 
     // Facebook
     try {
       _facebookAppEvents.logEvent(name: event);
     } catch (e) {
-      log('Error logging Facebook event: $e');
+      AppLogger.e('Error logging Facebook event: $e');
     }
   }
 }

@@ -14,6 +14,7 @@ import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 import 'package:sermon/services/razorpay_service.dart';
 import 'package:sermon/services/token_check_service/login_check_cubit.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
 
@@ -39,7 +40,7 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       Response response = await MyAppEndpoints.instance().createCustomer(
         firebaseUser: firebaseUser,
       );
-      print("response data: ${response.data}");
+  AppLogger.d("response data: ${response.data}");
       RazorpayCustomerResponse razorpayCustomerResponse =
           RazorpayCustomerResponse.fromJson(response.data);
       return razorpayCustomerResponse;

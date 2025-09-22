@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../log_service/log_service.dart';
 import '../../log_service/log_variables.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import '../firestore_variables.dart';
 import '../models/user_models.dart';
 
@@ -49,7 +50,7 @@ class UtilsFunctions {
         FirestoreVariables.rechargeEndDate: null,
       });
     } else {
-      debugPrint(
+      AppLogger.d(
         'Utility data already exists for user: ${utilityModel.userId}',
       );
     }
@@ -137,12 +138,11 @@ class UtilsFunctions {
   }
 
   Future<void> setRechargeTrue() async {
-    print("inside set recharge true");
+  AppLogger.d("inside set recharge true");
     final user = FirebaseAuth.instance.currentUser;
     if (user == null && HiveBoxFunctions().getUuid().isEmpty)
       return; // User not logged in
-
-    print("User Exsists");
+    AppLogger.d("User Exsists");
     // Set isRecharged to true
     Future.wait([
       updateFirebaseUtilityData(
@@ -154,36 +154,32 @@ class UtilsFunctions {
         fieldName: FirestoreVariables.rechargeStartDate,
         newValue: FieldValue.serverTimestamp(),
       ),
-
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().transistionCompleteEvent,
-      ),
     ]);
 
-    print("first future block passed");
+  AppLogger.d("first future block passed");
 
     DateTime? dateTime;
 
     try {
       dateTime = await MyAppEndpoints.instance().getNetworkTime();
     } catch (e) {
-      debugPrint("Error while getting network time");
+      AppLogger.e("Error while getting network time: $e");
       dateTime = DateTime.now();
     }
 
-    print('walaah part 0');
+  AppLogger.d('walaah part 0');
     getFirebaseUtility(userId: user?.uid ?? HiveBoxFunctions().getUuid()).then((
       utility,
     ) async {
-      if (utility != null) {
+        if (utility != null) {
         // If the user has a utility document, update the video count to check subscription
-        print('walaah part 1');
+        AppLogger.d('walaah part 1');
         var data = utility.rechargeStartDate;
         await updateFirebaseUtilityData(
           fieldName: FirestoreVariables.rechargeEndDate,
           newValue: dateTime?.add(Duration(days: 30)),
         );
-        print('walaah part 2');
+        AppLogger.d('walaah part 2');
       }
     });
   }
@@ -202,8 +198,9 @@ class UtilsFunctions {
     if (utility == null) return;
 
     try {
+      var userId = user?.uid ?? HiveBoxFunctions().getUuid();
       var data = await MyAppEndpoints.instance().subscriptionStatus(
-        userId: user?.uid ?? HiveBoxFunctions().getUuid(),
+        userId: userId,
       );
 
       bool hasSubscription =
@@ -223,7 +220,7 @@ class UtilsFunctions {
         }, SetOptions(merge: true));
       }
     } catch (e) {
-      debugPrint("Error while setting isRecharge");
+      AppLogger.e("Error while setting isRecharge: $e");
     }
 
     // Step 1: Write temporary server timestamp field to same doc
