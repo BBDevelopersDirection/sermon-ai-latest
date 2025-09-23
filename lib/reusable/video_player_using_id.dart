@@ -42,10 +42,18 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
       Uri.parse(widget.url),
     );
 
+    if (widget.isCaraousel) {
+      await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().videoOfTheDayEvent,
+      );
+    }
     UtilsFunctions().canUseVideo().then((canUseVideo) async {
       AppLogger.d('I can use video: $canUseVideo');
 
       if (!canUseVideo) {
+        await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  event: LogEventsName.instance().subscribePageByVideoPlay,
+                );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => BlocProvider(
@@ -62,10 +70,6 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
           event: LogEventsName.instance().videoOpenEvent,
         ),
         UtilsFunctions().increaseVideoCount(),
-        if (widget.isCaraousel)
-          MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-            event: LogEventsName.instance().videoOfTheDayEvent,
-          ),
       ]);
 
       await videoPlayerController.initialize();

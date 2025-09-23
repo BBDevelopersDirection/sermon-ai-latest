@@ -98,9 +98,6 @@ class SharedPreferenceLogic {
 
   static Future<void> saveAmplititudeUserId({required String UserId}) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-      event: LogEventsName.instance().install,
-    );
     pref.setString(AppSharedPreference.AmplititudeUserId, UserId);
   }
 }

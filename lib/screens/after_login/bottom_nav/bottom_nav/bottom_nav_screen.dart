@@ -48,6 +48,9 @@ class _BottomNavScreenState extends State<BottomNavScreen>
   ];
 
   void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
     if (_selectedIndex == 0) {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().reelsScreenButton,
@@ -61,9 +64,6 @@ class _BottomNavScreenState extends State<BottomNavScreen>
         event: LogEventsName.instance().profileScreenButton,
       );
     }
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   @override

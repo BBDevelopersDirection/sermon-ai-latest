@@ -149,8 +149,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               }
               Future.wait([
                 MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().otpEntryCorrect,
-                ),
+              event: LogEventsName.instance().loginFirebase,
+            ),
                 HiveBoxFunctions().saveLoginDetails(
                   FirebaseUser(
                     uid: value.uid,
@@ -426,6 +426,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
 
       AppLogger.d("👤 Existing User: $data");
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().loginTruecaller,
+      );
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
 
@@ -486,79 +489,78 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     String? uuid;
     if (isTruecaller) {
       uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().registeredUserTruecaller,
+      );
       AppLogger.d('👤 uuid: $uuid');
+    }else{
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().registeredUserFirebase,
+      );
     }
 
-    MyAppAmplitudeAndFirebaseAnalitics()
-        .logEvent(event: LogEventsName.instance().truecallerLoginEvent)
-        .then((_) {
-          FirestoreFunctions()
-              .newFirebaseUserData(
-                firebaseUser: FirebaseUser(
-                  uid:
-                      uuid ??
-                      FirebaseAuth.instance.currentUser?.uid ??
-                      HiveBoxFunctions().getUuid(),
-                  phoneNumber: isTruecaller
-                      ? unverifiedMobNum
-                      : "+91$unverifiedMobNum",
-                  name: name,
-                  email: email.isNotEmpty ? email : '',
-                ),
-              )
-              .then((value) async {
-                Future.wait([
-                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                    event: LogEventsName.instance().regestrationName,
-                  ),
-                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                    event: LogEventsName.instance().regestredUser,
-                  ),
-                  UtilsFunctions().createFirebaseUtilityData(
-                    utilityModel: UtilityModel(
-                      userId: isTruecaller
-                          ? HiveBoxFunctions().getUuidByPhone(
-                              phoneNumber: unverifiedMobNum,
-                            )
-                          : FirebaseAuth.instance.currentUser!.uid,
-                      totalVideoCount: 0,
-                      isRecharged: false,
-                      videoCountToCheckSub: 0,
-                    ),
-                  ),
-                  if (email.isNotEmpty)
-                    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                      event: LogEventsName.instance().regestrationEmail,
-                    ),
-                  HiveBoxFunctions().saveLoginDetails(
-                    FirebaseUser(
-                      uid: isTruecaller
-                          ? HiveBoxFunctions().getUuidByPhone(
-                              phoneNumber: unverifiedMobNum,
-                            )
-                          : FirebaseAuth.instance.currentUser!.uid,
-                      phoneNumber: isTruecaller
-                          ? unverifiedMobNum
-                          : "+91$unverifiedMobNum",
-                      name: name,
-                      email: email.isNotEmpty ? email : '',
-                    ),
-                  ),
-                ]);
+    if(!isTruecaller && email!=''){
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().registeredEmailTyped,
+            );
+    }
 
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => LoginCheckScreen()),
-                  (route) => false,
-                );
-              })
-              .catchError((error) {
-                emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-                MyAppDialogs().info_dialog(
-                  context: context,
-                  title: 'Failed',
-                  body: error.toString(),
-                );
-              });
+    FirestoreFunctions()
+        .newFirebaseUserData(
+          firebaseUser: FirebaseUser(
+            uid:
+                uuid ??
+                FirebaseAuth.instance.currentUser?.uid ??
+                HiveBoxFunctions().getUuid(),
+            phoneNumber: isTruecaller
+                ? unverifiedMobNum
+                : "+91$unverifiedMobNum",
+            name: name,
+            email: email.isNotEmpty ? email : '',
+          ),
+        )
+        .then((value) async {
+          Future.wait([
+            UtilsFunctions().createFirebaseUtilityData(
+              utilityModel: UtilityModel(
+                userId: isTruecaller
+                    ? HiveBoxFunctions().getUuidByPhone(
+                        phoneNumber: unverifiedMobNum,
+                      )
+                    : FirebaseAuth.instance.currentUser!.uid,
+                totalVideoCount: 0,
+                isRecharged: false,
+                videoCountToCheckSub: 0,
+              ),
+            ),
+            HiveBoxFunctions().saveLoginDetails(
+              FirebaseUser(
+                uid: isTruecaller
+                    ? HiveBoxFunctions().getUuidByPhone(
+                        phoneNumber: unverifiedMobNum,
+                      )
+                    : FirebaseAuth.instance.currentUser!.uid,
+                phoneNumber: isTruecaller
+                    ? unverifiedMobNum
+                    : "+91$unverifiedMobNum",
+                name: name,
+                email: email.isNotEmpty ? email : '',
+              ),
+            ),
+          ]);
+
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+            (route) => false,
+          );
+        })
+        .catchError((error) {
+          emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+          MyAppDialogs().info_dialog(
+            context: context,
+            title: 'Failed',
+            body: error.toString(),
+          );
         });
   }
 }
