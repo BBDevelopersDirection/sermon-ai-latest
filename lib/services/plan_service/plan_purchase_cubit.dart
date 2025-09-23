@@ -10,6 +10,8 @@ import 'package:sermon/network/endpoints.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 import 'package:sermon/services/razorpay_service.dart';
@@ -17,7 +19,6 @@ import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import 'package:sermon/reusable/logger_service.dart';
 
 class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
-
   PlanPurchaseCubit()
     : super(
         PlanPurchaseState(
@@ -40,7 +41,7 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       Response response = await MyAppEndpoints.instance().createCustomer(
         firebaseUser: firebaseUser,
       );
-  AppLogger.d("response data: ${response.data}");
+      AppLogger.d("response data: ${response.data}");
       RazorpayCustomerResponse razorpayCustomerResponse =
           RazorpayCustomerResponse.fromJson(response.data);
       return razorpayCustomerResponse;
@@ -86,11 +87,19 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       return;
     }
 
-    String? subscriptionId = await createSubscription(
-      providedRazorpayCustomerResponse: razorpayCustomerResponse,
-    );
+    String? subscriptionId;
+    final data = await Future.wait([
+      createSubscription(
+        providedRazorpayCustomerResponse: razorpayCustomerResponse,
+      ),
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().subscribeNowButtonTap,
+      ),
+    ]);
 
-  // subscription listening is handled by PaymentInProgressPage
+    subscriptionId = data[0] as String;
+
+    // subscription listening is handled by PaymentInProgressPage
 
     if (subscriptionId == null) {
       emit(state.copyWith(loading: false));
@@ -100,12 +109,14 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
     emit(state.copyWith(loading: false));
 
     Navigator.of(context, rootNavigator: true).pushReplacement(
-      MaterialPageRoute(builder: (builder) => PaymentInProgressPage(subscriptionId: subscriptionId)),
+      MaterialPageRoute(
+        builder: (builder) =>
+            PaymentInProgressPage(subscriptionId: subscriptionId!),
+      ),
     );
     RazorpayService().openCheckout(
       apiKey: kDebugMode
           ? 'rzp_test_zFue9vNxhSABQ6'
-          // ? 'rzp_live_d5McFTkC2w2nZd'
           : 'rzp_live_d5McFTkC2w2nZd',
       subscriptionId: subscriptionId,
       onSuccess: () async {
@@ -113,5 +124,4 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       },
     );
   }
-
 }
