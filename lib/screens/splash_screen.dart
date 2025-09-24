@@ -40,7 +40,11 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset(MyAppAssets.svg_image_icon_full)
+            SizedBox(
+              width: MediaQuery
+            .sizeOf(context)
+            .width*0.45,
+              child: SvgPicture.asset(MyAppAssets.svg_image_icon_full))
           ],
         ),
       ),
