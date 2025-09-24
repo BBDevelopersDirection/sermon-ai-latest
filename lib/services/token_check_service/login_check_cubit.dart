@@ -30,6 +30,14 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     emit(state.copyWith(showPaymentInProgress: isShow));
   }
 
+  void freshInstallEventLog(){
+    if(SharedPreferenceLogic.isFreshInstall()){
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  event: LogEventsName.instance().install,
+      );
+    }
+  }
+
   Future<void> checkToken() async {
     try {
       // SharedPreferenceLogic.setLoginFalse();

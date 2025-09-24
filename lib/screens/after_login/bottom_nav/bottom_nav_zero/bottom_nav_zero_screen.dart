@@ -119,6 +119,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                   var canUseVideo = await UtilsFunctions().canUseReel(index: index);
 
                   if (!canUseVideo) {
+                    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  event: LogEventsName.instance().subscribePageByReels,
+                );
                     // Snap back to last free index
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (_pageController.hasClients) {

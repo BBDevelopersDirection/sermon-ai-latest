@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginCheckCubit(),
+      create: (context) => LoginCheckCubit()..freshInstallEventLog(),
       child: MaterialApp(
         navigatorKey: navigatorKey, // Add navigator key here
         debugShowCheckedModeBanner: false,
@@ -102,9 +102,6 @@ class MyApp extends StatelessWidget {
             titleMedium: TextStyle(color: Colors.white),
             titleSmall: TextStyle(color: Colors.white),
           ),
-          // progressIndicatorTheme: const ProgressIndicatorThemeData(
-          //   color: Colors.white,
-          // ),
         ),
         home: const SplashScreen(),
         // home: const SignUpThirdScreen(),

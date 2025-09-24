@@ -3,12 +3,14 @@ class LogEventsName{
   String phoneNumberCorrectEntry = 'phoneNumberCorrectEntry';
   String phoneNumberIncorrectEntry = 'phoneNumberIncorrectEntry';
 
-  String otpEntryCorrect = 'otpEntryCorrect';
   String otpEntryIncorrect = 'otpEntryIncorrect';
 
-  String regestrationName = 'regestrationName';
-  String regestredUser = 'regestredUser';
-  String regestrationEmail = 'regestrationEmail';
+  String registeredUserFirebase = 'registeredUserFirebase';
+  String registeredUserTruecaller = 'registeredUserTruecaller';
+  String registeredEmailTyped = 'registeredEmailTyped';
+
+  String loginFirebase = 'loginFirebase';
+  String loginTruecaller = 'loginTruecaller';
 
   String reelsScreenButton = 'reelsScreenButton';
   String homeScreenButton = 'homeScreenButton';
@@ -18,13 +20,12 @@ class LogEventsName{
   String videoOfTheDayEvent = 'videoOfTheDayEvent';
   String videoOpenEvent = 'videoOpenedEvent';
 
-  // String transistionCompleteEvent = 'transistionCompleteEvent';
-  // String transistionFailEvent = 'transistionFailEvent';
+  String subscribePageByReels = 'subscribePageByReels';
+  String subscribePageByVideoPlay = 'subscribePageByVideoPlay';
 
+  String subscribeNowButtonTap = 'subscriptionNowButtonTap';
   String subscriptionCompleteEvent = 'subscriptionCompleteEvent';
   String subscriptionFailEvent = 'subscriptionFailEvent';
-
-  String truecallerLoginEvent = 'truecallerLoginEvent';
 
 
   String chat_support = 'chatSupport';
