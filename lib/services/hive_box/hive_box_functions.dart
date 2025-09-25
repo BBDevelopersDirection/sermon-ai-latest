@@ -8,7 +8,6 @@ import '../firebase/models/utility_model.dart';
 import 'hive_box_variables.dart';
 
 class HiveBoxFunctions {
-
   Future<void> init() async {
     await Hive.openBox<Map>(HiveBoxVariables.boxName); // Open as a Map box
   }
@@ -69,6 +68,7 @@ class HiveBoxFunctions {
     String? email,
     String? phone,
     String? userId,
+    String? subscriptionId,
   }) async {
     final current = getLoginDetails();
     if (current != null) {
@@ -77,6 +77,7 @@ class HiveBoxFunctions {
         email: email ?? current.email,
         phoneNumber: phone ?? current.phoneNumber,
         uid: userId ?? current.uid,
+        subscriptionId: subscriptionId ?? current.subscriptionId,
       );
       await saveLoginDetails(updated);
     }
