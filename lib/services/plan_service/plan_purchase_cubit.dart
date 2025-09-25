@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/reusable/payment_in_progress_page.dart';
 import 'package:sermon/network/endpoints.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
+import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
@@ -15,7 +16,6 @@ import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 import 'package:sermon/services/razorpay_service.dart';
-import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import 'package:sermon/reusable/logger_service.dart';
 
 class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
@@ -81,27 +81,34 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
 
   Future<void> rechargeNowCallBack({required BuildContext context}) async {
     emit(state.copyWith(loading: true));
-    RazorpayCustomerResponse? razorpayCustomerResponse = await createPlan();
-    if (razorpayCustomerResponse == null) {
-      emit(state.copyWith(loading: false));
-      return;
+    FirebaseUser? firebaseUser = HiveBoxFunctions().getLoginDetails();
+    String? subscriptionId = firebaseUser?.subscriptionId;
+
+    if (subscriptionId == null) {
+      RazorpayCustomerResponse? razorpayCustomerResponse = await createPlan();
+      if (razorpayCustomerResponse == null) {
+        emit(state.copyWith(loading: false));
+        return;
+      }
+
+      final data = await Future.wait([
+        createSubscription(
+          providedRazorpayCustomerResponse: razorpayCustomerResponse,
+        ),
+        MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+          event: LogEventsName.instance().subscribeNowButtonTap,
+        ),
+      ]);
+
+      subscriptionId = data[0] as String;
+      await FirestoreFunctions().updateOrSaveSubscriptionIdFirestoreData(
+        subscriptionId: subscriptionId,
+      );
     }
-
-    String? subscriptionId;
-    final data = await Future.wait([
-      createSubscription(
-        providedRazorpayCustomerResponse: razorpayCustomerResponse,
-      ),
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().subscribeNowButtonTap,
-      ),
-    ]);
-
-    subscriptionId = data[0] as String;
 
     // subscription listening is handled by PaymentInProgressPage
 
-    if (subscriptionId == null) {
+    if (subscriptionId == null || subscriptionId.trim() == '') {
       emit(state.copyWith(loading: false));
       return;
     }
