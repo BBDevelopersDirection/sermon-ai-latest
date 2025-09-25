@@ -21,6 +21,7 @@ class BottomNavFirstScreen extends StatefulWidget {
 class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
   @override
   void initState() {
+    context.read<LoginCheckCubit>().checkForUpdate();
     super.initState();
   }
 

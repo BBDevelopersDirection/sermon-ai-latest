@@ -149,14 +149,15 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               }
               Future.wait([
                 MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().loginFirebase,
-            ),
+                  event: LogEventsName.instance().loginFirebase,
+                ),
                 HiveBoxFunctions().saveLoginDetails(
                   FirebaseUser(
                     uid: value.uid,
                     phoneNumber: value.phoneNumber,
                     name: value.name,
                     email: value.email,
+                    subscriptionId: value.subscriptionId,
                   ),
                 ),
                 NotificationService.instance.requestPermissionAndGetToken(),
@@ -423,11 +424,12 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         email: userData[FirestoreVariables.emailField],
         phoneNumber: userData[FirestoreVariables.phoneField],
         name: userData[FirestoreVariables.nameField],
+        subscriptionId: userData[FirestoreVariables.subscriptionIdField],
       );
 
       AppLogger.d("👤 Existing User: $data");
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().loginTruecaller,
+        event: LogEventsName.instance().loginTruecaller,
       );
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
@@ -490,19 +492,19 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     if (isTruecaller) {
       uuid = HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum);
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().registeredUserTruecaller,
+        event: LogEventsName.instance().registeredUserTruecaller,
       );
       AppLogger.d('👤 uuid: $uuid');
-    }else{
+    } else {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().registeredUserFirebase,
+        event: LogEventsName.instance().registeredUserFirebase,
       );
     }
 
-    if(!isTruecaller && email!=''){
+    if (!isTruecaller && email != '') {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().registeredEmailTyped,
-            );
+        event: LogEventsName.instance().registeredEmailTyped,
+      );
     }
 
     FirestoreFunctions()
@@ -517,6 +519,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                 : "+91$unverifiedMobNum",
             name: name,
             email: email.isNotEmpty ? email : '',
+            subscriptionId: null,
           ),
         )
         .then((value) async {
@@ -545,6 +548,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                     : "+91$unverifiedMobNum",
                 name: name,
                 email: email.isNotEmpty ? email : '',
+                subscriptionId: null,
               ),
             ),
           ]);
