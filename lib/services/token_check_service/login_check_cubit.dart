@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
@@ -37,6 +38,23 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
       );
     }
   }
+
+  Future<void> checkForUpdate() async {
+  try {
+    final info = await InAppUpdate.checkForUpdate();
+
+    if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+      if (info.immediateUpdateAllowed) {
+        await InAppUpdate.performImmediateUpdate();
+      } else if (info.flexibleUpdateAllowed) {
+        await InAppUpdate.startFlexibleUpdate();
+        await InAppUpdate.completeFlexibleUpdate();
+      }
+    }
+  } catch (e) {
+    ("Update check failed: $e");
+  }
+}
 
   Future<void> checkToken() async {
     try {
