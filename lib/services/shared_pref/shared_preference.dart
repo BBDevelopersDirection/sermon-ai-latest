@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import '../log_service/log_service.dart';
-import '../log_service/log_variables.dart';
 import 'shared_pref_variable.dart';
 
 class SharedPreferenceLogic {

@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.live.ai.sermon"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -29,8 +29,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
         targetSdk = 35
-        versionCode = 30
-        versionName = "1.3.8"
+        versionCode = 31
+        versionName = "1.3.9"
     }
 
     buildTypes {

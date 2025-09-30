@@ -1,18 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
 import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
+import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import '../../main.dart';
 import '../../models/playlist_and_episode_model_old.dart';
 import '../../reusable/app_dialogs.dart';
 import '../../reusable/video_player_using_id.dart';
 import '../../screens/after_login/bottom_nav/bottom_nav_first/widgets/episode_list_page.dart';
 import '../app_opner_service.dart';
-import '../firebase/firestore_variables.dart';
 import '../firebase/models/utility_model.dart';
 import '../firebase/utils_management/utils_functions.dart';
 import '../log_service/log_service.dart';
@@ -23,18 +23,41 @@ import 'login_check_state.dart';
 
 class LoginCheckCubit extends Cubit<LoginCheckState> {
   LoginCheckCubit()
-  : super(LoginCheckState(showRechargePage: false, showPaymentInProgress: false, currentPlan: 0));
+    : super(
+        LoginCheckState(
+          showRechargePage: false,
+          showPaymentInProgress: false,
+          currentPlan: 0,
+        ),
+      );
 
   /// Show or hide the payment-in-progress overlay.
   void emit_show_payment_in_progress({required bool isShow}) {
     emit(state.copyWith(showPaymentInProgress: isShow));
   }
 
-  void freshInstallEventLog(){
-    if(SharedPreferenceLogic.isFreshInstall()){
+  void freshInstallEventLog() {
+    if (SharedPreferenceLogic.isFreshInstall()) {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().install,
+        event: LogEventsName.instance().install,
       );
+    }
+  }
+
+  Future<void> checkForUpdate() async {
+    try {
+      final info = await InAppUpdate.checkForUpdate();
+
+      if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+        if (info.immediateUpdateAllowed) {
+          await InAppUpdate.performImmediateUpdate();
+        } else if (info.flexibleUpdateAllowed) {
+          await InAppUpdate.startFlexibleUpdate();
+          await InAppUpdate.completeFlexibleUpdate();
+        }
+      }
+    } catch (e) {
+      ("Update check failed: $e");
     }
   }
 
@@ -47,6 +70,11 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
         // emit(state.copyWith(loading: false, isTokenPresent: true));
         emit(state.copyWith(loading: false, isTokenPresent: true));
         createUtilityData();
+        FirestoreFunctions().getFirebaseUser(
+          userId:
+              FirebaseAuth.instance.currentUser?.uid ??
+              HiveBoxFunctions().getUuid(),
+        );
         checkPlanExpire();
       } else {
         emit(state.copyWith(loading: false, isTokenPresent: false));
