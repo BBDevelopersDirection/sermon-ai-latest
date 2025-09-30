@@ -84,7 +84,9 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
     FirebaseUser? firebaseUser = HiveBoxFunctions().getLoginDetails();
     String? subscriptionId = firebaseUser?.subscriptionId;
 
-    if (subscriptionId == null) {
+    if (subscriptionId == null ||
+        subscriptionId.trim() == '' ||
+        subscriptionId.contains('no subscriptions')) {
       RazorpayCustomerResponse? razorpayCustomerResponse = await createPlan();
       if (razorpayCustomerResponse == null) {
         emit(state.copyWith(loading: false));
@@ -108,7 +110,9 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
 
     // subscription listening is handled by PaymentInProgressPage
 
-    if (subscriptionId == null || subscriptionId.trim() == '') {
+    if (subscriptionId == null ||
+        subscriptionId.trim() == '' ||
+        subscriptionId.contains('no subscriptions')) {
       emit(state.copyWith(loading: false));
       return;
     }

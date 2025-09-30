@@ -1,20 +1,14 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/src/response.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:sermon/models/video_data_model.dart';
 import 'package:sermon/network/endpoints.dart';
+import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/models/utility_model.dart';
+import 'package:sermon/services/firebase/subscription_management/subscription_function.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../log_service/log_service.dart';
-import '../../log_service/log_variables.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import '../firestore_variables.dart';
-import '../models/user_models.dart';
 
 class UtilsFunctions {
   Future<UtilityModel?> getFirebaseUtility({required String userId}) async {
@@ -138,7 +132,7 @@ class UtilsFunctions {
   }
 
   Future<void> setRechargeTrue() async {
-  AppLogger.d("inside set recharge true");
+    AppLogger.d("inside set recharge true");
     final user = FirebaseAuth.instance.currentUser;
     if (user == null && HiveBoxFunctions().getUuid().isEmpty)
       return; // User not logged in
@@ -156,7 +150,7 @@ class UtilsFunctions {
       ),
     ]);
 
-  AppLogger.d("first future block passed");
+    AppLogger.d("first future block passed");
 
     DateTime? dateTime;
 
@@ -167,11 +161,11 @@ class UtilsFunctions {
       dateTime = DateTime.now();
     }
 
-  AppLogger.d('walaah part 0');
+    AppLogger.d('walaah part 0');
     getFirebaseUtility(userId: user?.uid ?? HiveBoxFunctions().getUuid()).then((
       utility,
     ) async {
-        if (utility != null) {
+      if (utility != null) {
         // If the user has a utility document, update the video count to check subscription
         AppLogger.d('walaah part 1');
         var data = utility.rechargeStartDate;
@@ -203,11 +197,44 @@ class UtilsFunctions {
         userId: userId,
       );
 
-      bool hasSubscription =
-          data.data['hasSubscription'] &&
-          (data.data['subscription']['status'] == 'active' ||
-              data.data['subscription']['status'] == 'payment_captured');
+      final bool hasSubscription;
 
+      FirebaseUser? loggedInUncheckFirebaseUser = HiveBoxFunctions()
+          .getLoginDetails();
+      if (loggedInUncheckFirebaseUser == null ||
+          loggedInUncheckFirebaseUser.subscriptionId == null ||
+          loggedInUncheckFirebaseUser.subscriptionId!.trim() == '' ||
+          loggedInUncheckFirebaseUser.subscriptionId!.contains(
+            'no subscriptions',
+          )) {
+        hasSubscription = false;
+      } else {
+        SubscriptionStatus subscriptionStatus =
+            await SubscriptionFirestoreFunction()
+                .getFirebaseUserSubscriptionStatus(
+                  subscriptionId: loggedInUncheckFirebaseUser.subscriptionId!,
+                );
+
+        switch (subscriptionStatus) {
+          case SubscriptionStatus.active:
+            hasSubscription = true;
+
+          case SubscriptionStatus.cancelled:
+            hasSubscription = false;
+
+          case SubscriptionStatus.payment_captured:
+            hasSubscription = true;
+
+          case SubscriptionStatus.nullStatus:
+            hasSubscription = false;
+
+          case SubscriptionStatus.created:
+            hasSubscription = false;
+        }
+      }
+
+      // Its not dead code for ide i wrote this so it wont give me warning.
+      // ignore: dead_code
       if (hasSubscription) {
         await docRef.set({
           FirestoreVariables.isRecharged: true,
