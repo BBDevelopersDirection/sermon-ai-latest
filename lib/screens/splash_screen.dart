@@ -16,26 +16,28 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   void change_page({required BuildContext context}) {
-    Future.delayed(Duration(seconds: 1)).then((_) async {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) =>
-          LoginCheckScreen()));
-    });
-  }
+  context.read<LoginCheckCubit>().checkForUpdate().then(
+    (_) => Future.delayed(const Duration(milliseconds: 500)).then((_) async {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+      );
+    }),
+  );
+}
 
-  @override
-  void initState() {
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     change_page(context: context);
-    super.initState();
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox(
-        width: MediaQuery
-            .sizeOf(context)
-            .width,
+        width: MediaQuery.sizeOf(context).width,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

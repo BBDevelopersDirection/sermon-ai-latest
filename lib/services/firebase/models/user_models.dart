@@ -5,12 +5,14 @@ class FirebaseUser {
   final String email;
   final String phoneNumber;
   final String name;
+  final String? subscriptionId;
 
   FirebaseUser({
     required this.uid,
     required this.email,
     required this.phoneNumber,
     required this.name,
+    required this.subscriptionId,
   });
 
   factory FirebaseUser.fromJson(Map<String, dynamic> json) {
@@ -19,6 +21,7 @@ class FirebaseUser {
       email: json[FirestoreVariables.emailField] as String,
       phoneNumber: json[FirestoreVariables.phoneField] as String,
       name: json[FirestoreVariables.nameField] as String,
+      subscriptionId: json[FirestoreVariables.subscriptionIdField] as String?,
     );
   }
 
@@ -28,9 +31,9 @@ class FirebaseUser {
       FirestoreVariables.emailField: email,
       FirestoreVariables.phoneField: phoneNumber,
       FirestoreVariables.nameField: name,
+      FirestoreVariables.subscriptionIdField: subscriptionId,
     };
   }
-
 
   // Convert to Map (for Hive)
   Map<String, dynamic> toMap() {
@@ -39,6 +42,7 @@ class FirebaseUser {
       FirestoreVariables.emailField: email,
       FirestoreVariables.phoneField: phoneNumber,
       FirestoreVariables.userIdField: uid,
+      FirestoreVariables.subscriptionIdField: subscriptionId,
     };
   }
 
@@ -49,6 +53,7 @@ class FirebaseUser {
       email: map[FirestoreVariables.emailField],
       phoneNumber: map[FirestoreVariables.phoneField],
       uid: map[FirestoreVariables.userIdField],
+      subscriptionId: map[FirestoreVariables.subscriptionIdField],
     );
   }
 }
