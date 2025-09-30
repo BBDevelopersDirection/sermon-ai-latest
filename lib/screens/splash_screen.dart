@@ -41,7 +41,13 @@ void initState() {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [SvgPicture.asset(MyAppAssets.svg_image_icon_full)],
+          children: [
+            SizedBox(
+              width: MediaQuery
+            .sizeOf(context)
+            .width*0.45,
+              child: SvgPicture.asset(MyAppAssets.svg_image_icon_full))
+          ],
         ),
       ),
     );
