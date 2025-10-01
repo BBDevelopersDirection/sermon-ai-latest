@@ -12,20 +12,13 @@ class MyAppDialogs {
         barrierDismissible: false,
         builder: (context) =>
             AlertDialog.adaptive(
-              title: Text(title),
-              content: Text(body),
+              backgroundColor: Colors.white,
+              title: Text(title, style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),),
+              content: Text(body, style: TextStyle(color: Colors.black)),
               actions: [
-                // TextButton(
-                //     onPressed: () {
-                //       if(onCancelCallback!=null){
-                //         onCancelCallback();
-                //       }
-                //       Navigator.pop(context);
-                //     },
-                //     child: Text(
-                //       'Cancel',
-                //       style: TextStyle(color: Colors.black),
-                //     )),
                 TextButton(
                     onPressed: () {
                       if (onOkCallback != null) {

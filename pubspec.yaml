@@ -70,6 +70,7 @@ flutter:
     - assets/fonts_assets/
     - assets/lottie_assets/
     - assets/png_assets/
+    - assets/jpg/
     - assets/svg_assets/
 
   #  ./gradlew bundleRelease \

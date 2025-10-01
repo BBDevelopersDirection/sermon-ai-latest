@@ -31,7 +31,7 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
   }
 
   void _startListening() {
-    final collectionName = kDebugMode ? 'test-subscriptions' : 'subscriptions';
+    final collectionName = isDebugMode() ? 'test-subscriptions' : 'subscriptions';
     _listener = FirebaseFirestore.instance
         .collection(collectionName)
         .doc(widget.subscriptionId)

@@ -12,7 +12,7 @@ class SubscriptionFirestoreFunction {
     required String subscriptionId,
   }) async {
     try {
-      String _subscriptionCollection = kDebugMode
+      String _subscriptionCollection = isDebugMode()
           ? FirestoreVariables.subscriptionCollectionTest
           : FirestoreVariables.subscriptionCollection;
 
