@@ -69,6 +69,7 @@ class HiveBoxFunctions {
     String? phone,
     String? userId,
     String? subscriptionId,
+    DateTime? createdDate
   }) async {
     final current = getLoginDetails();
     if (current != null) {
@@ -78,6 +79,7 @@ class HiveBoxFunctions {
         phoneNumber: phone ?? current.phoneNumber,
         uid: userId ?? current.uid,
         subscriptionId: subscriptionId ?? current.subscriptionId,
+        createdDate: createdDate ?? current.createdDate
       );
       await saveLoginDetails(updated);
     }
