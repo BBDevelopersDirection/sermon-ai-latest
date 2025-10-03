@@ -17,24 +17,68 @@ class TrialPriceInfo extends StatelessWidget {
 
     return Column(
       children: [
-        AutoSizeText(
-          "100/- per month ka subscription lijiye",
-          maxLines: 1,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: spacing),
-        AutoSizeText(
-          "Aur unlimited sermons dekhiye. Cancel anytime.",
-          maxLines: 1,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: subtitleFontSize,
+        AutoSizeText.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Try 7 days for just ',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontFamily: 'Epilogue',
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
+                ),
+              ),
+              TextSpan(
+                text: '₹5',
+                style: TextStyle(
+                  color: Color(0xFFD89118),
+                  fontSize: 28,
+                  fontFamily: 'Gilroy',
+                  fontWeight: FontWeight.w800,
+                  height: 1.25,
+                ),
+              ),
+            ],
           ),
           textAlign: TextAlign.center,
+          maxLines: 1, // force it to stay in one line
+          minFontSize: 14, // shrink down if needed
+          overflow: TextOverflow.ellipsis, // optional
+        ),
+        SizedBox(height: spacing),
+        AutoSizeText.rich(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: 'Then Rs 99/month. Unlimited sermons dekhiye. ',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontFamily: 'Gilroy',
+                  fontWeight: FontWeight.w500,
+                  height: 1.50,
+                  letterSpacing: 0.12,
+                ),
+              ),
+              TextSpan(
+                text: '\nCancel anytime.',
+                style: TextStyle(
+                  color: Color(0xFF918989),
+                  fontSize: 12,
+                  fontFamily: 'Gilroy',
+                  fontWeight: FontWeight.w700,
+                  height: 1.50,
+                  letterSpacing: 0.12,
+                ),
+              ),
+            ],
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2, // you can allow multiple lines if needed
+          minFontSize: 8, // the minimum size it will shrink to
+          overflow: TextOverflow.ellipsis, // optional
         ),
       ],
     );

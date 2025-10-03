@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class TrialMessage extends StatelessWidget {
@@ -8,8 +9,9 @@ class TrialMessage extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth * 0.035; // ~3.5% of width
 
-    return Text(
-      "Apka free limit end hogaya ha",
+    return AutoSizeText(
+      "Jai masih ki, Apka free limit end hogaya hai",
+      maxLines: 1,
       style: TextStyle(
         color: Colors.white,
         fontSize: fontSize,

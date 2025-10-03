@@ -70,9 +70,9 @@ class PaywallScreen extends StatelessWidget {
                 controller?.setVolume(1);
               },
               imagePaths: [
-                MyAppAssets.png_paywall_1, // Replace with your image paths
-                MyAppAssets.png_paywall_2,
-                MyAppAssets.png_paywall_3,
+                MyAppAssets.png_login_image_6, // Replace with your image paths
+                MyAppAssets.png_login_image_5,
+                MyAppAssets.png_login_image_2,
               ],
             ),
             const SizedBox(height: 20),
@@ -80,23 +80,26 @@ class PaywallScreen extends StatelessWidget {
             const SizedBox(height: 10),
             const TrialPriceInfo(),
             const SizedBox(height: 24),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FeatureItem(
+                const SizedBox(width: 1),
+                const FeatureItem(
                   icon: Icons.translate,
                   label: "Hindi Mai\npravachan\ndekhiye",
                 ),
-                SizedBox(width: 30),
+                const SizedBox(width: 1),
                 FeatureItem(
                   icon: Icons.add,
+                  svgAsset: MyAppAssets.svg_christ_plus,
                   label: "Har topic pe\npravachan\ndekhiye",
                 ),
-                SizedBox(width: 30),
-                FeatureItem(
+                const SizedBox(width: 1),
+                const FeatureItem(
                   icon: Icons.play_circle_fill,
                   label: "Naye pravachan\nhar din",
                 ),
+                const SizedBox(width: 1),
               ],
             ),
             const Spacer(),

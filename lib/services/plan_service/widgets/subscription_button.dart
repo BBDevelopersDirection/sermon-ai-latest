@@ -12,7 +12,7 @@ class SubscribeButton extends StatelessWidget {
     return BlocBuilder<PlanPurchaseCubit, PlanPurchaseState>(
       builder: (context, state) {
         return SizedBox(
-          width: double.infinity,
+          width: MediaQuery.sizeOf(context).width-60,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Color.fromRGBO(216, 145, 24, 1),
