@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:sermon/main.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
 import 'package:sermon/utils/string_extensions.dart';
@@ -10,7 +11,7 @@ import 'package:sermon/reusable/logger_service.dart';
 class MyAppEndpoints {
   MyAppEndpoints._();
   static MyAppEndpoints instance() => MyAppEndpoints._();
-  String razorPayUrl = kDebugMode ? 'test' : '';
+  String razorPayUrl = isDebugMode() ? 'test' : '';
 
   Future<Response> subscriptionStatus({required String userId}) async {
     try {
@@ -49,7 +50,7 @@ class MyAppEndpoints {
   }) async {
     try {
       Map<String, dynamic> data = {
-              'planId': kDebugMode ? 'plan_Qwe6q0fZBLxs0L' : 'plan_PvgYi6MEgXZKPB',
+              'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_PvgYi6MEgXZKPB',
               'customerId':
                   razorpayCustomerResponse.customer?.razorpayCustomerId,
               'userId': razorpayCustomerResponse.customer?.userId,

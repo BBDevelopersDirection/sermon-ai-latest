@@ -76,6 +76,7 @@ class MyAppAmplitudeAndFirebaseAnalitics {
     // Facebook
     try {
       _facebookAppEvents.logEvent(name: event);
+      AppLogger.d('🚀🔥 "$event" event logged successfully in Facebook! 🎉✅');
     } catch (e) {
       AppLogger.e('Error logging Facebook event: $e');
     }

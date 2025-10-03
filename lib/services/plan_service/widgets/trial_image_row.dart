@@ -6,8 +6,9 @@ import 'package:sermon/services/plan_service/widgets/header_close_button.dart';
 class TrialImageRow extends StatelessWidget {
   final List<String> imagePaths;
   final VoidCallback? onTap;
+  final bool IsForLogin;
 
-  const TrialImageRow({super.key, required this.imagePaths, this.onTap});
+  const TrialImageRow({super.key, required this.imagePaths, this.onTap, this.IsForLogin=false});
 
   Widget _buildImage(BuildContext context, String? path, double width, double height, {double rotation = 0}) {
     if (path == null) {
@@ -43,7 +44,7 @@ class TrialImageRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double imageHeight = MediaQuery.of(context).size.height * 0.35;
+    final double imageHeight = IsForLogin? MediaQuery.of(context).size.height * 0.28 : MediaQuery.of(context).size.height * 0.35;
     final double imageWidth = MediaQuery.of(context).size.width * 0.6;
     final double sideVisibleWidth = imageWidth / 2;
     final double gapBetweenImages = 22; // gap only between images
@@ -101,17 +102,20 @@ class TrialImageRow extends StatelessWidget {
           ),
 
           // Top gradient
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.15,
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.black, Colors.transparent],
+          Visibility(
+            visible: IsForLogin == false,
+            child: Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.15,
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black, Colors.transparent],
+                  ),
                 ),
               ),
             ),
@@ -135,10 +139,13 @@ class TrialImageRow extends StatelessWidget {
           ),
 
           // Close button
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8, // safe area + small margin
-            left: 8,
-            child: HeaderCloseButton(onTap: onTap),
+          Visibility(
+            visible: IsForLogin == false,
+            child: Positioned(
+              top: MediaQuery.of(context).padding.top + 8, // safe area + small margin
+              left: 8,
+              child: HeaderCloseButton(onTap: onTap),
+            ),
           ),
         ],
       ),

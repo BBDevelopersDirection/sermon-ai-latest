@@ -29,13 +29,13 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  await NotificationService.instance.initialize();
-  AppLogger.d('🔥 Firebase Core initialized successfully');
+    await NotificationService.instance.initialize();
+    AppLogger.d('🔥 Firebase Core initialized successfully');
 
     // Initialize Firebase Analytics
     final analytics = FirebaseAnalytics.instance;
-  await analytics.setAnalyticsCollectionEnabled(true);
-  AppLogger.d('📊 Firebase Analytics initialized and enabled');
+    await analytics.setAnalyticsCollectionEnabled(true);
+    AppLogger.d('📊 Firebase Analytics initialized and enabled');
 
     await MyAppAmplitudeAndFirebaseAnalitics().init();
     AppLogger.d('📱 App analytics services initialized');
@@ -52,10 +52,11 @@ void main() async {
     return true;
   };
 
-    // Enable offline persistence
+  // Enable offline persistence
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true, // ✅ Enable offline mode
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, // Optional: keep unlimited cache
+    cacheSizeBytes:
+        Settings.CACHE_SIZE_UNLIMITED, // Optional: keep unlimited cache
   );
 
   // final config = ClarityConfig(
@@ -108,4 +109,11 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+}
+
+bool isDebugMode() {
+  if (kReleaseMode) {
+    return false;
+  }
+  return true;
 }

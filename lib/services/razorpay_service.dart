@@ -48,7 +48,6 @@ class RazorpayService {
       "recurring": true,
       'method': 'wallet',
       "name": "SermonTV",
-      // "callback_url": kDebugMode? "https://asia-south1-sermon-ai-test.cloudfunctions.net/razorpayApi/test/webhook":"https://asia-south1-sermon-ai-test.cloudfunctions.net/razorpayApi/webhook",
       "description": 'Recharge Plan Activation',
       'theme': {'color': '#1F20D6'},
     };

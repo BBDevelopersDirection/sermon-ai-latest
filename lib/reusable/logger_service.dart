@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:sermon/main.dart';
 
 class AppLogger {
   static final Logger _logger = Logger(
@@ -14,21 +15,21 @@ class AppLogger {
   );
 
   static void d(String message) {
-    if (kDebugMode) _logger.d('🐛 ${message}\n');
+    if (isDebugMode() || kDebugMode) _logger.d('🐛 ${message}\n');
   }
 
   static void i(String message) {
-    if (kDebugMode) _logger.i('🐛 ${message}\n');
+    if (isDebugMode() || kDebugMode) _logger.i('🐛 ${message}\n');
   }
 
   static void w(String message, [dynamic error, StackTrace? stackTrace]) {
-    if (kDebugMode) {
+    if (isDebugMode() || kDebugMode) {
       _logger.w('🐛 ${message}\n', error: error, stackTrace: stackTrace);
     }
   }
 
   static void e(String message, [dynamic error, StackTrace? stackTrace]) {
-    if (kDebugMode) {
+    if (isDebugMode() || kDebugMode) {
       _logger.e(message, error: error, stackTrace: stackTrace);
     }
   }

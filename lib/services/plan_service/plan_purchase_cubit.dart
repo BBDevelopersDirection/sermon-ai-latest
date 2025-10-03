@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sermon/main.dart';
 import 'package:sermon/reusable/payment_in_progress_page.dart';
 import 'package:sermon/network/endpoints.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
@@ -66,7 +67,7 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       Response response = await MyAppEndpoints.instance().createSubscription(
         razorpayCustomerResponse: providedRazorpayCustomerResponse,
       );
-      return kDebugMode
+      return isDebugMode()
           ? response.data['subscription']['id']
           : response.data['subscription']['id'];
     } catch (e) {
@@ -126,7 +127,7 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
       ),
     );
     RazorpayService().openCheckout(
-      apiKey: kDebugMode
+      apiKey: isDebugMode()
           ? 'rzp_test_zFue9vNxhSABQ6'
           : 'rzp_live_d5McFTkC2w2nZd',
       subscriptionId: subscriptionId,
