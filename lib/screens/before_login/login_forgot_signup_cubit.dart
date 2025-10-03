@@ -127,7 +127,6 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             message: 'User is null after OTP verification.',
           );
         }
-
         FirestoreFunctions()
             .getFirebaseUser(
               userId:
@@ -158,6 +157,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                     name: value.name,
                     email: value.email,
                     subscriptionId: value.subscriptionId,
+                    createdDate: value.createdDate
                   ),
                 ),
                 NotificationService.instance.requestPermissionAndGetToken(),
@@ -425,6 +425,16 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         phoneNumber: userData[FirestoreVariables.phoneField],
         name: userData[FirestoreVariables.nameField],
         subscriptionId: userData[FirestoreVariables.subscriptionIdField],
+        createdDate: userData[FirestoreVariables.createdDateField] != null
+            ? (userData[FirestoreVariables.createdDateField] is Timestamp
+                  ? (userData[FirestoreVariables.createdDateField] as Timestamp)
+                        .toDate()
+                  : DateTime.tryParse(
+                          userData[FirestoreVariables.createdDateField]
+                              .toString(),
+                        ) ??
+                        DateTime.now())
+            : DateTime.now(),
       );
 
       AppLogger.d("👤 Existing User: $data");
@@ -520,6 +530,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             name: name,
             email: email.isNotEmpty ? email : '',
             subscriptionId: null,
+            createdDate: DateTime.now()
           ),
         )
         .then((value) async {
@@ -549,6 +560,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                 name: name,
                 email: email.isNotEmpty ? email : '',
                 subscriptionId: null,
+                createdDate: DateTime.now(),
               ),
             ),
           ]);

@@ -5,6 +5,7 @@ class FirestoreVariables {
   static const String phoneField = 'PHONE_NUMBER';
   static const String nameField = 'NAME';
   static const String subscriptionIdField = 'subscriptionId';
+  static const String createdDateField = 'createdDate';
 
   static const String transactionsCollection = 'Transactions';
   static const String transactionIdField = 'TRANSACTION_ID';

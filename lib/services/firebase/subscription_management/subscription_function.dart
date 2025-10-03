@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:sermon/main.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/services/firebase/firestore_variables.dart';
 import 'package:sermon/services/firebase/models/subscription_model.dart';
