@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flick_video_player/flick_video_player.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
@@ -12,6 +11,7 @@ import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
+import '../../../../reusable/logger_service.dart';
 import 'bottom_nav_zero_cubit.dart';
 import 'bottom_nav_zero_state.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
@@ -112,58 +112,105 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
             return PageView.builder(
               controller: _pageController,
               scrollDirection: Axis.vertical,
+              physics:
+                  const PageScrollPhysics(), // Snap exactly one page at a time
+              pageSnapping: true,
               itemCount: state.reels.length,
               onPageChanged: (index) async {
-                // If scrolling beyond allowed free index
-                if (index > _maxFreeIndex) {
-                  var canUseVideo = await UtilsFunctions().canUseReel(index: index);
+                // Pause previous video
+                _pauseController(_currentPage);
 
-                  if (!canUseVideo) {
-                    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().subscribePageByReels,
-                );
-                    // Snap back to last free index
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (_pageController.hasClients) {
-                        _pageController.animateToPage(
-                          _maxFreeIndex,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    });
+                // Play current video
+                _playController(index);
+                _currentPage = index;
 
-                    final controller = _controllers[_maxFreeIndex];
-                    if (controller != null) {
-                      controller.pause();
-                      controller.setVolume(
-                        0,
-                      ); // optional safety, avoids background audio
-                    }
+                // Check free/restricted index
+                // if (index > _maxFreeIndex) {
+                //   var canUseVideo = await UtilsFunctions().canUseReel(
+                //     index: index,
+                //   );
 
-                    if (context.mounted) {
-                      _controllers[_maxFreeIndex]?.pause();
+                //   if (!canUseVideo) {
+                //     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                //       event: LogEventsName.instance().subscribePageByReels,
+                //     );
+
+                //     // Snap back safely
+                //     Future.delayed(Duration.zero, () {
+                //       if (_pageController.hasClients) {
+                //         _pageController.animateToPage(
+                //           _maxFreeIndex,
+                //           duration: const Duration(milliseconds: 300),
+                //           curve: Curves.easeInOut,
+                //         );
+                //       }
+                //     });
+
+                //     // Pause and mute previous controller
+                //     _controllers[_maxFreeIndex]?.pause();
+                //     _controllers[_maxFreeIndex]?.setVolume(0);
+
+                //     if (context.mounted) {
+                //       Navigator.of(context).push(
+                //         MaterialPageRoute(
+                //           builder: (context) => BlocProvider(
+                //             create: (context) => PlanPurchaseCubit(),
+                //             child: SubscriptionTrialScreen(
+                //               controller: _controllers[_maxFreeIndex],
+                //             ),
+                //           ),
+                //         ),
+                //       );
+                //     }
+                //     return;
+                //   }
+                // }
+
+                Future.microtask(() async {
+                  if (index > _maxFreeIndex) {
+                    var canUseVideo = await UtilsFunctions().canUseReel(
+                      index: index,
+                    );
+                    if (!canUseVideo && context.mounted) {
+                      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                        event: LogEventsName.instance().subscribePageByReels,
+                      );
+
+                      // Snap back safely
+                      Future.delayed(Duration.zero, () {
+                        if (_pageController.hasClients) {
+                          _pageController.animateToPage(
+                            _maxFreeIndex,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      });
+
+                      // Pause and mute
+                      final ctrl = _controllers[_maxFreeIndex];
+                      ctrl?.pause();
+                      ctrl?.setVolume(0);
+
+                      // Navigate to subscription
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => BlocProvider(
-                            create: (context) => PlanPurchaseCubit(),
-                            child: SubscriptionTrialScreen(
-                              controller: _controllers[_maxFreeIndex],
-                            ),
+                            create: (_) => PlanPurchaseCubit(),
+                            child: SubscriptionTrialScreen(controller: ctrl),
                           ),
                         ),
                       );
                     }
-                    return;
                   }
-                }
+                });
 
-                // ✅ Only fetch more reels if user actually has access
+                // Fetch more reels if near end
                 if (index == state.reels.length - 2 && state.hasMore) {
                   context.read<BottomNavZeroCubit>().fetchReels(loadMore: true);
                 }
 
-                // ✅ Log reel watch
+                // Log reel watch event
                 MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                   event: LogEventsName.instance().reel_watched,
                 );
@@ -171,6 +218,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
               itemBuilder: (context, index) {
                 final reel = state.reels[index];
                 return ReelVideoPlayer(
+                  key: ValueKey('${reel.id}_$index'), // ✅ unique key
                   reelsModel: reel,
                   index: index,
                   onControllerReady: _registerController,
@@ -207,6 +255,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    AppLogger.d("video reel: ${widget.reelsModel.reelLink}");
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
           ..initialize().then((_) {

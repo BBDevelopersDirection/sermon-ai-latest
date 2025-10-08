@@ -14,45 +14,7 @@ class ReelsResult {
   });
 }
 
-// class ReelsFirestoreFunctions {
-//   final _firestore = FirebaseFirestore.instance;
-
-//   Future<ReelsResult> fetchReels({
-//     required int limit,
-//     String? startAfterDocId,
-//   }) async {
-//     Query query = _firestore.collection('reels').limit(limit);
-
-//     if (startAfterDocId != null) {
-//       final startDoc =
-//           await _firestore.collection('reels').doc(startAfterDocId).get();
-//       if (startDoc.exists) {
-//         query = query.startAfterDocument(startDoc);
-//       }
-//     }
-
-//     final snapshot = await query.get();
-
-//     final reels = snapshot.docs.map((doc) {
-//       final data = doc.data() as Map<String, dynamic>;
-//       return ReelsModel.fromMap({
-//         'id': doc.id,
-//         ...data,
-//       });
-//     }).toList();
-
-//     final lastDocId =
-//         snapshot.docs.isNotEmpty ? snapshot.docs.last.id : startAfterDocId;
-
-//     return ReelsResult(
-//       reels: reels,
-//       hasMore: snapshot.docs.length == limit,
-//       lastDocId: lastDocId,
-//     );
-//   }
-// }
-
-
+// for fetching some at a tym
 
 class ReelsFirestoreFunctions {
   final _firestore = FirebaseFirestore.instance;
@@ -69,7 +31,7 @@ class ReelsFirestoreFunctions {
   }) async {
   AppLogger.d("🔥 Fetching reels | limit: $limit | startAfterDocId: $startAfterDocId");
 
-    Query query = _firestore.collection('reels').limit(limit);
+    Query query = _firestore.collection('reels').orderBy('createdDate', descending: true).limit(limit);
 
     if (startAfterDocId != null) {
   AppLogger.d("👉 Getting startAfterDoc: $startAfterDocId");
@@ -108,3 +70,51 @@ class ReelsFirestoreFunctions {
   }
 }
 
+
+
+
+// class ReelsFirestoreFunctions {
+//   final _firestore = FirebaseFirestore.instance;
+
+//   /// Get total count of reels
+//   Future<int?> getTotalCount() async {
+//     final snapshot = await _firestore.collection('reels').count().get();
+//     return snapshot.count;
+//   }
+
+//   /// Fetch all reels at once (no pagination)
+//   Future<ReelsResult> fetchReels() async {
+//     AppLogger.d("🔥 Fetching ALL reels from Firestore");
+
+//     try {
+//       final snapshot = await _firestore
+//           .collection('reels')
+//           .orderBy('createdDate', descending: true)
+//           .get();
+
+//       AppLogger.d("📦 Query returned ${snapshot.docs.length} reels");
+
+//       final reels = snapshot.docs.map((doc) {
+//         final data = doc.data();
+//         AppLogger.d("🎬 Reel fetched: ${doc.id}");
+//         return ReelsModel.fromMap({
+//           'id': doc.id,
+//           ...data,
+//         });
+//       }).toList();
+
+//       return ReelsResult(
+//         reels: reels,
+//         hasMore: false, // No pagination
+//         lastDocId: snapshot.docs.isNotEmpty ? snapshot.docs.last.id : null,
+//       );
+//     } catch (e, st) {
+//       AppLogger.e("❌ Error fetching reels: $e", st);
+//       return ReelsResult(
+//         reels: [],
+//         hasMore: false,
+//         lastDocId: null,
+//       );
+//     }
+//   }
+// }

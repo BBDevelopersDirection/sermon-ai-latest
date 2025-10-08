@@ -1,4 +1,5 @@
 import '../firestore_variables.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // for Timestamp
 
 class FirebaseUser {
   final String uid;
@@ -6,13 +7,15 @@ class FirebaseUser {
   final String phoneNumber;
   final String name;
   final String? subscriptionId;
+  final DateTime createdDate;
 
   FirebaseUser({
     required this.uid,
     required this.email,
     required this.phoneNumber,
     required this.name,
-    required this.subscriptionId,
+    this.subscriptionId,
+    required this.createdDate,
   });
 
   factory FirebaseUser.fromJson(Map<String, dynamic> json) {
@@ -22,6 +25,15 @@ class FirebaseUser {
       phoneNumber: json[FirestoreVariables.phoneField] as String,
       name: json[FirestoreVariables.nameField] as String,
       subscriptionId: json[FirestoreVariables.subscriptionIdField] as String?,
+      createdDate: json[FirestoreVariables.createdDateField] != null
+          ? (json[FirestoreVariables.createdDateField] is Timestamp
+                ? (json[FirestoreVariables.createdDateField] as Timestamp)
+                      .toDate()
+                : DateTime.tryParse(
+                        json[FirestoreVariables.createdDateField].toString(),
+                      ) ??
+                      DateTime.now())
+          : DateTime.now(),
     );
   }
 
@@ -32,6 +44,7 @@ class FirebaseUser {
       FirestoreVariables.phoneField: phoneNumber,
       FirestoreVariables.nameField: name,
       FirestoreVariables.subscriptionIdField: subscriptionId,
+      FirestoreVariables.createdDateField: Timestamp.fromDate(createdDate),
     };
   }
 
@@ -43,6 +56,7 @@ class FirebaseUser {
       FirestoreVariables.phoneField: phoneNumber,
       FirestoreVariables.userIdField: uid,
       FirestoreVariables.subscriptionIdField: subscriptionId,
+      FirestoreVariables.createdDateField: createdDate.toIso8601String(),
     };
   }
 
@@ -54,6 +68,12 @@ class FirebaseUser {
       phoneNumber: map[FirestoreVariables.phoneField],
       uid: map[FirestoreVariables.userIdField],
       subscriptionId: map[FirestoreVariables.subscriptionIdField],
+      createdDate: map[FirestoreVariables.createdDateField] != null
+          ? DateTime.tryParse(
+                  map[FirestoreVariables.createdDateField].toString(),
+                ) ??
+                DateTime.now()
+          : DateTime.now(),
     );
   }
 }
