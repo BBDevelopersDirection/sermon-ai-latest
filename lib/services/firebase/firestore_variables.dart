@@ -6,6 +6,9 @@ class FirestoreVariables {
   static const String nameField = 'NAME';
   static const String subscriptionIdField = 'subscriptionId';
 
+  static const String isFreeTrialOpted = 'IS_FREE_TRIAL_OPTED';
+  static const String isFreeTrialCompleted = 'IS_FREE_TRIAL_COMPLETED';
+
   static const String transactionsCollection = 'Transactions';
   static const String transactionIdField = 'TRANSACTION_ID';
   static const String amountField = 'AMOUNT';
@@ -41,11 +44,11 @@ class FirestoreVariables {
   static const int totalReelCountUserCanSee = 2;
 }
 
-
 enum SubscriptionStatus {
   active,
   payment_captured,
   cancelled,
   nullStatus,
-  created
+  created,
+  subscription_authenticated,
 }

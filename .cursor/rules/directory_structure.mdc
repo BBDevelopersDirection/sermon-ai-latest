@@ -1,0 +1,240 @@
+---
+description: Sermon AI Flutter project directory structure and important files organization
+globs: **/*
+alwaysApply: true
+---
+
+# Sermon AI - Project Directory Structure
+
+## **Root Level Structure**
+- **Configuration Files**
+  - [pubspec.yaml](mdc:pubspec.yaml) - Flutter dependencies and project configuration
+  - [analysis_options.yaml](mdc:analysis_options.yaml) - Dart/Flutter linting rules
+  - [devtools_options.yaml](mdc:devtools_options.yaml) - Flutter DevTools configuration
+  - [firebase_options.dart](mdc:lib/firebase_options.dart) - Firebase configuration
+  - [main.dart](mdc:lib/main.dart) - Application entry point
+
+## **Source Code Organization (`lib/`)**
+
+### **Core Application Files**
+- [main.dart](mdc:lib/main.dart) - Application entry point and initialization
+- [firebase_options.dart](mdc:lib/firebase_options.dart) - Firebase configuration
+
+### **Models (`lib/models/`)**
+- [login_model.dart](mdc:lib/models/login_model.dart) - User authentication data models
+- [sign_up_model.dart](mdc:lib/models/sign_up_model.dart) - User registration data models
+- [video_data_model.dart](mdc:lib/models/video_data_model.dart) - Video content data models
+- [playlist_and_episode_model_old.dart](mdc:lib/models/playlist_and_episode_model_old.dart) - Legacy playlist models
+
+### **Network Layer (`lib/network/`)**
+- [dio_client.dart](mdc:lib/network/dio_client.dart) - HTTP client configuration using Dio
+- [endpoints.dart](mdc:lib/network/endpoints.dart) - API endpoint definitions
+- [form_data.dart](mdc:lib/network/form_data.dart) - Form data handling utilities
+
+### **Reusable Components (`lib/reusable/`)**
+- [my_scaffold_widget.dart](mdc:lib/reusable/my_scaffold_widget.dart) - Custom scaffold wrapper
+- [MyAppElevatedButton.dart](mdc:lib/reusable/MyAppElevatedButton.dart) - Custom button component
+- [video_player_using_id.dart](mdc:lib/reusable/video_player_using_id.dart) - Video player implementation
+- [app_dialogs.dart](mdc:lib/reusable/app_dialogs.dart) - Dialog components
+- [progress_indicator.dart](mdc:lib/reusable/progress_indicator.dart) - Loading indicators
+- [text_field_with_head.dart](mdc:lib/reusable/text_field_with_head.dart) - Custom text input fields
+- [no_internet_page.dart](mdc:lib/reusable/no_internet_page.dart) - Offline state UI
+- [payment_in_progress_page.dart](mdc:lib/reusable/payment_in_progress_page.dart) - Payment flow UI
+- [recharge_page.dart](mdc:lib/reusable/recharge_page.dart) - Subscription recharge UI
+- [pulsing_icon_anim.dart](mdc:lib/reusable/pulsing_icon_anim.dart) - Animation components
+- [logger_service.dart](mdc:lib/reusable/logger_service.dart) - Logging utilities
+
+#### **Analytics (`lib/reusable/my_app_firebase_analytics/`)**
+- [AnalyticsEngine.dart](mdc:lib/reusable/my_app_firebase_analytics/AnalyticsEngine.dart) - Analytics engine
+- [analytic_logger.dart](mdc:lib/reusable/my_app_firebase_analytics/analytic_logger.dart) - Analytics logging
+- [event_name.dart](mdc:lib/reusable/my_app_firebase_analytics/event_name.dart) - Event name constants
+
+### **Screen Components (`lib/screens/`)**
+
+#### **Authentication Flow (`lib/screens/before_login/`)**
+- [login_forgot_signup_cubit.dart](mdc:lib/screens/before_login/login_forgot_signup_cubit.dart) - Auth state management
+- [login_forgot_signup_state.dart](mdc:lib/screens/before_login/login_forgot_signup_state.dart) - Auth states
+- [sign_up/](mdc:lib/screens/before_login/sign_up/) - Registration screens
+  - [sign_up_screen.dart](mdc:lib/screens/before_login/sign_up/sign_up_screen.dart)
+  - [sign_up_second.dart](mdc:lib/screens/before_login/sign_up/sign_up_second.dart)
+  - [sign_up_third_screen.dart](mdc:lib/screens/before_login/sign_up/sign_up_third_screen.dart)
+
+#### **Main Application (`lib/screens/after_login/`)**
+- [splash_screen.dart](mdc:lib/screens/splash_screen.dart) - App launch screen
+
+#### **Bottom Navigation Structure (`lib/screens/after_login/bottom_nav/`)**
+- [bottom_nav/](mdc:lib/screens/after_login/bottom_nav/bottom_nav/) - Main navigation container
+  - [bottom_nav_cubit.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav/bottom_nav_cubit.dart) - Navigation state management
+  - [bottom_nav_screen.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav/bottom_nav_screen.dart) - Navigation UI
+  - [bottom_nav_state.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav/bottom_nav_state.dart) - Navigation states
+  - [reusable/bottom_nav_container.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav/reusable/bottom_nav_container.dart) - Navigation container
+
+- [bottom_nav_zero/](mdc:lib/screens/after_login/bottom_nav/bottom_nav_zero/) - First tab (Home/Reels)
+  - [bottom_nav_zero_cubit.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_cubit.dart)
+  - [bottom_nav_zero_screen.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_screen.dart)
+  - [bottom_nav_zero_state.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_state.dart)
+
+- [bottom_nav_first/](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/) - Second tab (Videos/Episodes)
+  - [bottom_nav_first_cubit.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/bottom_nav_first_cubit.dart)
+  - [bottom_nav_first_screen.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/bottom_nav_first_screen.dart)
+  - [bottom_nav_first_state.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/bottom_nav_first_state.dart)
+  - [widgets/](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/widgets/) - Tab-specific widgets
+    - [carasol_slider.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/widgets/carasol_slider.dart)
+    - [episode_list_page.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/widgets/episode_list_page.dart)
+    - [grid_view_of_videos.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/widgets/grid_view_of_videos.dart)
+    - [section_to_show.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_first/widgets/section_to_show.dart)
+
+- [bottom_nav_second/](mdc:lib/screens/after_login/bottom_nav/bottom_nav_second/) - Third tab
+  - [bottom_nav_second_cubit.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_second/bottom_nav_second_cubit.dart)
+  - [bottom_nav_second_screen.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_second/bottom_nav_second_screen.dart)
+  - [bottom_nav_second_state.dart](mdc:lib/screens/after_login/bottom_nav/bottom_nav_second/bottom_nav_second_state.dart)
+
+### **Services Layer (`lib/services/`)**
+
+#### **Firebase Services (`lib/services/firebase/`)**
+- [firestore_variables.dart](mdc:lib/services/firebase/firestore_variables.dart) - Firestore collection names and constants
+- [otp_service.dart](mdc:lib/services/firebase/otp_service.dart) - OTP authentication service
+
+#### **Firebase Data Models (`lib/services/firebase/models/`)**
+- [user_models.dart](mdc:lib/services/firebase/models/user_models.dart) - User data models
+- [meels_model.dart](mdc:lib/services/firebase/models/meels_model.dart) - Reels/Meels data models
+- [subscription_model.dart](mdc:lib/services/firebase/models/subscription_model.dart) - Subscription data models
+- [transition_model.dart](mdc:lib/services/firebase/models/transition_model.dart) - Transaction data models
+- [utility_model.dart](mdc:lib/services/firebase/models/utility_model.dart) - Utility data models
+
+#### **Firebase Management Services**
+- [user_data_management/firestore_functions.dart](mdc:lib/services/firebase/user_data_management/firestore_functions.dart) - User CRUD operations
+- [video_management/video_functions.dart](mdc:lib/services/firebase/video_management/video_functions.dart) - Video content management
+- [reels_management/reels_functions.dart](mdc:lib/services/firebase/reels_management/reels_functions.dart) - Reels content management
+- [subscription_management/subscription_function.dart](mdc:lib/services/firebase/subscription_management/subscription_function.dart) - Subscription management
+- [transictions_management/transistion_function.dart](mdc:lib/services/firebase/transictions_management/transistion_function.dart) - Transaction management
+- [utils_management/utils_functions.dart](mdc:lib/services/firebase/utils_management/utils_functions.dart) - Utility functions
+
+#### **Other Services**
+- [firebase_notification_mine.dart](mdc:lib/services/firebase_notification_mine.dart) - Push notification service
+- [razorpay_service.dart](mdc:lib/services/razorpay_service.dart) - Payment processing service
+- [app_opner_service.dart](mdc:lib/services/app_opner_service.dart) - Deep linking service
+
+#### **Local Storage Services**
+- [hive_box/](mdc:lib/services/hive_box/) - Local database management
+  - [hive_box_functions.dart](mdc:lib/services/hive_box/hive_box_functions.dart)
+  - [hive_box_variables.dart](mdc:lib/services/hive_box/hive_box_variables.dart)
+- [shared_pref/](mdc:lib/services/shared_pref/) - Shared preferences management
+  - [shared_preference.dart](mdc:lib/services/shared_pref/shared_preference.dart)
+  - [shared_pref_variable.dart](mdc:lib/services/shared_pref/shared_pref_variable.dart)
+
+#### **Logging Services**
+- [log_service/](mdc:lib/services/log_service/) - Application logging
+  - [log_service.dart](mdc:lib/services/log_service/log_service.dart)
+  - [log_variables.dart](mdc:lib/services/log_service/log_variables.dart)
+
+#### **Subscription Services**
+- [plan_service/](mdc:lib/services/plan_service/) - Subscription plan management
+  - [plan_purchase_cubit.dart](mdc:lib/services/plan_service/plan_purchase_cubit.dart)
+  - [plan_purchase_screen.dart](mdc:lib/services/plan_service/plan_purchase_screen.dart)
+  - [plan_purchase_state.dart](mdc:lib/services/plan_service/plan_purchase_state.dart)
+  - [models/CreateCustomerResponseModel.dart](mdc:lib/services/plan_service/models/CreateCustomerResponseModel.dart)
+  - [widgets/](mdc:lib/services/plan_service/widgets/) - Subscription UI components
+
+#### **Authentication Services**
+- [token_check_service/](mdc:lib/services/token_check_service/) - Token validation
+  - [login_check_cubit.dart](mdc:lib/services/token_check_service/login_check_cubit.dart)
+  - [login_check_screen.dart](mdc:lib/services/token_check_service/login_check_screen.dart)
+  - [login_check_state.dart](mdc:lib/services/token_check_service/login_check_state.dart)
+
+### **Utilities (`lib/utils/`)**
+- [app_assets.dart](mdc:lib/utils/app_assets.dart) - Asset path constants
+- [app_color.dart](mdc:lib/utils/app_color.dart) - Color scheme definitions
+- [string_extensions.dart](mdc:lib/utils/string_extensions.dart) - String utility extensions
+
+## **Assets Organization (`assets/`)**
+- [fonts_assets/](mdc:assets/fonts_assets/) - Custom fonts
+- [jpg/](mdc:assets/jpg/) - JPEG images (login screens)
+- [lottie_assets/](mdc:assets/lottie_assets/) - Lottie animations
+  - [no_internet.json](mdc:assets/lottie_assets/no_internet.json) - Offline animation
+  - [payment_verify_loader.json](mdc:assets/lottie_assets/payment_verify_loader.json) - Payment loading animation
+- [png_assets/](mdc:assets/png_assets/) - PNG images
+  - [icon.png](mdc:assets/png_assets/icon.png) - App icon
+  - [login_*.png](mdc:assets/png_assets/) - Login screen images
+  - [paywall_*.png](mdc:assets/png_assets/) - Subscription paywall images
+- [svg_assets/](mdc:assets/svg_assets/) - SVG vector graphics
+  - [christ_plus.svg](mdc:assets/svg_assets/christ_plus.svg) - Christian-themed icons
+  - [icon_full.svg](mdc:assets/svg_assets/icon_full.svg) - Full app icon
+  - [only_icon.svg](mdc:assets/svg_assets/only_icon.svg) - Icon only
+
+## **Platform-Specific Code**
+
+### **Android (`android/`)**
+- [app/build.gradle.kts](mdc:android/app/build.gradle.kts) - Android build configuration
+- [app/google-services.json](mdc:android/app/google-services.json) - Firebase Android configuration
+- [app/src/](mdc:android/app/src/) - Android-specific source code and resources
+
+### **iOS (`ios/`)**
+- [Runner/](mdc:ios/Runner/) - iOS app configuration and resources
+- [Podfile](mdc:ios/Podfile) - iOS dependencies
+- [Runner.xcodeproj/](mdc:ios/Runner.xcodeproj/) - Xcode project files
+
+## **Documentation (`docs/`)**
+- [PRODUCT_BRIEF.md](mdc:docs/PRODUCT_BRIEF.md) - Product overview and requirements
+- [features/](mdc:docs/features/) - Feature planning documents
+  - [0001_PLAN.md](mdc:docs/features/0001_PLAN.md) - Feature plan 1
+  - [0002_PLAN.md](mdc:docs/features/0002_PLAN.md) - Feature plan 2
+
+## **Development Workflow (`cursor-workflow/`)**
+- [README.md](mdc:cursor-workflow/README.md) - Workflow documentation
+- [code_review.md](mdc:cursor-workflow/code_review.md) - Code review guidelines
+- [create_brief.md](mdc:cursor-workflow/create_brief.md) - Brief creation process
+- [plan_feature.md](mdc:cursor-workflow/plan_feature.md) - Feature planning process
+- [write_docs.md](mdc:cursor-workflow/write_docs.md) - Documentation writing guidelines
+
+## **Build and Distribution**
+- [build/](mdc:build/) - Build artifacts (generated)
+- [playstore_things/](mdc:playstore_things/) - Play Store assets and configuration
+  - [keys.json](mdc:playstore_things/keys.json) - App signing keys
+  - [sermon_ai.jks](mdc:playstore_things/sermon_ai.jks) - Android keystore
+  - [*.png](mdc:playstore_things/) - Play Store screenshots and graphics
+
+## **Architecture Patterns**
+
+### **State Management**
+- **BLoC Pattern**: Used throughout the app for state management
+  - Cubit files: `*_cubit.dart`
+  - State files: `*_state.dart`
+  - Screen files: `*_screen.dart`
+
+### **Service Layer Architecture**
+- **Firebase Services**: Organized by feature (user, video, reels, subscription, etc.)
+- **Local Storage**: Hive for complex data, SharedPreferences for simple key-value
+- **Network Layer**: Dio client with centralized configuration
+
+### **Component Organization**
+- **Reusable Components**: Shared UI components in `lib/reusable/`
+- **Screen Components**: Feature-specific screens with BLoC pattern
+- **Widget Organization**: Feature-specific widgets in dedicated folders
+
+### **Asset Management**
+- **Organized by Type**: Separate folders for fonts, images, animations
+- **Platform Assets**: Platform-specific assets in respective folders
+- **Naming Convention**: Descriptive names indicating usage (login_, paywall_, etc.)
+
+## **Key Development Guidelines**
+
+### **File Naming Conventions**
+- **Screens**: `*_screen.dart`
+- **Cubits**: `*_cubit.dart`
+- **States**: `*_state.dart`
+- **Models**: `*_model.dart`
+- **Services**: `*_service.dart` or `*_functions.dart`
+- **Widgets**: Descriptive names in `widgets/` folders
+
+### **Import Organization**
+- **External packages** first
+- **Internal services** second
+- **Models and utilities** third
+- **Relative imports** last
+
+### **Code Organization Principles**
+- **Feature-based grouping**: Related functionality grouped together
+- **Separation of concerns**: Clear separation between UI, business logic, and data
+- **Reusability**: Common components extracted to `reusable/` folder
+- **Consistency**: Follow established patterns throughout the codebase

@@ -33,6 +33,11 @@ class UtilsFunctions {
 
     final docSnapshot = await docRef.get();
 
+    await setFirebaseUtilityFieldsIfAbsent({
+      FirestoreVariables.isFreeTrialOpted: false,
+      FirestoreVariables.isFreeTrialCompleted: false,
+    });
+
     if (!docSnapshot.exists) {
       await docRef.set({
         FirestoreVariables.userIdField: utilityModel.userId,
@@ -64,6 +69,63 @@ class UtilsFunctions {
 
     // Always sets/updates the field, creates doc if it doesn't exist
     await docRef.set({fieldName: newValue}, SetOptions(merge: true));
+  }
+
+  /// Sets Firebase Utility fields in bulk if they are absent.
+  /// [fields] is a map containing field names and their default values.
+  Future<void> setFirebaseUtilityFieldsIfAbsent(Map<String, dynamic> fields) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final uuid = HiveBoxFunctions().getUuid();
+    if (user == null && uuid.isEmpty) {
+      AppLogger.e("User not logged in to create utility data if not exists");
+      return;
+    }
+
+    final docRef = FirebaseFirestore.instance
+        .collection(FirestoreVariables.utilitiesCollection)
+        .doc(user?.uid ?? uuid);
+
+    final docSnapshot = await docRef.get();
+    Map<String, dynamic> data = docSnapshot.data() ?? {};
+
+    // Collect only the fields that are absent
+    final Map<String, dynamic> fieldsToSet = {};
+    fields.forEach((key, value) {
+      if (!data.containsKey(key)) {
+        fieldsToSet[key] = value;
+      }
+    });
+
+    // Only update Firestore if there's something new to set
+    if (fieldsToSet.isNotEmpty) {
+      await docRef.set(fieldsToSet, SetOptions(merge: true));
+    }
+  }
+
+  Future<void> createFirebaseUtilityDataForFieldIfNotExists({
+    required String fieldName,
+    required dynamic newValue,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
+      AppLogger.e("User not logged in to create utility data if not exists");
+      return; // User not logged in
+    }
+
+    final docRef = FirebaseFirestore.instance
+        .collection(FirestoreVariables.utilitiesCollection)
+        .doc(user?.uid ?? HiveBoxFunctions().getUuid());
+
+    final docSnapshot = await docRef.get();
+
+    if (!docSnapshot.exists) {
+      await docRef.set({fieldName: newValue}, SetOptions(merge: true));
+    } else {
+      final data = docSnapshot.data();
+      if (data == null || !data.containsKey(fieldName)) {
+        await docRef.set({fieldName: newValue}, SetOptions(merge: true));
+      }
+    }
   }
 
   Future<bool> canUseVideo() async {
@@ -192,11 +254,6 @@ class UtilsFunctions {
     if (utility == null) return;
 
     try {
-      var userId = user?.uid ?? HiveBoxFunctions().getUuid();
-      var data = await MyAppEndpoints.instance().subscriptionStatus(
-        userId: userId,
-      );
-
       final bool hasSubscription;
 
       FirebaseUser? loggedInUncheckFirebaseUser = HiveBoxFunctions()
@@ -230,6 +287,9 @@ class UtilsFunctions {
 
           case SubscriptionStatus.created:
             hasSubscription = false;
+
+          case SubscriptionStatus.subscription_authenticated:
+            hasSubscription = true;
         }
       }
 

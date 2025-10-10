@@ -115,5 +115,5 @@ bool isDebugMode() {
   if (kReleaseMode) {
     return false;
   }
-  return true;
+  return false;
 }

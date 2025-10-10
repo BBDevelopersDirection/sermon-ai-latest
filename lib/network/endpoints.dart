@@ -26,16 +26,16 @@ class MyAppEndpoints {
   Future<Response> createCustomer({required FirebaseUser firebaseUser}) async {
     try {
       String emailIs = "69bbe1ae-c3f3-54a5-ab9b-86b8202d193d".toGmail();
-  AppLogger.d("Email is: $emailIs");
+      AppLogger.d("Email is: $emailIs");
       var data = {
-              'name': firebaseUser.name,
-              'email': firebaseUser.email == ''
-                  ? firebaseUser.uid.toGmail()
-                  : firebaseUser.email,
-              'contact': firebaseUser.phoneNumber,
-              'userId': firebaseUser.uid,
-            };
-  AppLogger.d("data is: ${data}");
+        'name': firebaseUser.name,
+        'email': firebaseUser.email == ''
+            ? firebaseUser.uid.toGmail()
+            : firebaseUser.email,
+        'contact': firebaseUser.phoneNumber,
+        'userId': firebaseUser.uid,
+      };
+      AppLogger.d("data is: ${data}");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-customer',
         data: data,
@@ -50,15 +50,15 @@ class MyAppEndpoints {
   }) async {
     try {
       Map<String, dynamic> data = {
-              'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_PvgYi6MEgXZKPB',
-              'customerId':
-                  razorpayCustomerResponse.customer?.razorpayCustomerId,
-              'userId': razorpayCustomerResponse.customer?.userId,
-              'planType': 'monthly',
-              'totalCount': 12,
-              'customerNotify': 1,
-            };
-  AppLogger.d("Data for subscription: $data");
+        'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_RLVhblLvuxHbFc',
+        'customerId': razorpayCustomerResponse.customer?.razorpayCustomerId,
+        'userId': razorpayCustomerResponse.customer?.userId,
+        'planType': 'monthly',
+        'totalCount': 12,
+        'startDate': 7,
+        'customerNotify': 1,
+      };
+      AppLogger.d("Data for subscription: $data");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-subscription',
         data: data,
@@ -81,7 +81,7 @@ class MyAppEndpoints {
         }
       }
     } catch (e) {
-        AppLogger.e('⚠️ Failed to fetch network time: $e');
+      AppLogger.e('⚠️ Failed to fetch network time: $e');
     }
 
     return null; // fallback on failure
