@@ -7,7 +7,6 @@ import '../models/user_models.dart';
 
 class FirestoreFunctions {
   Future<FirebaseUser?> getFirebaseUser({required String userId}) async {
-    await FirestoreFunctions().ensureCreatedDateExists(userId: userId);
     final userDoc = await FirebaseFirestore.instance
         .collection(FirestoreVariables.usersCollection)
         .doc(userId)
@@ -21,7 +20,7 @@ class FirestoreFunctions {
           name: firebaseUser.name,
           email: firebaseUser.email,
           subscriptionId: firebaseUser.subscriptionId,
-          createdDate: firebaseUser.createdDate
+          createdDate: firebaseUser.createdDate,
         ),
       );
       return firebaseUser;
@@ -39,14 +38,15 @@ class FirestoreFunctions {
           FirestoreVariables.emailField: firebaseUser.email,
           FirestoreVariables.phoneField: firebaseUser.phoneNumber,
           FirestoreVariables.nameField: firebaseUser.name,
-          FirestoreVariables.amountField: firebaseUser.createdDate
+          FirestoreVariables.createdDateField: FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
   }
 
   Future<void> ensureCreatedDateExists({required String userId}) async {
-    final CollectionReference usersRef =
-      FirebaseFirestore.instance.collection(FirestoreVariables.usersCollection);
-      
+    final CollectionReference usersRef = FirebaseFirestore.instance.collection(
+      FirestoreVariables.usersCollection,
+    );
+
     final userDoc = await usersRef.doc(userId).get();
 
     if (userDoc.exists) {
@@ -57,11 +57,6 @@ class FirestoreFunctions {
           FirestoreVariables.createdDateField: FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       }
-    } else {
-      // Optional: create the document with createdDate if it doesn't exist
-      await usersRef.doc(userId).set({
-        FirestoreVariables.createdDateField: FieldValue.serverTimestamp(),
-      });
     }
   }
 

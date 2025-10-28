@@ -146,6 +146,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                 );
                 return;
               }
+              await FirestoreFunctions().ensureCreatedDateExists(
+                userId: value.uid,
+              );
               Future.wait([
                 MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                   event: LogEventsName.instance().loginFirebase,
@@ -157,7 +160,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                     name: value.name,
                     email: value.email,
                     subscriptionId: value.subscriptionId,
-                    createdDate: value.createdDate
+                    createdDate: value.createdDate,
                   ),
                 ),
                 NotificationService.instance.requestPermissionAndGetToken(),
@@ -438,6 +441,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
 
       AppLogger.d("👤 Existing User: $data");
+      await FirestoreFunctions().ensureCreatedDateExists(userId: data.uid);
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().loginTruecaller,
       );
@@ -530,7 +534,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             name: name,
             email: email.isNotEmpty ? email : '',
             subscriptionId: null,
-            createdDate: DateTime.now()
+            createdDate:
+                DateTime.now(), // Use current time, Firestore will override with serverTimestamp()
           ),
         )
         .then((value) async {
