@@ -31,7 +31,7 @@ class FirestoreVariables {
   static const String currentStartField = 'currentStart';
   static const String currentEndField = 'currentEnd';
 
-  static const String videosCollection = 'Videos';
+  static const String videosCollection = 'videos';
 
   static const String reelsCollection = 'reels';
 

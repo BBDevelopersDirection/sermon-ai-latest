@@ -3,79 +3,19 @@ import 'package:sermon/services/firebase/firestore_variables.dart';
 
 import '../../../models/video_data_model.dart';
 
+const defaultVideoCategories = <String>[
+  'Latest Sermons',
+  'Popular sermons',
+  'Sermons on Faith',
+  'Sermons on Healing',
+  'Sermons on Miracles',
+  'Sermons on holyspirit',
+  'Sermons on prayer',
+];
+
 class VideoFunctions {
-  //   Future<SectionDetail?> getSliderVideo() async {
-  //   final videoCollection = FirebaseFirestore.instance.collection(
-  //     'SermonVideosCollection', // new collection name
-  //   );
-
-  //   final snapshot = await videoCollection.get();
-  //   if (snapshot.docs.isEmpty) return null;
-
-  //   // Find the "Latest Sermons" document
-  //   final videoDoc = snapshot.docs.firstWhere(
-  //     (doc) => doc.id == 'Latest Sermons',
-  //     orElse: () => throw Exception('No slider video found'),
-  //   );
-
-  //   final data = videoDoc.data();
-
-  //   // Episodes is stored as List<List<dynamic>>
-  //   final episodes = data['Episodes'] as List<dynamic>;
-
-  //   final videos = episodes.map((episode) {
-  //     final ep = episode as Map<String, dynamic>;
-  //     return VideoDataModel(
-  //       thumbnailUrl: ep['thumbnailUrl'] as String,
-  //       video: ep['video'] as String,
-  //       title: ep['title'] as String,
-  //     );
-  //   }).toList();
-
-  //   return SectionDetail(
-  //     nameOfSection: videoDoc.id,
-  //     videos: videos,
-  //   );
-  // }
-  //   Future<List<SectionDetail>> getAllSections() async {
-  //   final videoCollection = FirebaseFirestore.instance.collection(
-  //     'SermonVideosCollection',
-  //   );
-
-  //   final snapshot = await videoCollection.get();
-  //   if (snapshot.docs.isEmpty) return [];
-
-  //   return snapshot.docs.map((doc) {
-  //     final data = doc.data();
-  //     final episodesRaw = data['Episodes'] as List<dynamic>? ?? [];
-
-  //     final videos = episodesRaw.map((episode) {
-  //       if (episode is Map<String, dynamic>) {
-  //         // Handle Map format
-  //         return VideoDataModel(
-  //           thumbnailUrl: episode['thumbnailUrl'] as String,
-  //           video: episode['video'] as String,
-  //           title: episode['title'] as String,
-  //         );
-  //       } else if (episode is List<dynamic>) {
-  //         // Handle List format
-  //         return VideoDataModel(
-  //           thumbnailUrl: episode[0] as String,
-  //           video: episode[1] as String,
-  //           title: episode[2] as String,
-  //         );
-  //       } else {
-  //         throw Exception("Invalid episode format in doc ${doc.id}");
-  //       }
-  //     }).toList();
-
-  //     return SectionDetail(
-  //       nameOfSection: doc.id,
-  //       videos: videos,
-  //     );
-  //   }).toList();
-  // }
-
+  // Old way by SermonVideosCollection
+  // This is the old way of getting the sections by the sermon videos collection
   Stream<List<SectionDetail>> getSectionsStream() {
     final videoCollection = FirebaseFirestore.instance.collection(
       'SermonVideosCollection',
@@ -106,6 +46,46 @@ class VideoFunctions {
 
         return SectionDetail(nameOfSection: doc.id, videos: videos);
       }).toList();
+    });
+  }
+
+  // New way by videos collection
+  Stream<List<SectionDetail>>  cvwgetSectionsByCategoriesStream(
+  ) {
+    final videosRef = FirebaseFirestore.instance.collection(
+      FirestoreVariables.videosCollection,
+    );
+
+    final query = videosRef
+        .where('category', whereIn: defaultVideoCategories)
+        .orderBy('createdDate', descending: true);
+
+    return query.snapshots().map((snapshot) {
+      // Group docs by category
+      final Map<String, List<VideoDataModel>> categoryToVideos = {};
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final category = data['category'] as String?;
+        if (category == null) continue;
+
+        final video = VideoDataModel(
+          title: (data['title'] ?? '').toString(),
+          thumbnailUrl: (data['thumbnail'] ?? '').toString(),
+          video: (data['fullVideoLink'] ?? '').toString(),
+        );
+
+        (categoryToVideos[category] ??= <VideoDataModel>[]).add(video);
+      }
+
+      final List<SectionDetail> sections = [];
+      for (final category in defaultVideoCategories) {
+        final videos = categoryToVideos[category];
+        if (videos == null || videos.isEmpty) continue;
+        sections.add(SectionDetail(nameOfSection: category, videos: videos));
+      }
+
+      return sections;
     });
   }
 }
