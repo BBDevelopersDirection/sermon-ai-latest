@@ -72,7 +72,7 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
                 SizedBox(height: 12),
                 Divider(),
                 StreamBuilder<List<SectionDetail>>(
-                  stream: VideoFunctions().getSectionsStream(),
+                  stream: VideoFunctions().cvwgetSectionsByCategoriesStream(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return SizedBox(
@@ -89,8 +89,8 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
                       itemBuilder: (context, index) {
                         if (index == 0) {
                           return PropheticCarousel(
-                        videoDataModelList: sections[0].videos,
-                      ); // Skip the first item as it's already shown in the carousel
+                            videoDataModelList: sections[0].videos,
+                          ); // Skip the first item as it's already shown in the carousel
                         } else {
                           return SectionToShow(sectionDetail: sections[index]);
                         }
