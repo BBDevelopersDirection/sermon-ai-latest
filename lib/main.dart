@@ -17,6 +17,7 @@ import 'services/firebase_notification_mine.dart';
 import 'services/token_check_service/login_check_cubit.dart';
 import 'utils/app_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 
 // Global navigator key for navigation from outside of build context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -39,6 +40,10 @@ void main() async {
 
     await MyAppAmplitudeAndFirebaseAnalitics().init();
     AppLogger.d('📱 App analytics services initialized');
+
+    // Initialize Firebase Remote Config
+    await FirebaseRemoteConfigService().initialize();
+    AppLogger.d('📡 Firebase Remote Config initialized');
   } catch (e) {
     AppLogger.e('❌ Error initializing Firebase: $e');
   }

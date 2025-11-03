@@ -15,6 +15,7 @@ import '../../screens/after_login/bottom_nav/bottom_nav_first/widgets/episode_li
 import '../app_opner_service.dart';
 import '../firebase/models/utility_model.dart';
 import '../firebase/utils_management/utils_functions.dart';
+import '../firebase/firebase_remote_config.dart';
 import '../log_service/log_service.dart';
 import '../log_service/log_variables.dart';
 import '../shared_pref/shared_preference.dart';
@@ -249,16 +250,16 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
 
   Future<void> reportOnWhatsapp() async {
     // Format the message to be sent on WhatsApp
-    String formattedMessage = Uri.encodeComponent(
-      "Hey, There's some error in my application. Please look into it:-\n\n",
-    );
+    final errorMessage = FirebaseRemoteConfigService().whatsappErrorMessage;
+    String formattedMessage = Uri.encodeComponent("$errorMessage\n\n");
 
     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
       event: LogEventsName.instance().chat_support,
     );
 
     // Construct the WhatsApp URL with the formatted message
-    String whatsappUrl = 'https://wa.me/+917993478539?text=$formattedMessage';
+    final whatsappNumber = FirebaseRemoteConfigService().whatsappSupportNumber;
+    String whatsappUrl = 'https://wa.me/$whatsappNumber?text=$formattedMessage';
 
     // Launch WhatsApp with the message
     await AppOpener.launchAppUsingUrl(link: whatsappUrl);

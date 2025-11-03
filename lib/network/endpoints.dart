@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sermon/main.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
 import 'package:sermon/utils/string_extensions.dart';
 
@@ -26,16 +27,16 @@ class MyAppEndpoints {
   Future<Response> createCustomer({required FirebaseUser firebaseUser}) async {
     try {
       String emailIs = "69bbe1ae-c3f3-54a5-ab9b-86b8202d193d".toGmail();
-  AppLogger.d("Email is: $emailIs");
+      AppLogger.d("Email is: $emailIs");
       var data = {
-              'name': firebaseUser.name,
-              'email': firebaseUser.email == ''
-                  ? firebaseUser.uid.toGmail()
-                  : firebaseUser.email,
-              'contact': firebaseUser.phoneNumber,
-              'userId': firebaseUser.uid,
-            };
-  AppLogger.d("data is: ${data}");
+        'name': firebaseUser.name,
+        'email': firebaseUser.email == ''
+            ? firebaseUser.uid.toGmail()
+            : firebaseUser.email,
+        'contact': firebaseUser.phoneNumber,
+        'userId': firebaseUser.uid,
+      };
+      AppLogger.d("data is: ${data}");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-customer',
         data: data,
@@ -49,16 +50,19 @@ class MyAppEndpoints {
     required RazorpayCustomerResponse razorpayCustomerResponse,
   }) async {
     try {
+      final remoteConfig = FirebaseRemoteConfigService();
+      final planId = isDebugMode()
+          ? remoteConfig.razorpayTestPlanId
+          : remoteConfig.razorpayLivePlanId;
       Map<String, dynamic> data = {
-              'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_PvgYi6MEgXZKPB',
-              'customerId':
-                  razorpayCustomerResponse.customer?.razorpayCustomerId,
-              'userId': razorpayCustomerResponse.customer?.userId,
-              'planType': 'monthly',
-              'totalCount': 12,
-              'customerNotify': 1,
-            };
-  AppLogger.d("Data for subscription: $data");
+        'planId': planId,
+        'customerId': razorpayCustomerResponse.customer?.razorpayCustomerId,
+        'userId': razorpayCustomerResponse.customer?.userId,
+        'planType': 'monthly',
+        'totalCount': 12,
+        'customerNotify': 1,
+      };
+      AppLogger.d("Data for subscription: $data");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-subscription',
         data: data,
@@ -81,7 +85,7 @@ class MyAppEndpoints {
         }
       }
     } catch (e) {
-        AppLogger.e('⚠️ Failed to fetch network time: $e');
+      AppLogger.e('⚠️ Failed to fetch network time: $e');
     }
 
     return null; // fallback on failure
