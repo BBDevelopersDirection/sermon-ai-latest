@@ -57,7 +57,7 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => BlocProvider(
-              create: (context) => PlanPurchaseCubit(),
+              create: (context) => PlanPurchaseCubit()..updateSubscriptionType(),
               child: SubscriptionTrialScreen(),
             ),
           ),

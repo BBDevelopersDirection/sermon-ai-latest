@@ -47,15 +47,23 @@ class MyAppEndpoints {
 
   Future<Response> createSubscription({
     required RazorpayCustomerResponse razorpayCustomerResponse,
+    required bool isFreeTrialSubscription,
   }) async {
     try {
-      Map<String, dynamic> data = {
+      Map<String, dynamic> data = isFreeTrialSubscription ? {
         'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_RLVhblLvuxHbFc',
         'customerId': razorpayCustomerResponse.customer?.razorpayCustomerId,
         'userId': razorpayCustomerResponse.customer?.userId,
         'planType': 'monthly',
         'totalCount': 12,
         'startDate': 7,
+        'customerNotify': 1,
+      }:{
+        'planId': isDebugMode() ? 'plan_Qwe6q0fZBLxs0L' : 'plan_RLVhblLvuxHbFc',
+        'customerId': razorpayCustomerResponse.customer?.razorpayCustomerId,
+        'userId': razorpayCustomerResponse.customer?.userId,
+        'planType': 'monthly',
+        'totalCount': 12,
         'customerNotify': 1,
       };
       AppLogger.d("Data for subscription: $data");

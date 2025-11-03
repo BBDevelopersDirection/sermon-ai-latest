@@ -25,6 +25,7 @@ class LogEventsName{
 
   String subscribeNowButtonTap = 'subscriptionNowButtonTap';
   String subscriptionCompleteEvent = 'subscriptionCompleteEvent';
+  String subscriptionCompleteEventFreeTrial = 'subscriptionCompleteEventFreeTrial';
   String subscriptionFailEvent = 'subscriptionFailEvent';
 
 

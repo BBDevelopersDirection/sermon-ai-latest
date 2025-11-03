@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/src/response.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/network/endpoints.dart';
+import 'package:sermon/services/firebase/models/subscription_model.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/firebase/subscription_management/subscription_function.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 
 import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import '../firestore_variables.dart';
 
 class UtilsFunctions {
@@ -35,7 +39,6 @@ class UtilsFunctions {
 
     await setFirebaseUtilityFieldsIfAbsent({
       FirestoreVariables.isFreeTrialOpted: false,
-      FirestoreVariables.isFreeTrialCompleted: false,
     });
 
     if (!docSnapshot.exists) {
@@ -73,7 +76,9 @@ class UtilsFunctions {
 
   /// Sets Firebase Utility fields in bulk if they are absent.
   /// [fields] is a map containing field names and their default values.
-  Future<void> setFirebaseUtilityFieldsIfAbsent(Map<String, dynamic> fields) async {
+  Future<void> setFirebaseUtilityFieldsIfAbsent(
+    Map<String, dynamic> fields,
+  ) async {
     final user = FirebaseAuth.instance.currentUser;
     final uuid = HiveBoxFunctions().getUuid();
     if (user == null && uuid.isEmpty) {
@@ -193,106 +198,134 @@ class UtilsFunctions {
     }
   }
 
-  Future<void> setRechargeTrue() async {
-    AppLogger.d("inside set recharge true");
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null && HiveBoxFunctions().getUuid().isEmpty)
-      return; // User not logged in
-    AppLogger.d("User Exsists");
-    // Set isRecharged to true
-    Future.wait([
-      updateFirebaseUtilityData(
-        fieldName: FirestoreVariables.isRecharged,
-        newValue: true,
-      ),
-
-      updateFirebaseUtilityData(
-        fieldName: FirestoreVariables.rechargeStartDate,
-        newValue: FieldValue.serverTimestamp(),
-      ),
-    ]);
-
-    AppLogger.d("first future block passed");
-
-    DateTime? dateTime;
-
-    try {
-      dateTime = await MyAppEndpoints.instance().getNetworkTime();
-    } catch (e) {
-      AppLogger.e("Error while getting network time: $e");
-      dateTime = DateTime.now();
-    }
-
-    AppLogger.d('walaah part 0');
-    getFirebaseUtility(userId: user?.uid ?? HiveBoxFunctions().getUuid()).then((
-      utility,
-    ) async {
-      if (utility != null) {
-        // If the user has a utility document, update the video count to check subscription
-        AppLogger.d('walaah part 1');
-        var data = utility.rechargeStartDate;
-        await updateFirebaseUtilityData(
-          fieldName: FirestoreVariables.rechargeEndDate,
-          newValue: dateTime?.add(Duration(days: 30)),
-        );
-        AppLogger.d('walaah part 2');
-      }
-    });
-  }
-
-  Future<void> setRechargeFalseIfRechargeExpires() async {
+  Future<void> setRechargeFalseIfRechargeExpires({
+    required BuildContext context,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null && HiveBoxFunctions().getUuid().isEmpty) return;
 
-    final docRef = FirebaseFirestore.instance
+    final utilityDocRef = FirebaseFirestore.instance
         .collection(FirestoreVariables.utilitiesCollection)
         .doc(user?.uid ?? HiveBoxFunctions().getUuid());
 
-    final utility = await getFirebaseUtility(
-      userId: user?.uid ?? HiveBoxFunctions().getUuid(),
-    );
-    if (utility == null) return;
+    final subscription = await SubscriptionFirestoreFunction()
+        .getFirebaseUserSubscription();
 
+    DateTime serverCurrentTime =
+        await MyAppEndpoints.instance().getNetworkTime() ?? DateTime.now();
+
+    if (subscription == null) {
+      // this thing is to handel edge case in which recharge will set to false.
+      checkAndChangeRechargeStatus(
+        docRef: utilityDocRef,
+        isGracePeriodActive: false,
+        subscription: SubscriptionCollectionOfUser(
+          status: SubscriptionStatus.nullStatus,
+          uid: user?.uid ?? HiveBoxFunctions().getUuid(),
+        ),
+        newSubscriptionCreationCallback: () {
+          context
+              .read<PlanPurchaseCubit>()
+              .newSubscriptionCreationAndStoreCallback();
+        },
+      );
+      AppLogger.e(
+        "No subscription collection of user found for user ${user?.uid}",
+      );
+      return;
+    }
+
+    if (subscription.currentStart!.isAfter(serverCurrentTime)) {
+      checkAndChangeRechargeStatus(
+        docRef: utilityDocRef,
+        isGracePeriodActive: false,
+        subscription: subscription,
+        newSubscriptionCreationCallback: () {
+          context
+              .read<PlanPurchaseCubit>()
+              .newSubscriptionCreationAndStoreCallback();
+        },
+      );
+      return;
+    } else {
+      checkAndChangeRechargeStatus(
+        docRef: utilityDocRef,
+        isGracePeriodActive: true,
+        subscription: subscription,
+        newSubscriptionCreationCallback: () {
+          context
+              .read<PlanPurchaseCubit>()
+              .newSubscriptionCreationAndStoreCallback();
+        },
+      );
+      return;
+    }
+  }
+
+  void checkAndChangeRechargeStatus({
+    required DocumentReference docRef,
+    required bool isGracePeriodActive,
+    required SubscriptionCollectionOfUser subscription,
+    required Function() newSubscriptionCreationCallback,
+  }) async {
     try {
       final bool hasSubscription;
+      bool isNewSubscriptionStatusRequired = false;
 
       FirebaseUser? loggedInUncheckFirebaseUser = HiveBoxFunctions()
           .getLoginDetails();
-      if (loggedInUncheckFirebaseUser == null ||
-          loggedInUncheckFirebaseUser.subscriptionId == null ||
+      if (loggedInUncheckFirebaseUser == null) {
+        hasSubscription = false;
+      } else if (loggedInUncheckFirebaseUser.subscriptionId == null ||
           loggedInUncheckFirebaseUser.subscriptionId!.trim() == '' ||
           loggedInUncheckFirebaseUser.subscriptionId!.contains(
             'no subscriptions',
           )) {
         hasSubscription = false;
+        isNewSubscriptionStatusRequired = true;
       } else {
-        SubscriptionStatus subscriptionStatus =
-            await SubscriptionFirestoreFunction()
-                .getFirebaseUserSubscriptionStatus(
-                  subscriptionId: loggedInUncheckFirebaseUser.subscriptionId!,
-                );
+        SubscriptionStatus subscriptionStatus = subscription.status;
 
         switch (subscriptionStatus) {
           case SubscriptionStatus.active:
             hasSubscription = true;
+            break;
 
           case SubscriptionStatus.cancelled:
             hasSubscription = false;
+            isNewSubscriptionStatusRequired = true;
+            break;
 
           case SubscriptionStatus.payment_captured:
             hasSubscription = true;
+            break;
 
           case SubscriptionStatus.nullStatus:
             hasSubscription = false;
+            isNewSubscriptionStatusRequired = true;
+            break;
 
           case SubscriptionStatus.created:
             hasSubscription = false;
+            break;
 
           case SubscriptionStatus.subscription_authenticated:
-            hasSubscription = true;
+            if (isGracePeriodActive) {
+              hasSubscription = true;
+              await docRef.set({
+                FirestoreVariables.isFreeTrialOpted: true,
+              }, SetOptions(merge: true));
+            } else {
+              hasSubscription = false;
+            }
+            break;
+
+          case SubscriptionStatus.halted:
+            hasSubscription = false;
+            isNewSubscriptionStatusRequired = true;
+            break;
         }
       }
-
       // Its not dead code for ide i wrote this so it wont give me warning.
       // ignore: dead_code
       if (hasSubscription) {
@@ -306,31 +339,13 @@ class UtilsFunctions {
           FirestoreVariables.rechargeEndDate: null,
         }, SetOptions(merge: true));
       }
+
+      if (isNewSubscriptionStatusRequired) {
+        await newSubscriptionCreationCallback();
+      }
     } catch (e) {
       AppLogger.e("Error while setting isRecharge: $e");
     }
-
-    // Step 1: Write temporary server timestamp field to same doc
-    // await docRef.set({
-    // 'lastChecked': FieldValue.serverTimestamp(),
-    // }, SetOptions(merge: true));
-
-    // // Step 2: Read back that server time
-    // final updatedSnapshot = await docRef.get();
-    // final serverTime = updatedSnapshot.data()?['lastChecked']?.toDate();
-
-    // // Step 3: Compare and act
-    // if (serverTime != null && serverTime.isAfter(utility.rechargeEndDate!)) {
-    // await docRef.set({
-    //   FirestoreVariables.isRecharged: false,
-    //   FirestoreVariables.rechargeStartDate: null,
-    //   FirestoreVariables.rechargeEndDate: null,
-    //   'lastChecked': FieldValue.delete(), // clean up
-    // }, SetOptions(merge: true));
-    // }
-    // await docRef.set({
-    //   'lastChecked': FieldValue.delete(), // clean up
-    // }, SetOptions(merge: true));
   }
 }
 

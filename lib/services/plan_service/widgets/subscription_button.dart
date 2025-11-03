@@ -12,7 +12,7 @@ class SubscribeButton extends StatelessWidget {
     return BlocBuilder<PlanPurchaseCubit, PlanPurchaseState>(
       builder: (context, state) {
         return SizedBox(
-          width: MediaQuery.sizeOf(context).width-60,
+          width: MediaQuery.sizeOf(context).width - 60,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Color.fromRGBO(216, 145, 24, 1),
@@ -22,7 +22,7 @@ class SubscribeButton extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              if (state.loading) {
+              if (state.LoadingFreeTrialNormal == loadingStates.buttonLoading) {
                 return;
               }
 
@@ -30,7 +30,7 @@ class SubscribeButton extends StatelessWidget {
                 context: context,
               );
             },
-            child: state.loading
+            child: state.LoadingFreeTrialNormal == loadingStates.buttonLoading
                 ? CircularProgressIndicator.adaptive(
                     backgroundColor: Colors.white,
                   )

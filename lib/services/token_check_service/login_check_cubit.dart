@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
-import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
+import 'package:sermon/services/firebase/firestore_variables.dart';
 import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import '../../models/playlist_and_episode_model_old.dart';
@@ -42,7 +44,55 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
         event: LogEventsName.instance().install,
       );
     }
+    // runMigration();
   }
+
+  // static Future<void> runMigration({int batchSize = 400}) async {
+  //   final firestore = FirebaseFirestore.instance;
+  //   Query query = firestore
+  //       .collection(FirestoreVariables.utilitiesCollection)
+  //       .limit(batchSize);
+
+  //   DocumentSnapshot? lastDoc;
+  //   int totalUpdated = 0;
+
+  //   while (true) {
+  //     if (lastDoc != null) {
+  //       query = query.startAfterDocument(lastDoc);
+  //     }
+
+  //     final snapshot = await query.get();
+
+  //     if (snapshot.docs.isEmpty) {
+  //       AppLogger.d('🔹✅ Migration complete. Total updated: $totalUpdated');
+  //       break;
+  //     }
+
+  //     final batch = firestore.batch();
+
+  //     for (final doc in snapshot.docs) {
+  //       final docRef = firestore
+  //           .collection(FirestoreVariables.utilitiesCollection)
+  //           .doc(doc.id);
+  //       batch.update(docRef, {
+  //         FirestoreVariables.isFreeTrialSubscription: false,
+  //         FirestoreVariables.isFreeTrialOpted: false,
+  //       });
+  //     }
+
+  //     await batch.commit();
+  //     totalUpdated += snapshot.docs.length;
+
+  //     AppLogger.d(
+  //       '🔹 Updated batch of ${snapshot.docs.length} docs. Total updated: $totalUpdated',
+  //     );
+
+  //     lastDoc = snapshot.docs.last;
+
+  //     // Optional small delay to avoid Firestore rate limits
+  //     await Future.delayed(const Duration(milliseconds: 300));
+  //   }
+  // }
 
   Future<void> checkForUpdate() async {
     try {
@@ -61,7 +111,7 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     }
   }
 
-  Future<void> checkToken() async {
+  Future<void> checkToken({required BuildContext context}) async {
     try {
       // SharedPreferenceLogic.setLoginFalse();
       // HiveBoxFunctions().removeLoginDetails();
@@ -75,7 +125,7 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
               FirebaseAuth.instance.currentUser?.uid ??
               HiveBoxFunctions().getUuid(),
         );
-        checkPlanExpire();
+        checkPlanExpire(context: context);
       } else {
         emit(state.copyWith(loading: false, isTokenPresent: false));
       }
@@ -93,12 +143,14 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
         totalVideoCount: 0,
         isRecharged: false,
         videoCountToCheckSub: 0,
+        isFreeTrialOpted: false,
+        isFreeTrialSubscription: false,
       ),
     );
   }
 
-  Future<void> checkPlanExpire() async {
-    await UtilsFunctions().setRechargeFalseIfRechargeExpires();
+  Future<void> checkPlanExpire({required BuildContext context}) async {
+    await UtilsFunctions().setRechargeFalseIfRechargeExpires(context: context);
     // await UtilsFunctions().setRechargeTrue();
   }
 

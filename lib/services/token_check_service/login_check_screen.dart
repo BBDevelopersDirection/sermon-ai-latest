@@ -19,7 +19,7 @@ class LoginCheckScreen extends StatefulWidget {
 class _LoginCheckScreenState extends State<LoginCheckScreen> {
   @override
   void initState() {
-    context.read<LoginCheckCubit>().checkToken();
+    context.read<LoginCheckCubit>().checkToken(context: context);
     super.initState();
   }
 

@@ -146,7 +146,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => BlocProvider(
-                            create: (context) => PlanPurchaseCubit(),
+                            create: (context) => PlanPurchaseCubit()..updateSubscriptionType(),
                             child: SubscriptionTrialScreen(
                               controller: _controllers[_maxFreeIndex],
                             ),

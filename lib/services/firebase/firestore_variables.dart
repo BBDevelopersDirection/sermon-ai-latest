@@ -7,7 +7,6 @@ class FirestoreVariables {
   static const String subscriptionIdField = 'subscriptionId';
 
   static const String isFreeTrialOpted = 'IS_FREE_TRIAL_OPTED';
-  static const String isFreeTrialCompleted = 'IS_FREE_TRIAL_COMPLETED';
 
   static const String transactionsCollection = 'Transactions';
   static const String transactionIdField = 'TRANSACTION_ID';
@@ -19,6 +18,7 @@ class FirestoreVariables {
   static const String totalVideoCount = 'TOTAL_VIDEO_COUNT';
   static const String isRecharged = 'IS_RECHARGED';
   static const String videoCountToCheckSub = 'VIDEO_COUNT_TO_CHECK_SUB';
+  static const String isFreeTrialSubscription = 'IS_FREE_TRIAL_SUBSCRIPTION_KEY';
 
   static const String subscriptionCollection = 'subscriptions';
   static const String subscriptionCollectionTest = 'test-subscriptions';
@@ -42,13 +42,29 @@ class FirestoreVariables {
 
   static const int totalVideoCountUserCanSee = 1;
   static const int totalReelCountUserCanSee = 2;
+
+  static const String isGracePeriodActive = 'IS_GRACE_PERIOD_ACTIVE';
+  static const String gracePeriodStartDate = 'GRACE_PERIOD_START_DATE';
+  static const String gracePeriodEndDate = 'GRACE_PERIOD_END_DATE';
+  static const String utilitySubscriptionId = 'UTILITY_SUBSCRIPTION_ID';
 }
 
 enum SubscriptionStatus {
   active,
+  halted,
   payment_captured,
   cancelled,
   nullStatus,
   created,
   subscription_authenticated,
+}
+
+class SubscriptionStatusStrings {
+  static const String active = 'active';
+  static const String halted = 'halted';
+  static const String payment_captured = 'payment_captured';
+  static const String cancelled = 'cancelled';
+  static const String nullStatus = 'nullStatus';
+  static const String created = 'created';
+  static const String subscription_authenticated = 'subscription_authenticated';
 }

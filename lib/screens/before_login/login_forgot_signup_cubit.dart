@@ -534,6 +534,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                 totalVideoCount: 0,
                 isRecharged: false,
                 videoCountToCheckSub: 0,
+                isFreeTrialOpted: false,
+                isFreeTrialSubscription: true,
               ),
             ),
             HiveBoxFunctions().saveLoginDetails(

@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../firestore_variables.dart';
 
 class UtilityModel {
@@ -7,16 +5,26 @@ class UtilityModel {
   final int totalVideoCount;
   final bool isRecharged;
   final int videoCountToCheckSub;
-  final DateTime? rechargeStartDate; // new
-  final DateTime? rechargeEndDate;   // new
+  final bool isFreeTrialOpted;
+  final bool isFreeTrialSubscription;
+
+  // Grace period fields
+  final bool isGracePeriodActive;
+  final DateTime? gracePeriodStartDate;
+  final DateTime? gracePeriodEndDate;
+  final String? utilitySubscriptionId;
 
   UtilityModel({
     required this.userId,
     required this.totalVideoCount,
     required this.isRecharged,
     required this.videoCountToCheckSub,
-    this.rechargeStartDate,
-    this.rechargeEndDate,
+    required this.isFreeTrialOpted,
+    required this.isFreeTrialSubscription,
+    this.isGracePeriodActive = false,
+    this.gracePeriodStartDate,
+    this.gracePeriodEndDate,
+    this.utilitySubscriptionId,
   });
 
   factory UtilityModel.fromJson(Map<String, dynamic> json) {
@@ -24,9 +32,17 @@ class UtilityModel {
       userId: json[FirestoreVariables.userIdField] as String,
       totalVideoCount: json[FirestoreVariables.totalVideoCount] as int,
       isRecharged: json[FirestoreVariables.isRecharged] as bool,
-      videoCountToCheckSub: json[FirestoreVariables.videoCountToCheckSub] as int,
-      rechargeStartDate: json[FirestoreVariables.rechargeStartDate]?.toDate(),
-      rechargeEndDate: json[FirestoreVariables.rechargeEndDate]?.toDate(),
+      isFreeTrialSubscription: json[FirestoreVariables.isFreeTrialSubscription] as bool,
+      isFreeTrialOpted: json[FirestoreVariables.isFreeTrialOpted] as bool,
+      videoCountToCheckSub:
+          json[FirestoreVariables.videoCountToCheckSub] as int,
+      isGracePeriodActive:
+          json[FirestoreVariables.isGracePeriodActive] as bool? ?? false,
+      gracePeriodStartDate: json[FirestoreVariables.gracePeriodStartDate]
+          ?.toDate(),
+      gracePeriodEndDate: json[FirestoreVariables.gracePeriodEndDate]?.toDate(),
+      utilitySubscriptionId:
+          json[FirestoreVariables.utilitySubscriptionId] as String?,
     );
   }
 
@@ -36,8 +52,12 @@ class UtilityModel {
       FirestoreVariables.totalVideoCount: totalVideoCount,
       FirestoreVariables.isRecharged: isRecharged,
       FirestoreVariables.videoCountToCheckSub: videoCountToCheckSub,
-      FirestoreVariables.rechargeStartDate: rechargeStartDate,
-      FirestoreVariables.rechargeEndDate: rechargeEndDate,
+      FirestoreVariables.isFreeTrialSubscription: isFreeTrialSubscription,
+      FirestoreVariables.isFreeTrialOpted: isFreeTrialOpted,
+      FirestoreVariables.isGracePeriodActive: isGracePeriodActive,
+      FirestoreVariables.gracePeriodStartDate: gracePeriodStartDate,
+      FirestoreVariables.gracePeriodEndDate: gracePeriodEndDate,
+      FirestoreVariables.utilitySubscriptionId: utilitySubscriptionId,
     };
   }
 
@@ -48,8 +68,12 @@ class UtilityModel {
       FirestoreVariables.totalVideoCount: totalVideoCount,
       FirestoreVariables.isRecharged: isRecharged,
       FirestoreVariables.videoCountToCheckSub: videoCountToCheckSub,
-      FirestoreVariables.rechargeStartDate: rechargeStartDate,
-      FirestoreVariables.rechargeEndDate: rechargeEndDate,
+      FirestoreVariables.isFreeTrialSubscription: isFreeTrialSubscription,
+      FirestoreVariables.isFreeTrialOpted: isFreeTrialOpted,
+      FirestoreVariables.isGracePeriodActive: isGracePeriodActive,
+      FirestoreVariables.gracePeriodStartDate: gracePeriodStartDate,
+      FirestoreVariables.gracePeriodEndDate: gracePeriodEndDate,
+      FirestoreVariables.utilitySubscriptionId: utilitySubscriptionId,
     };
   }
 
@@ -59,9 +83,16 @@ class UtilityModel {
       userId: map[FirestoreVariables.userIdField] as String,
       totalVideoCount: map[FirestoreVariables.totalVideoCount] as int,
       isRecharged: map[FirestoreVariables.isRecharged] as bool,
+      isFreeTrialOpted: map[FirestoreVariables.isFreeTrialOpted] as bool,
+      isFreeTrialSubscription: map[FirestoreVariables.isFreeTrialSubscription] as bool,
       videoCountToCheckSub: map[FirestoreVariables.videoCountToCheckSub] as int,
-      rechargeStartDate: map[FirestoreVariables.rechargeStartDate]?.toDate(),
-      rechargeEndDate: map[FirestoreVariables.rechargeEndDate]?.toDate(),
+      isGracePeriodActive:
+          map[FirestoreVariables.isGracePeriodActive] as bool? ?? false,
+      gracePeriodStartDate: map[FirestoreVariables.gracePeriodStartDate]
+          ?.toDate(),
+      gracePeriodEndDate: map[FirestoreVariables.gracePeriodEndDate]?.toDate(),
+      utilitySubscriptionId:
+          map[FirestoreVariables.utilitySubscriptionId] as String?,
     );
   }
 }

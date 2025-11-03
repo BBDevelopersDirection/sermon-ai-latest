@@ -40,16 +40,18 @@ class SubscriptionCollectionOfUser {
     SubscriptionStatus statusEnum = SubscriptionStatus.nullStatus;
     if (status == null) {
       statusEnum = SubscriptionStatus.nullStatus;
-    } else if (status == 'active') {
+    } else if (status == SubscriptionStatusStrings.active) {
       statusEnum = SubscriptionStatus.active;
-    } else if (status == 'payment_captured') {
+    } else if (status == SubscriptionStatusStrings.payment_captured) {
       statusEnum = SubscriptionStatus.payment_captured;
-    } else if (status == 'cancelled') {
+    } else if (status == SubscriptionStatusStrings.cancelled) {
       statusEnum = SubscriptionStatus.cancelled;
-    } else if (status == 'created') {
+    } else if (status == SubscriptionStatusStrings.created) {
       statusEnum = SubscriptionStatus.created;
-    } else if (status == 'subscription_authenticated') {
+    } else if (status == SubscriptionStatusStrings.subscription_authenticated) {
       statusEnum = SubscriptionStatus.subscription_authenticated;
+    } else if (status == SubscriptionStatusStrings.halted) {
+      statusEnum = SubscriptionStatus.halted;
     }
 
     return SubscriptionCollectionOfUser(

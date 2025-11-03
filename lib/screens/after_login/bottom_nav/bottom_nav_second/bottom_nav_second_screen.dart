@@ -139,21 +139,21 @@ class _BottomNavSecondScreenState extends State<BottomNavSecondScreen> {
               //   },
               // ),
       
-              BlocBuilder<BottomNavSecondCubit, BottomNavSecondState>(
-                builder: (context, state) {
-                  final endDate = utilityModel?.rechargeEndDate;
+              // BlocBuilder<BottomNavSecondCubit, BottomNavSecondState>(
+              //   builder: (context, state) {
+              //     final endDate = utilityModel?.rechargeEndDate;
       
-                  // If null, return an empty SizedBox (i.e., don't show anything)
-                  if (endDate == null) return const SizedBox.shrink();
+              //     // If null, return an empty SizedBox (i.e., don't show anything)
+              //     if (endDate == null) return const SizedBox.shrink();
       
-                  final formattedDate = DateFormat('dd/MM/yyyy (HH:mm)').format(endDate);
+              //     final formattedDate = DateFormat('dd/MM/yyyy (HH:mm)').format(endDate);
       
-                  return profileItem(
-                    'Subscription Expiry Date',
-                    formattedDate,
-                  );
-                },
-              ),
+              //     return profileItem(
+              //       'Subscription Expiry Date',
+              //       formattedDate,
+              //     );
+              //   },
+              // ),
       
       
               sectionHeader('Privacy & Security'),

@@ -2,7 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class TrialPriceInfo extends StatelessWidget {
-  const TrialPriceInfo({super.key});
+  final bool isFreeTrialSubscription;
+  const TrialPriceInfo({super.key, this.isFreeTrialSubscription = true});
 
   @override
   Widget build(BuildContext context) {
@@ -20,26 +21,48 @@ class TrialPriceInfo extends StatelessWidget {
         AutoSizeText.rich(
           TextSpan(
             children: [
-              TextSpan(
-                text: 'Try 7 days for just ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontFamily: 'Epilogue',
-                  fontWeight: FontWeight.w700,
-                  height: 1.25,
-                ),
-              ),
-              TextSpan(
-                text: '₹5',
-                style: TextStyle(
-                  color: Color(0xFFD89118),
-                  fontSize: 28,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w800,
-                  height: 1.25,
-                ),
-              ),
+              isFreeTrialSubscription
+                  ? TextSpan(
+                      text: 'Try 7 days for just ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontFamily: 'Epilogue',
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                      ),
+                    )
+                  : TextSpan(
+                      text: '₹99/- for per month',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontFamily: 'Epilogue',
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                      ),
+                    ),
+              isFreeTrialSubscription
+                  ? TextSpan(
+                      text: '₹5',
+                      style: TextStyle(
+                        color: Color(0xFFD89118),
+                        fontSize: 28,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w800,
+                        height: 1.25,
+                      ),
+                    )
+                  : TextSpan(
+                      text: '',
+                      style: TextStyle(
+                        color: Color(0xFFD89118),
+                        fontSize: 28,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w800,
+                        height: 1.25,
+                      ),
+                    ),
             ],
           ),
           textAlign: TextAlign.center,
@@ -51,17 +74,29 @@ class TrialPriceInfo extends StatelessWidget {
         AutoSizeText.rich(
           TextSpan(
             children: [
-              TextSpan(
-                text: 'Then Rs 99/month. Unlimited sermons dekhiye. ',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontFamily: 'Gilroy',
-                  fontWeight: FontWeight.w500,
-                  height: 1.50,
-                  letterSpacing: 0.12,
-                ),
-              ),
+              isFreeTrialSubscription
+                  ? TextSpan(
+                      text: 'Then Rs 99/month. Unlimited sermons dekhiye. ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w500,
+                        height: 1.50,
+                        letterSpacing: 0.12,
+                      ),
+                    )
+                  : TextSpan(
+                      text: 'Unlimited Sermons Dekhiye',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontFamily: 'Gilroy',
+                        fontWeight: FontWeight.w500,
+                        height: 1.50,
+                        letterSpacing: 0.12,
+                      ),
+                    ),
               TextSpan(
                 text: '\nCancel anytime.',
                 style: TextStyle(

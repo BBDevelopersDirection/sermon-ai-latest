@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/reusable/app_dialogs.dart';
+import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 import 'package:sermon/services/plan_service/widgets/footer.dart';
@@ -19,20 +20,35 @@ import '../razorpay_service.dart';
 import 'widgets/header_close_button.dart';
 import 'package:sermon/reusable/logger_service.dart';
 
-class SubscriptionTrialScreen extends StatelessWidget {
+class SubscriptionTrialScreen extends StatefulWidget {
   final VideoPlayerController? controller;
   SubscriptionTrialScreen({super.key, this.controller});
 
+  @override
+  State<SubscriptionTrialScreen> createState() =>
+      _SubscriptionTrialScreenState();
+}
+
+class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
   Future<bool> _onWillPop(BuildContext context) async {
-  // 👉 Your custom function here
-  AppLogger.d("Back button pressed! Run cleanup or analytics here.");
-    if (controller != null && !controller!.value.isPlaying) {
-      controller!.play();
-      controller!.setVolume(1);
+    // 👉 Your custom function here
+    AppLogger.d("Back button pressed! Run cleanup or analytics here.");
+    if (widget.controller != null && !widget.controller!.value.isPlaying) {
+      widget.controller!.play();
+      widget.controller!.setVolume(1);
     }
 
     // Return true to allow pop, false to block
     return true;
+  }
+
+  initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -43,18 +59,37 @@ class SubscriptionTrialScreen extends StatelessWidget {
         listener: (context, state) {
           // Handle subscription state changes if needed
         },
-        child: PaywallScreen(controller: controller),
+        child: BlocBuilder<PlanPurchaseCubit, PlanPurchaseState>(
+          builder: (context, state) {
+            if (state.subscriptionType == subscriptionTypes.freeTrial) {
+              return PaywallScreen(
+                controller: widget.controller,
+                isFreeTrialSubscription: true,
+              );
+            } else if (state.subscriptionType ==
+                subscriptionTypes.normalSubscription) {
+              return PaywallScreen(
+                controller: widget.controller,
+                isFreeTrialSubscription: false,
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        ),
       ),
     );
   }
 }
 
-
-
-
 class PaywallScreen extends StatelessWidget {
   final VideoPlayerController? controller;
-  const PaywallScreen({super.key, this.controller});
+  final bool isFreeTrialSubscription;
+  const PaywallScreen({
+    super.key,
+    this.controller,
+    required this.isFreeTrialSubscription,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +113,7 @@ class PaywallScreen extends StatelessWidget {
             const SizedBox(height: 20),
             const TrialMessage(),
             const SizedBox(height: 10),
-            const TrialPriceInfo(),
+            TrialPriceInfo(isFreeTrialSubscription: isFreeTrialSubscription),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,

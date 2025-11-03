@@ -1,25 +1,48 @@
 import 'package:equatable/equatable.dart';
+import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 
-enum planPurchaseErrorCode{
+enum planPurchaseErrorCode {
   noError,
   firebaseUserNotFound,
   customerApiError,
-  createSubscriptionApiError
+  createSubscriptionApiError,
+}
+
+enum loadingStates {
+  buttonLoading,
+  buttonLoadingStop,
+}
+
+enum subscriptionTypes {
+  subscriptionTypeLoading,
+  freeTrial,
+  normalSubscription,
 }
 
 class PlanPurchaseState extends Equatable {
-  bool loading;
+  loadingStates LoadingFreeTrialNormal;
   planPurchaseErrorCode errorCode;
+  subscriptionTypes subscriptionType;
 
-  PlanPurchaseState({required this.loading, required this.errorCode});
+  PlanPurchaseState({
+    required this.LoadingFreeTrialNormal,
+    required this.errorCode,
+    required this.subscriptionType,
+  });
 
-  PlanPurchaseState copyWith({bool? loading, planPurchaseErrorCode? errorCode}) {
+  PlanPurchaseState copyWith({
+    loadingStates? LoadingFreeTrialNormal,
+    planPurchaseErrorCode? errorCode,
+    subscriptionTypes? subscriptionTypes,
+  }) {
     return PlanPurchaseState(
-      loading: loading ?? this.loading,
+      LoadingFreeTrialNormal:
+          LoadingFreeTrialNormal ?? this.LoadingFreeTrialNormal,
       errorCode: errorCode ?? this.errorCode,
+      subscriptionType: subscriptionTypes ?? this.subscriptionType,
     );
   }
 
   @override
-  List<Object> get props => [loading, errorCode];
+  List<Object> get props => [LoadingFreeTrialNormal, errorCode, subscriptionType];
 }
