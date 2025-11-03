@@ -1,8 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/main.dart';
@@ -17,6 +15,7 @@ import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
 import 'package:sermon/services/razorpay_service.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/reusable/logger_service.dart';
 
 class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
@@ -126,10 +125,11 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
             PaymentInProgressPage(subscriptionId: subscriptionId!),
       ),
     );
+    final remoteConfigService = FirebaseRemoteConfigService();
     RazorpayService().openCheckout(
       apiKey: isDebugMode()
-          ? 'rzp_test_zFue9vNxhSABQ6'
-          : 'rzp_live_d5McFTkC2w2nZd',
+          ? remoteConfigService.razorpayTestApiKey
+          : remoteConfigService.razorpayLiveApiKey,
       subscriptionId: subscriptionId,
       onSuccess: () async {
         UtilsFunctions().setRechargeTrue();

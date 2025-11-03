@@ -10,6 +10,7 @@ import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/utils/app_assets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/token_check_service/login_check_cubit.dart';
+import '../services/firebase/firebase_remote_config.dart';
 import '../main.dart';
 
 class PaymentInProgressPage extends StatefulWidget {
@@ -31,39 +32,44 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
   }
 
   void _startListening() {
-    final collectionName = isDebugMode() ? 'test-subscriptions' : 'subscriptions';
+    final remoteConfig = FirebaseRemoteConfigService();
+    final collectionName = isDebugMode()
+        ? remoteConfig.subscriptionCollectionTest
+        : remoteConfig.subscriptionCollectionProd;
     _listener = FirebaseFirestore.instance
         .collection(collectionName)
         .doc(widget.subscriptionId)
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.exists && snapshot.data() != null) {
-        final data = snapshot.data() as Map<String, dynamic>;
-        final status = data['status'] as String?;
-        if (status != null) {
-          final s = status.toLowerCase();
-          AppLogger.d('PaymentInProgressPage: subscription status -> $s');
-          if (s == 'active' || s == 'payment_captured') {
-            MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-              event: LogEventsName.instance().subscriptionCompleteEvent,
-            );
-            // update cubit and pop the page
-            try {
-              final rootCtx = navigatorKey.currentState?.context;
-              if (rootCtx != null) {
-                rootCtx.read<LoginCheckCubit>().emit_show_payment_in_progress(isShow: false);
-                rootCtx.read<LoginCheckCubit>().checkPlanExpire();
-              }
-            } catch (_) {}
+          if (snapshot.exists && snapshot.data() != null) {
+            final data = snapshot.data() as Map<String, dynamic>;
+            final status = data['status'] as String?;
+            if (status != null) {
+              final s = status.toLowerCase();
+              AppLogger.d('PaymentInProgressPage: subscription status -> $s');
+              if (s == 'active' || s == 'payment_captured') {
+                MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  event: LogEventsName.instance().subscriptionCompleteEvent,
+                );
+                // update cubit and pop the page
+                try {
+                  final rootCtx = navigatorKey.currentState?.context;
+                  if (rootCtx != null) {
+                    rootCtx
+                        .read<LoginCheckCubit>()
+                        .emit_show_payment_in_progress(isShow: false);
+                    rootCtx.read<LoginCheckCubit>().checkPlanExpire();
+                  }
+                } catch (_) {}
 
-            // pop this page
-            try {
-              if (mounted) Navigator.of(context, rootNavigator: true).pop();
-            } catch (_) {}
+                // pop this page
+                try {
+                  if (mounted) Navigator.of(context, rootNavigator: true).pop();
+                } catch (_) {}
+              }
+            }
           }
-        }
-      }
-    });
+        });
   }
 
   @override
@@ -100,7 +106,8 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
                   SizedBox(
                     height: 180,
                     child: Lottie.asset(
-                      MyAppAssets.lottie_payment_in_progress, // add your Lottie file
+                      MyAppAssets
+                          .lottie_payment_in_progress, // add your Lottie file
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -149,7 +156,7 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
                           color: Colors.purpleAccent.withOpacity(0.6),
                           blurRadius: 30,
                           spreadRadius: 4,
-                        )
+                        ),
                       ],
                     ),
                     child: const CircularProgressIndicator(
@@ -172,7 +179,9 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
                     context: context,
                     builder: (ctx) => AlertDialog(
                       title: const Text('Confirm'),
-                      content: const Text('Are you sure you want to cancel the payment?'),
+                      content: const Text(
+                        'Are you sure you want to cancel the payment?',
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(false),
@@ -190,8 +199,11 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
                     // First, try to update the cubit via a stable root context so
                     // other listeners can react.
                     try {
-                      final rootCtx = navigatorKey.currentState?.context ?? context;
-                      rootCtx.read<LoginCheckCubit>().emit_show_payment_in_progress(isShow: false);
+                      final rootCtx =
+                          navigatorKey.currentState?.context ?? context;
+                      rootCtx
+                          .read<LoginCheckCubit>()
+                          .emit_show_payment_in_progress(isShow: false);
                     } catch (e) {
                       // ignore
                     }

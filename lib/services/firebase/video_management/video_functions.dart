@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sermon/services/firebase/firestore_variables.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 
 import '../../../models/video_data_model.dart';
 
@@ -50,14 +51,16 @@ class VideoFunctions {
   }
 
   // New way by videos collection
-  Stream<List<SectionDetail>>  cvwgetSectionsByCategoriesStream(
-  ) {
+  Stream<List<SectionDetail>> cvwgetSectionsByCategoriesStream() {
+    // Get category order from Remote Config
+    final categories = FirebaseRemoteConfigService().categoryOrder;
+
     final videosRef = FirebaseFirestore.instance.collection(
       FirestoreVariables.videosCollection,
     );
 
     final query = videosRef
-        .where('category', whereIn: defaultVideoCategories)
+        .where('category', whereIn: categories)
         .orderBy('createdDate', descending: true);
 
     return query.snapshots().map((snapshot) {
@@ -78,8 +81,9 @@ class VideoFunctions {
         (categoryToVideos[category] ??= <VideoDataModel>[]).add(video);
       }
 
+      // Build sections in the Remote Config category order
       final List<SectionDetail> sections = [];
-      for (final category in defaultVideoCategories) {
+      for (final category in categories) {
         final videos = categoryToVideos[category];
         if (videos == null || videos.isEmpty) continue;
         sections.add(SectionDetail(nameOfSection: category, videos: videos));

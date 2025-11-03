@@ -10,6 +10,7 @@ import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/g
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/section_to_show.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/video_management/video_functions.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import '../../../../reusable/my_scaffold_widget.dart';
@@ -28,6 +29,8 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
     // FirebaseUser user = HiveBoxFunctions().getLoginDetails()!;
     // AppLogger.i(user.createdDate.toString());
     context.read<LoginCheckCubit>().checkForUpdate();
+    print('homeGreetingText: ${FirebaseRemoteConfigService().homeGreetingText}');
+    print('homeSubtitleText: ${FirebaseRemoteConfigService().homeSubtitleText}');
     super.initState();
   }
 
@@ -44,7 +47,7 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 12, left: 12),
                   child: Text(
-                    'Hello there,',
+                    FirebaseRemoteConfigService().homeGreetingText,
                     textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Colors.white,
@@ -58,7 +61,7 @@ class _BottomNavFirstScreenState extends State<BottomNavFirstScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 12),
                   child: AutoSizeText(
-                    'Serman\'s suniye aur aapke spiritual life ko grow kare.',
+                    FirebaseRemoteConfigService().homeSubtitleText,
                     maxLines: 1,
                     style: TextStyle(
                       color: Colors.white60,

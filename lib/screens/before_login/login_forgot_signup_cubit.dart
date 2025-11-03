@@ -23,6 +23,7 @@ import 'package:sermon/reusable/logger_service.dart';
 import '../../main.dart';
 import '../../reusable/app_dialogs.dart';
 import '../../services/firebase/otp_service.dart';
+import '../../services/firebase/firebase_remote_config.dart';
 import '../../services/hive_box/hive_box_functions.dart';
 import '../../services/log_service/log_service.dart';
 import '../../services/log_service/log_variables.dart';
@@ -346,11 +347,12 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       }
       AppLogger.d("🔄 Requesting access token...");
 
+      final remoteConfig = FirebaseRemoteConfigService();
       final tokenResponse = await dio.post(
-        'https://oauth-account-noneu.truecaller.com/v1/token',
+        remoteConfig.truecallerTokenEndpoint,
         data: {
           'grant_type': 'authorization_code',
-          'client_id': 'geccxmob7lmixsk6unz06-wwb91d9wksd8il0hmc-5i',
+          'client_id': remoteConfig.truecallerClientId,
           'code': authCode,
           'code_verifier': _codeVerifier,
           // Optional: 'redirect_uri': 'your.registered.uri',
@@ -370,7 +372,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       AppLogger.d("📡 Requesting user info...");
 
       final profileResponse = await dio.get(
-        'https://oauth-account-noneu.truecaller.com/v1/userinfo',
+        remoteConfig.truecallerUserinfoEndpoint,
         options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
