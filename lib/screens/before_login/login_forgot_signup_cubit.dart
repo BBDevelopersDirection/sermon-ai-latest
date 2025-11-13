@@ -88,10 +88,20 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         },
         onVerificationFailed: (e) {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+          MyAppDialogs().info_dialog(
+            context: context,
+            title: "Error",
+            body: '${e.message}',
+          );
           AppLogger.e("Verification failed: ${e.message}");
         },
         onAutoRetrievalTimeout: () {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+          MyAppDialogs().info_dialog(
+            context: context,
+            title: "Sorry",
+            body: 'OTP auto retrieval timeout.',
+          );
           AppLogger.d("OTP auto retrieval timeout.");
         },
       );
@@ -128,49 +138,43 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             message: 'User is null after OTP verification.',
           );
         }
-        FirestoreFunctions()
-            .getFirebaseUser(
-              userId:
-                  FirebaseAuth.instance.currentUser?.uid ??
-                  HiveBoxFunctions().getUuid(),
-            )
-            .then((value) async {
-              if (value == null) {
-                // If user data is null, create a new user
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider.value(
-                      value: this,
-                      child: SignUpThirdScreen(number: number),
-                    ),
-                  ),
-                );
-                return;
-              }
-              await FirestoreFunctions().ensureCreatedDateExists(
-                userId: value.uid,
-              );
-              Future.wait([
-                MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().loginFirebase,
+        FirestoreFunctions().getFirebaseUserByNumber(number: number).then((
+          value,
+        ) async {
+          if (value == null) {
+            // If user data is null, create a new user
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => BlocProvider.value(
+                  value: this,
+                  child: SignUpThirdScreen(number: number),
                 ),
-                HiveBoxFunctions().saveLoginDetails(
-                  FirebaseUser(
-                    uid: value.uid,
-                    phoneNumber: value.phoneNumber,
-                    name: value.name,
-                    email: value.email,
-                    subscriptionId: value.subscriptionId,
-                    createdDate: value.createdDate,
-                  ),
-                ),
-                NotificationService.instance.requestPermissionAndGetToken(),
-              ]);
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => LoginCheckScreen()),
-                (route) => false,
-              );
-            });
+              ),
+            );
+            return;
+          }
+          await FirestoreFunctions().ensureCreatedDateExists(userId: value.uid);
+          Future.wait([
+            MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+              event: LogEventsName.instance().loginFirebase,
+            ),
+            HiveBoxFunctions().saveLoginDetails(
+              FirebaseUser(
+                uid: value.uid,
+                phoneNumber: value.phoneNumber,
+                name: value.name,
+                email: value.email,
+                subscriptionId: value.subscriptionId,
+                createdDate: value.createdDate,
+              ),
+            ),
+            NotificationService.instance.requestPermissionAndGetToken(),
+          ]);
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+            (route) => false,
+          );
+        });
       } catch (e) {
         // AppLogger.d("OTP verification failed: $e");
         emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
@@ -552,6 +556,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
                 totalVideoCount: 0,
                 isRecharged: false,
                 videoCountToCheckSub: 0,
+                is30DaysSubscriptionID: false,
               ),
             ),
             HiveBoxFunctions().saveLoginDetails(

@@ -34,6 +34,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             context: context,
             controller: mobile_num,
           );
+          // context
+          //                         .read<LoginForgotSignupCubit>()
+          //                         .userRegisteration(
+          //                           phoneNumber: "+91${mobile_num.text}",
+          //                           fullName: '',
+          //                           email: '',
+          //                         );
         });
       }
     });
@@ -165,13 +172,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     context: context,
                                     controller: mobile_num,
                                   );
-                              // context
-                              //     .read<LoginForgotSignupCubit>()
-                              //     .userRegisteration(
-                              //       phoneNumber: "+91${mobile_num.text}",
-                              //       fullName: '',
-                              //       email: '',
-                              //     );
                             },
                             child:
                                 state.loadingStatus !=

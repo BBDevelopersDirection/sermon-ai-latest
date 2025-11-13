@@ -60,6 +60,7 @@ class MyAppEndpoints {
         'userId': razorpayCustomerResponse.customer?.userId,
         'planType': 'monthly',
         'totalCount': 12,
+        'startDate': 7,
         'customerNotify': 1,
       };
       AppLogger.d("Data for subscription: $data");

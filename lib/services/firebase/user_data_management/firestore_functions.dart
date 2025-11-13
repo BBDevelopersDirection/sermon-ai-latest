@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 
+import '../../../reusable/logger_service.dart';
 import '../firestore_variables.dart';
 import '../models/user_models.dart';
 
@@ -27,6 +28,43 @@ class FirestoreFunctions {
     }
     return null; // Placeholder return value
   }
+
+  Future<FirebaseUser?> getFirebaseUserByNumber({
+  required String number,
+}) async {
+  try {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection(FirestoreVariables.usersCollection)
+        .where(FirestoreVariables.phoneField, isEqualTo: '+91$number')
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final doc = querySnapshot.docs.first;
+      final firebaseUser = FirebaseUser.fromJson(doc.data());
+
+      // Save details in Hive
+      HiveBoxFunctions().saveLoginDetails(
+        FirebaseUser(
+          uid: firebaseUser.uid,
+          phoneNumber: firebaseUser.phoneNumber,
+          name: firebaseUser.name,
+          email: firebaseUser.email,
+          subscriptionId: firebaseUser.subscriptionId,
+          createdDate: firebaseUser.createdDate,
+        ),
+      );
+
+      return firebaseUser;
+    }
+
+    return null; // No user found
+  } catch (e) {
+    AppLogger.e('❌ Error getting Firebase user by number: $e');
+    return null;
+  }
+}
+
 
   // Example function to set user data
   Future<void> newFirebaseUserData({required FirebaseUser firebaseUser}) async {
