@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class TrialMessage extends StatelessWidget {
-  const TrialMessage({super.key});
+  String message;
+  TrialMessage({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -9,11 +10,8 @@ class TrialMessage extends StatelessWidget {
     final double fontSize = screenWidth * 0.035; // ~3.5% of width
 
     return Text(
-      "Apka free limit end hogaya ha",
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: fontSize,
-      ),
+      message,
+      style: TextStyle(color: Colors.white, fontSize: fontSize),
       textAlign: TextAlign.center,
     );
   }

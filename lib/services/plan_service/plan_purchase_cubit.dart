@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/main.dart';
+import 'package:sermon/reusable/app_dialogs.dart';
 import 'package:sermon/reusable/payment_in_progress_page.dart';
 import 'package:sermon/network/endpoints.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
@@ -87,22 +88,12 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
     if (subscriptionId == null ||
         subscriptionId.trim() == '' ||
         subscriptionId.contains('no subscriptions')) {
-      RazorpayCustomerResponse? razorpayCustomerResponse = await createPlan();
-      if (razorpayCustomerResponse == null) {
+      String? newSubscriptionId = await createSubscriptionId(context: context);
+      if (newSubscriptionId == null) {
         emit(state.copyWith(loading: false));
         return;
       }
-
-      final data = await Future.wait([
-        createSubscription(
-          providedRazorpayCustomerResponse: razorpayCustomerResponse,
-        ),
-        MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-          event: LogEventsName.instance().subscribeNowButtonTap,
-        ),
-      ]);
-
-      subscriptionId = data[0] as String;
+      subscriptionId = newSubscriptionId;
       await FirestoreFunctions().updateOrSaveSubscriptionIdFirestoreData(
         subscriptionId: subscriptionId,
       );
@@ -110,11 +101,11 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
 
     // subscription listening is handled by PaymentInProgressPage
 
-    if (subscriptionId == null ||
-        subscriptionId.trim() == '' ||
+    if (subscriptionId.trim() == '' ||
         subscriptionId.contains('no subscriptions')) {
       emit(state.copyWith(loading: false));
-      return;
+      AppLogger.e('Subscription API not working properly');
+      throw Exception("Subscription API not working properly");
     }
 
     emit(state.copyWith(loading: false));
@@ -135,5 +126,34 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
         UtilsFunctions().setRechargeTrue();
       },
     );
+  }
+
+  Future<String?> createSubscriptionId({required BuildContext context}) async {
+    try {
+      RazorpayCustomerResponse? razorpayCustomerResponse = await createPlan();
+      if (razorpayCustomerResponse == null) {
+        emit(state.copyWith(loading: false));
+        return null;
+      }
+
+      AppLogger.e('${razorpayCustomerResponse.toJson()}');
+
+      final data = await Future.wait([
+        createSubscription(
+          providedRazorpayCustomerResponse: razorpayCustomerResponse,
+        ),
+        MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+          event: LogEventsName.instance().subscribeNowButtonTap,
+        ),
+      ]);
+      AppLogger.e(data.toString());
+      return data[0] as String;
+    } catch (e) {
+      MyAppDialogs().info_dialog(
+        context: context,
+        title: 'Error',
+        body: "Error while creating Subscription",
+      );
+    }
   }
 }

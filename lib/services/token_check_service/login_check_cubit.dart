@@ -62,7 +62,7 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     }
   }
 
-  Future<void> checkToken() async {
+  Future<void> checkToken({required BuildContext context}) async {
     try {
       // SharedPreferenceLogic.setLoginFalse();
       // HiveBoxFunctions().removeLoginDetails();
@@ -76,7 +76,7 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
               FirebaseAuth.instance.currentUser?.uid ??
               HiveBoxFunctions().getUuid(),
         );
-        checkPlanExpire();
+        checkPlanExpire(context: context);
       } else {
         emit(state.copyWith(loading: false, isTokenPresent: false));
       }
@@ -94,12 +94,13 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
         totalVideoCount: 0,
         isRecharged: false,
         videoCountToCheckSub: 0,
+        is30DaysSubscriptionID: false,
       ),
     );
   }
 
-  Future<void> checkPlanExpire() async {
-    await UtilsFunctions().setRechargeFalseIfRechargeExpires();
+  Future<void> checkPlanExpire({required BuildContext context}) async {
+    await UtilsFunctions().setRechargeFalseIfRechargeExpires(context: context);
     // await UtilsFunctions().setRechargeTrue();
   }
 

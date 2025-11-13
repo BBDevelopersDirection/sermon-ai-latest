@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:lottie/lottie.dart'; // Add in pubspec.yaml for animations
+import 'package:sermon/services/firebase/firestore_variables.dart';
+import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/utils/app_assets.dart';
@@ -40,14 +42,26 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
         .collection(collectionName)
         .doc(widget.subscriptionId)
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot) async {
           if (snapshot.exists && snapshot.data() != null) {
             final data = snapshot.data() as Map<String, dynamic>;
             final status = data['status'] as String?;
             if (status != null) {
               final s = status.toLowerCase();
               AppLogger.d('PaymentInProgressPage: subscription status -> $s');
-              if (s == 'active' || s == 'payment_captured') {
+              if (s ==
+                      subscriptionStatusToString(
+                        subscriptionStatus: SubscriptionStatus.subscription_authenticated,
+                      )||s ==
+                      subscriptionStatusToString(
+                        subscriptionStatus: SubscriptionStatus.subscription_active,
+                      )||s ==
+                      subscriptionStatusToString(
+                        subscriptionStatus: SubscriptionStatus.active,
+                      ) ||
+                  s == subscriptionStatusToString(
+                        subscriptionStatus: SubscriptionStatus.payment_captured,
+                      )) {
                 MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                   event: LogEventsName.instance().subscriptionCompleteEvent,
                 );
@@ -55,10 +69,12 @@ class _PaymentInProgressPageState extends State<PaymentInProgressPage> {
                 try {
                   final rootCtx = navigatorKey.currentState?.context;
                   if (rootCtx != null) {
+                    await rootCtx.read<LoginCheckCubit>().checkPlanExpire(
+                      context: context,
+                    );
                     rootCtx
                         .read<LoginCheckCubit>()
                         .emit_show_payment_in_progress(isShow: false);
-                    rootCtx.read<LoginCheckCubit>().checkPlanExpire();
                   }
                 } catch (_) {}
 
