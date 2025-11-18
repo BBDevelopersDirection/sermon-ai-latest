@@ -37,16 +37,45 @@ class FirestoreVariables {
 
   static const String rechargeEndDate = 'RECHARGE_END_DATE';
   static const String rechargeStartDate = 'RECHARGE_START_DATE';
+  static const String is30DaysSubscriptionID = 'is30DaysSubscriptionID';
 
   static const int totalVideoCountUserCanSee = 1;
   static const int totalReelCountUserCanSee = 2;
 }
 
-
 enum SubscriptionStatus {
   active,
   payment_captured,
+  subscription_active,
+  subscription_authenticated,
   cancelled,
   nullStatus,
-  created
+  created,
+}
+
+String subscriptionStatusToString({
+  required SubscriptionStatus subscriptionStatus,
+}) {
+  switch (subscriptionStatus) {
+    case SubscriptionStatus.active:
+      return "active";
+
+    case SubscriptionStatus.payment_captured:
+      return "payment_captured";
+
+    case SubscriptionStatus.subscription_active:
+      return "subscription_active";
+
+    case SubscriptionStatus.subscription_authenticated:
+      return "subscription_authenticated";
+
+    case SubscriptionStatus.cancelled:
+      return "cancelled";
+
+    case SubscriptionStatus.created:
+      return "created";
+
+    case SubscriptionStatus.nullStatus:
+      return "null";
+  }
 }

@@ -8,13 +8,15 @@ class UtilityModel {
   final bool isRecharged;
   final int videoCountToCheckSub;
   final DateTime? rechargeStartDate; // new
-  final DateTime? rechargeEndDate;   // new
+  final DateTime? rechargeEndDate; // new
+  final bool is30DaysSubscriptionID;
 
   UtilityModel({
     required this.userId,
     required this.totalVideoCount,
     required this.isRecharged,
     required this.videoCountToCheckSub,
+    required this.is30DaysSubscriptionID,
     this.rechargeStartDate,
     this.rechargeEndDate,
   });
@@ -24,9 +26,11 @@ class UtilityModel {
       userId: json[FirestoreVariables.userIdField] as String,
       totalVideoCount: json[FirestoreVariables.totalVideoCount] as int,
       isRecharged: json[FirestoreVariables.isRecharged] as bool,
-      videoCountToCheckSub: json[FirestoreVariables.videoCountToCheckSub] as int,
+      videoCountToCheckSub:
+          json[FirestoreVariables.videoCountToCheckSub] as int,
       rechargeStartDate: json[FirestoreVariables.rechargeStartDate]?.toDate(),
       rechargeEndDate: json[FirestoreVariables.rechargeEndDate]?.toDate(),
+      is30DaysSubscriptionID: json[FirestoreVariables.is30DaysSubscriptionID] as bool,
     );
   }
 
@@ -38,6 +42,7 @@ class UtilityModel {
       FirestoreVariables.videoCountToCheckSub: videoCountToCheckSub,
       FirestoreVariables.rechargeStartDate: rechargeStartDate,
       FirestoreVariables.rechargeEndDate: rechargeEndDate,
+      FirestoreVariables.is30DaysSubscriptionID: is30DaysSubscriptionID,
     };
   }
 
@@ -50,6 +55,7 @@ class UtilityModel {
       FirestoreVariables.videoCountToCheckSub: videoCountToCheckSub,
       FirestoreVariables.rechargeStartDate: rechargeStartDate,
       FirestoreVariables.rechargeEndDate: rechargeEndDate,
+      FirestoreVariables.is30DaysSubscriptionID: is30DaysSubscriptionID,
     };
   }
 
@@ -62,6 +68,7 @@ class UtilityModel {
       videoCountToCheckSub: map[FirestoreVariables.videoCountToCheckSub] as int,
       rechargeStartDate: map[FirestoreVariables.rechargeStartDate]?.toDate(),
       rechargeEndDate: map[FirestoreVariables.rechargeEndDate]?.toDate(),
+      is30DaysSubscriptionID: map[FirestoreVariables.is30DaysSubscriptionID] as bool,
     );
   }
 }

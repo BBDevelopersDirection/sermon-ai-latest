@@ -48,6 +48,12 @@ class SubscriptionCollectionOfUser {
       statusEnum = SubscriptionStatus.cancelled;
     } else if (status == 'created'){
       statusEnum = SubscriptionStatus.created;
+    } else if (status == 'payment_captured'){
+      statusEnum = SubscriptionStatus.payment_captured;
+    }else if (status == 'subscription_active'){
+      statusEnum = SubscriptionStatus.subscription_active;
+    }else if(status == 'subscription_authenticated'){
+      statusEnum = SubscriptionStatus.subscription_authenticated;
     }
 
     return SubscriptionCollectionOfUser(
