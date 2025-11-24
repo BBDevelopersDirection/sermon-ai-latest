@@ -1,63 +1,65 @@
 import 'dart:async';
-import 'package:chewie/chewie.dart';
+import 'package:apivideo_player/apivideo_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/reusable/pulsing_icon_anim.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:video_player/video_player.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
-import '../services/log_service/log_service.dart';
-import '../services/log_service/log_variables.dart';
-import '../services/plan_service/plan_purchase_cubit.dart';
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
+import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
+import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 
 class VideoPlayerUsingId extends StatefulWidget {
-  String url;
-  bool isCaraousel;
-  VideoPlayerUsingId({super.key, required this.url, this.isCaraousel = false});
+  final String url; // this will be the api.video videoId or video URL
+  final bool isCaraousel;
+
+  const VideoPlayerUsingId({
+    super.key,
+    required this.url,
+    this.isCaraousel = false,
+  });
 
   @override
   State<VideoPlayerUsingId> createState() => _VideoPlayerUsingIdState();
 }
 
 class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
-  late VideoPlayerController videoPlayerController;
-  ChewieController? chewieController;
+  late ApiVideoPlayerController apiVideoController;
+  bool isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    // Keep screen on and hide system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    // Enable wakelock to prevent screen from turning off
     WakelockPlus.enable();
+
     initialize();
   }
 
   Future<void> initialize() async {
-    videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse(widget.url),
-    );
-
     if (widget.isCaraousel) {
       await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().videoOfTheDayEvent,
       );
     }
+
     UtilsFunctions().canUseVideo().then((canUseVideo) async {
-      AppLogger.d('I can use video: $canUseVideo');
+      AppLogger.d("I can use video: $canUseVideo");
 
       if (!canUseVideo) {
         await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().subscribePageByVideoPlay,
-                );
+          event: LogEventsName.instance().subscribePageByVideoPlay,
+        );
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => BlocProvider(
-              create: (context) => PlanPurchaseCubit(),
+              create: (_) => PlanPurchaseCubit(),
               child: SubscriptionTrialScreen(),
             ),
           ),
@@ -65,61 +67,48 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
         return;
       }
 
-      Future.wait([
+      await Future.wait([
         MyAppAmplitudeAndFirebaseAnalitics().logEvent(
           event: LogEventsName.instance().videoOpenEvent,
         ),
         UtilsFunctions().increaseVideoCount(),
       ]);
 
-      await videoPlayerController.initialize();
-
-      chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
-        autoPlay: true,
-        looping: true,
-        showOptions: false,
-        // autoInitialize: true,
-        // aspectRatio: 16/9,
-        allowFullScreen: true,
-        // maxScale: 1,
-        allowMuting: true,
-        fullScreenByDefault: false,
-        zoomAndPan: true,
-        // pauseOnBackgroundTap:true,
-        customControls: CupertinoControls(
-          backgroundColor: Colors.black54,
-          iconColor: Colors.white,
-        ),
+      // ---------- NEW API VIDEO CONTROLLER -----------
+      print('video url is: ${widget.url}');
+      apiVideoController = ApiVideoPlayerController(
+        autoplay: true,
+        videoOptions: VideoOptions(videoId: extractVideoId(widget.url)),
       );
 
-      // i want chewieController video to be vertical
-      chewieController?.play();
+      // wait for player to be ready
+      await apiVideoController.initialize();
 
-      // Refresh the UI after the ChewieController is initialized
-      setState(() {});
+      setState(() => isInitialized = true);
     });
+  }
+
+  String extractVideoId(String url) {
+    return url.split("/vod/")[1].split("/").first;
   }
 
   @override
   void dispose() {
-    // Disable wakelock when leaving the screen
     WakelockPlus.disable();
-    // Restore normal system UI mode
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    videoPlayerController.dispose();
-    chewieController?.dispose();
+
+    apiVideoController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Return a placeholder or loading spinner while the controller is not initialized
-    if (chewieController == null) {
+    if (!isInitialized) {
       return Scaffold(
         backgroundColor: Colors.black,
         body: Center(
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.sizeOf(context).width * 0.5,
             child: PulsingIconAnim(),
           ),
@@ -132,15 +121,49 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
       body: SafeArea(
         child: Stack(
           children: [
-            Chewie(controller: chewieController!),
+            // ------------------ API VIDEO PLAYER ------------------
+            ApiVideoPlayer(
+  controller: apiVideoController,
+  style: PlayerStyle(
+    timeSliderStyle: TimeSliderStyle(
+      sliderTheme: SliderThemeData(
+        activeTrackColor: Colors.white,    // Played portion
+        inactiveTrackColor: Colors.black45,  // Remaining portion
+        thumbColor: Colors.white,          // Circle handle
+        overlayColor: Colors.white.withOpacity(0.2),
+      ),
+    ),
+    controlsBarStyle: ControlsBarStyle(
+      mainControlButtonStyle: ButtonStyle(
+        iconColor: WidgetStateProperty.all(Colors.white), // Play / Pause
+      ),
+      seekForwardControlButtonStyle: ButtonStyle(
+        iconColor: WidgetStateProperty.all(Colors.white), // Forward 10s
+      ),
+      seekBackwardControlButtonStyle: ButtonStyle(
+        iconColor: WidgetStateProperty.all(Colors.white), // Backward 10s
+      ),
+    ),
+    settingsBarStyle: SettingsBarStyle(
+      // hide the speed button by giving it zero size
+      buttonStyle: ButtonStyle(
+        minimumSize: WidgetStateProperty.all(Size.zero),
+        fixedSize: WidgetStateProperty.all(Size.zero),
+        maximumSize: WidgetStateProperty.all(Size.zero),
+        padding: WidgetStateProperty.all(EdgeInsets.zero),
+        elevation: WidgetStateProperty.all(0),
+        backgroundColor: WidgetStateProperty.all(Colors.transparent),
+      ),
+    ),
+  ),
+),
+
+            // ------------------ BACK BUTTON ------------------
             Container(
-              color: Colors.black,
+              padding: const EdgeInsets.only(left: 8, top: 8),
               child: IconButton(
-                color: Colors.black,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
             ),
           ],
