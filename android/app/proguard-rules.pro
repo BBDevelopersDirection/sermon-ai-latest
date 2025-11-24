@@ -18,3 +18,5 @@
 # Keep OpenJSSE
 -keep class org.openjsse.** { *; }
 -dontwarn org.openjsse.**
+
+-dontwarn org.slf4j.impl.StaticLoggerBinder
