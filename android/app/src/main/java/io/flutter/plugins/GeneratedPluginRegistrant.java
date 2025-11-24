@@ -21,6 +21,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin amplitude_flutter, com.amplitude.amplitude_flutter.AmplitudeFlutterPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new video.api.flutter.player.ApiVideoPlayerPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin apivideo_player, video.api.flutter.player.ApiVideoPlayerPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestorePlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin cloud_firestore, io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestorePlugin", e);
