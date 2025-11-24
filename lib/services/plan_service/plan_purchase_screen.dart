@@ -120,9 +120,9 @@ class PaywallScreen30Days extends StatelessWidget {
                 controller?.setVolume(1);
               },
               imagePaths: [
-                MyAppAssets.png_paywall_1, // Replace with your image paths
-                MyAppAssets.png_paywall_2,
-                MyAppAssets.png_paywall_3,
+                MyAppAssets.png_login_image_5, // Replace with your image paths
+                MyAppAssets.png_login_image_6,
+                MyAppAssets.png_login_image_2,
               ],
             ),
             const SizedBox(height: 20),
@@ -181,9 +181,9 @@ class PaywallScreen7Days extends StatelessWidget {
                 controller?.setVolume(1);
               },
               imagePaths: [
-                MyAppAssets.png_paywall_1, // Replace with your image paths
-                MyAppAssets.png_paywall_2,
+                MyAppAssets.png_login_image_5, // Replace with your image paths
                 MyAppAssets.png_login_image_6,
+                MyAppAssets.png_login_image_2,
               ],
             ),
             const SizedBox(height: 20),
