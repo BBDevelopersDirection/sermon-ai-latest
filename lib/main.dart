@@ -46,6 +46,12 @@ void main() async {
     // Initialize Firebase Remote Config
     await FirebaseRemoteConfigService().initialize();
     AppLogger.d('📡 Firebase Remote Config initialized');
+
+    try{
+      await FirebaseRemoteConfigService().refresh();
+    } catch (e) {
+      AppLogger.e('❌ Error refreshing Firebase Remote Config: $e');
+    }
   } catch (e) {
     AppLogger.e('❌ Error initializing Firebase: $e');
   }

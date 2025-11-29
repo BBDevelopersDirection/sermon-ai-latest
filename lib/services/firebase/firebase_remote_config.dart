@@ -58,6 +58,21 @@ class FirebaseRemoteConfigService {
     }
   }
 
+  int getInt(String key) {
+  if (!_initialized) {
+    AppLogger.w('⚠️ Remote Config not initialized; call initialize() first.');
+    return 0;
+  }
+  try {
+    final value = _remoteConfig.getInt(key);
+    return value;
+  } catch (e) {
+    AppLogger.e('❌ Error getting int Remote Config value for "$key": $e');
+    return 0;
+  }
+}
+
+
   /// Example getters — all fetched remotely
   String get razorpayTestApiKey => getString('razorpay_test_api_key');
   String get razorpayLiveApiKey => getString('razorpay_live_api_key');
@@ -77,6 +92,8 @@ class FirebaseRemoteConfigService {
   String get homeGreetingText => getString('home_greeting_text');
   String get homeSubtitleText => getString('home_subtitle_text');
   String get whatsappErrorMessage => getString('whatsapp_error_message');
+  int get totalVideoCountUserCanSee => getInt('total_video_count_user_can_see');
+  int get totalReelCountUserCanSee => getInt('total_reel_count_user_can_see');
 
   /// Get Category Order as List<String>
   List<String> get categoryOrder {

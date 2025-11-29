@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/network/endpoints.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/firebase/subscription_management/subscription_function.dart';
@@ -86,8 +87,8 @@ class UtilsFunctions {
 
     if (utility.isRecharged) return true;
 
-    return utility.videoCountToCheckSub <=
-        FirestoreVariables.totalVideoCountUserCanSee;
+    return utility.totalVideoCount <=
+        FirebaseRemoteConfigService().totalVideoCountUserCanSee-1;
   }
 
   Future<bool> canUseReel({required int index}) async {
@@ -104,7 +105,7 @@ class UtilsFunctions {
 
     if (utility.isRecharged) return true;
 
-    return index < FirestoreVariables.totalReelCountUserCanSee;
+    return index <= FirebaseRemoteConfigService().totalReelCountUserCanSee-1;
   }
 
   Future<void> increaseVideoCount() async {
@@ -117,17 +118,7 @@ class UtilsFunctions {
     );
     if (utility != null) {
       final newCount = utility.totalVideoCount + 1;
-      final newVideoCountToCheckSub;
-      if (utility.isRecharged) {
-        newVideoCountToCheckSub = FirestoreVariables.totalVideoCountUserCanSee;
-      } else {
-        newVideoCountToCheckSub = utility.videoCountToCheckSub + 1;
-      }
       Future.wait([
-        updateFirebaseUtilityData(
-          fieldName: FirestoreVariables.videoCountToCheckSub,
-          newValue: newVideoCountToCheckSub,
-        ),
         updateFirebaseUtilityData(
           fieldName: FirestoreVariables.totalVideoCount,
           newValue: newCount,
@@ -199,7 +190,7 @@ class UtilsFunctions {
     if (utility == null) return;
 
     try {
-      final bool hasSubscription;
+      bool hasSubscription;
       FirebaseUser? loggedInUncheckFirebaseUser = HiveBoxFunctions()
           .getLoginDetails();
       if (loggedInUncheckFirebaseUser == null ||
@@ -263,6 +254,7 @@ class UtilsFunctions {
           }
         }
       }
+      hasSubscription = false;
       // Its not dead code for ide i wrote this so it wont give me warning.
       // ignore: dead_code
       if (hasSubscription) {

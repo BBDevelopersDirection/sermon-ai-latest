@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
@@ -27,7 +28,6 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
   final PageController _pageController = PageController();
   late BottomNavZeroCubit _cubit;
   int _currentPage = 0;
-  int _maxFreeIndex = 1;
   final Map<int, VideoPlayerController> _controllers = {};
 
   @override
@@ -167,7 +167,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                 // }
 
                 Future.microtask(() async {
-                  if (index > _maxFreeIndex) {
+                  if (index > 0) {
                     var canUseVideo = await UtilsFunctions().canUseReel(
                       index: index,
                     );
@@ -175,12 +175,20 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                         event: LogEventsName.instance().subscribePageByReels,
                       );
-
+                      int index =
+                          FirebaseRemoteConfigService()
+                                      .totalReelCountUserCanSee -
+                                  1 <
+                              0
+                          ? 0
+                          : FirebaseRemoteConfigService()
+                                    .totalReelCountUserCanSee -
+                                1;
                       // Snap back safely
                       Future.delayed(Duration.zero, () {
                         if (_pageController.hasClients) {
                           _pageController.animateToPage(
-                            _maxFreeIndex,
+                            index,
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
@@ -188,7 +196,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen> {
                       });
 
                       // Pause and mute
-                      final ctrl = _controllers[_maxFreeIndex];
+                      final ctrl = _controllers[index];
                       ctrl?.pause();
                       ctrl?.setVolume(0);
 
