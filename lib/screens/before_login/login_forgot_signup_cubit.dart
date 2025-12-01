@@ -171,7 +171,10 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             NotificationService.instance.requestPermissionAndGetToken(),
           ]);
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  LoginCheckScreen(isLoginOrRegesterFlow: true),
+            ),
             (route) => false,
           );
         });
@@ -456,7 +459,9 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
       // Navigate to login check screen
       Navigator.of(navigatorKey.currentContext!).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+        MaterialPageRoute(
+          builder: (context) => LoginCheckScreen(isLoginOrRegesterFlow: true),
+        ),
         (route) => false,
       );
     } else {
@@ -578,7 +583,10 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
           ]);
 
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+            MaterialPageRoute(
+              builder: (context) =>
+                  LoginCheckScreen(isLoginOrRegesterFlow: true),
+            ),
             (route) => false,
           );
         })

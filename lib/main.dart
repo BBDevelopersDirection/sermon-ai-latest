@@ -23,6 +23,8 @@ import 'package:sermon/services/firebase/firebase_remote_config.dart';
 
 // Global navigator key for navigation from outside of build context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure proper initialization
@@ -95,6 +97,7 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => LoginCheckCubit()..freshInstallEventLog(),
       child: MaterialApp(
+        navigatorObservers: [routeObserver],
         navigatorKey: navigatorKey, // Add navigator key here
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

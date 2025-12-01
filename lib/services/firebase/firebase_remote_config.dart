@@ -94,6 +94,7 @@ class FirebaseRemoteConfigService {
   String get whatsappErrorMessage => getString('whatsapp_error_message');
   int get totalVideoCountUserCanSee => getInt('total_video_count_user_can_see');
   int get totalReelCountUserCanSee => getInt('total_reel_count_user_can_see');
+  int get rechargePageDelaySecondsAfterLogin => getInt('recharge_page_delay_seconds_after_login');
 
   /// Get Category Order as List<String>
   List<String> get categoryOrder {

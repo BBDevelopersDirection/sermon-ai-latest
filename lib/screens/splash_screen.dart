@@ -16,22 +16,25 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   void change_page({required BuildContext context}) {
-  context.read<LoginCheckCubit>().checkForUpdate().then(
-    (_) => Future.delayed(const Duration(milliseconds: 500)).then((_) async {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginCheckScreen()),
-      );
-    }),
-  );
-}
+    context.read<LoginCheckCubit>().checkForUpdate().then(
+      (_) => Future.delayed(const Duration(milliseconds: 500)).then((_) async {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) =>
+                LoginCheckScreen(isLoginOrRegesterFlow: false),
+          ),
+        );
+      }),
+    );
+  }
 
-@override
-void initState() {
-  super.initState();
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    change_page(context: context);
-  });
-}
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      change_page(context: context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +46,9 @@ void initState() {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              width: MediaQuery
-            .sizeOf(context)
-            .width*0.45,
-              child: SvgPicture.asset(MyAppAssets.svg_image_icon_full))
+              width: MediaQuery.sizeOf(context).width * 0.45,
+              child: SvgPicture.asset(MyAppAssets.svg_image_icon_full),
+            ),
           ],
         ),
       ),
