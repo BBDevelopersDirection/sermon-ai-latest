@@ -10,7 +10,8 @@ import 'login_check_cubit.dart';
 import 'login_check_state.dart';
 
 class LoginCheckScreen extends StatefulWidget {
-  const LoginCheckScreen({super.key});
+  bool isLoginOrRegesterFlow;
+  LoginCheckScreen({super.key, required this.isLoginOrRegesterFlow});
 
   @override
   State<LoginCheckScreen> createState() => _LoginCheckScreenState();
@@ -64,7 +65,9 @@ class _LoginCheckScreenState extends State<LoginCheckScreen> {
 
   Widget _token_found() {
     return BlocProvider(
-      create: (context) => BottomNavCubit(),
+      create: (context) =>
+          BottomNavCubit()
+            ..showRechargePage(isShow: widget.isLoginOrRegesterFlow),
       child: BottomNavScreen(),
     );
   }

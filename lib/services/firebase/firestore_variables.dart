@@ -39,8 +39,8 @@ class FirestoreVariables {
   static const String rechargeStartDate = 'RECHARGE_START_DATE';
   static const String is30DaysSubscriptionID = 'is30DaysSubscriptionID';
 
-  static const int totalVideoCountUserCanSee = 1;
-  static const int totalReelCountUserCanSee = 2;
+  // static const int totalVideoCountUserCanSee = 1;
+  // static const int totalReelCountUserCanSee = 0;
 }
 
 enum SubscriptionStatus {

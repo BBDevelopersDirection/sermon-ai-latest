@@ -123,7 +123,10 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
 
         // Perform the navigation
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => LoginCheckScreen()),
+          MaterialPageRoute(
+            builder: (context) =>
+                LoginCheckScreen(isLoginOrRegesterFlow: false),
+          ),
           (Route<dynamic> route) => false,
         );
       },
