@@ -54,6 +54,8 @@ dependencies:
   logger: ^2.6.1
   in_app_update: ^4.2.5
   apivideo_player: ^1.4.0
+  mobile_number: ^3.0.0
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +78,14 @@ flutter:
     - assets/svg_assets/
 
   #  ./gradlew bundleRelease \
+  #  -Pandroid.injected.signing.store.file=/Users/prashantranjansingh/Flutter/Projects/sermon/playstore_things/sermon_ai.jks \
+  #  -Pandroid.injected.signing.store.password=sermon_ai \
+  #  -Pandroid.injected.signing.key.alias=sermon_ai \
+  #  -Pandroid.injected.signing.key.password=sermon_ai
+
+
+  # apk
+  # ./gradlew assembleRelease \
   #  -Pandroid.injected.signing.store.file=/Users/prashantranjansingh/Flutter/Projects/sermon/playstore_things/sermon_ai.jks \
   #  -Pandroid.injected.signing.store.password=sermon_ai \
   #  -Pandroid.injected.signing.key.alias=sermon_ai \

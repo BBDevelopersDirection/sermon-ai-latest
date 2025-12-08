@@ -6,6 +6,8 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_number/mobile_number.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sermon/screens/before_login/login_forgot_signup_state.dart';
 import 'package:sermon/screens/before_login/sign_up/sign_up_third_screen.dart';
 import 'package:sermon/services/firebase/firestore_variables.dart';
@@ -108,6 +110,58 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       // Show an error message or handle invalid input
     }
   }
+
+  Future<void> showPhoneSelector({
+  required BuildContext context,
+  required TextEditingController mobile_num,
+}) async {
+  if (await Permission.phone.request().isGranted) {
+    List<String> numbers = [];
+
+    try {
+      String? mainNumber = await MobileNumber.mobileNumber;
+      List<SimCard>? sims = await MobileNumber.getSimCards;
+
+      if (mainNumber != null) numbers.add(mainNumber);
+      if (sims != null) {
+        for (final sim in sims) {
+          if (sim.number != null && sim.number!.isNotEmpty) {
+            numbers.add(sim.number!);
+          }
+        }
+      }
+    } catch (e) {
+      AppLogger.e("Error reading numbers: $e");
+    }
+
+    /// Keep only last 10 digits
+    numbers = numbers.map((n) {
+      String digits = n.replaceAll(RegExp(r'\D'), '');
+      return digits.length >= 10 ? digits.substring(digits.length - 10) : digits;
+    }).toList();
+
+    /// Remove duplicates
+    numbers = numbers.toSet().toList();
+
+    if (numbers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No phone numbers found. Enter manually.")),
+      );
+      return;
+    }
+
+    MyAppDialogs().phoneNumberDialog(
+      context: context,
+      numbers: numbers,
+      onNumberSelected: (selectedNumber) {
+        mobile_num.text = selectedNumber;
+      },
+    );
+  } else {
+    // openAppSettings();
+  }
+}
+
 
   Future<void> otp_ver_screen({
     required BuildContext context,

@@ -123,6 +123,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: const TextStyle(color: Colors.black),
                     controller: mobile_num,
                     keyboardType: TextInputType.phone,
+                    onTap: () => context
+                        .read<LoginForgotSignupCubit>()
+                        .showPhoneSelector(
+                          context: context,
+                          mobile_num: mobile_num,
+                        ),
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(10),
