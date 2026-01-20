@@ -74,7 +74,7 @@ class _LoginCheckScreenState extends State<LoginCheckScreen> {
 
   Widget _token_not_found() {
     return BlocProvider(
-      create: (context) => LoginForgotSignupCubit(),
+      create: (context) => LoginForgotSignupCubit()..logLoginPageAppearEvent(),
       child: SignUpScreen(),
     );
     // return BlocProvider(
