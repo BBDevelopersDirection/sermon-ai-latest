@@ -72,6 +72,20 @@ class FirebaseRemoteConfigService {
   }
 }
 
+bool? getBool(String key) {
+  if (!_initialized) {
+    AppLogger.w('⚠️ Remote Config not initialized; call initialize() first.');
+    return null;
+  }
+  try {
+    final value = _remoteConfig.getBool(key);
+    return value;
+  } catch (e) {
+    AppLogger.e('❌ Error getting bool Remote Config value for "$key": $e');
+    return null;
+  }
+}
+
 
   /// Example getters — all fetched remotely
   String get razorpayTestApiKey => getString('razorpay_test_api_key');
@@ -95,6 +109,7 @@ class FirebaseRemoteConfigService {
   int get totalVideoCountUserCanSee => getInt('total_video_count_user_can_see');
   int get totalReelCountUserCanSee => getInt('total_reel_count_user_can_see');
   int get rechargePageDelaySecondsAfterLogin => getInt('recharge_page_delay_seconds_after_login');
+  bool get shouldShowRechargePage => getBool('shouldShowRechargePage') ?? true;
 
   /// Get Category Order as List<String>
   List<String> get categoryOrder {

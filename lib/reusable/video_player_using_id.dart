@@ -3,6 +3,7 @@ import 'package:apivideo_player/apivideo_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/reusable/pulsing_icon_anim.dart';
@@ -51,7 +52,10 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
     UtilsFunctions().canUseVideo().then((canUseVideo) async {
       AppLogger.d("I can use video: $canUseVideo");
 
-      if (!canUseVideo) {
+      final shouldShowRechargePage =
+                        FirebaseRemoteConfigService().shouldShowRechargePage;
+
+      if (!canUseVideo && shouldShowRechargePage) {
         await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
           event: LogEventsName.instance().subscribePageByVideoPlay,
         );
