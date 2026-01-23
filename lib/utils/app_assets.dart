@@ -23,4 +23,7 @@ class MyAppAssets{
   // Lottie
   static String lottie_no_internet = 'assets/lottie_assets/no_internet.json';
   static String lottie_payment_in_progress = 'assets/lottie_assets/payment_verify_loader.json';
+
+  // Video Assets
+  static String video_signup_reel = 'assets/video/login_video.mp4';
 }

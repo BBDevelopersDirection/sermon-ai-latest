@@ -76,6 +76,7 @@ flutter:
     - assets/png_assets/
     - assets/jpg/
     - assets/svg_assets/
+    - assets/video/
 
   #  ./gradlew bundleRelease \
   #  -Pandroid.injected.signing.store.file=/Users/prashantranjansingh/Flutter/Projects/sermon/playstore_things/sermon_ai.jks \
