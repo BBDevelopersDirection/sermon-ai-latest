@@ -35,7 +35,7 @@ import 'sign_up/sign_up_second.dart';
 
 class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   LoginForgotSignupCubit()
-    : super(LoginForgotSignupState(loadingStatus: LoadingStatus.noLoading));
+    : super(LoginForgotSignupState(loadingStatus: LoadingStatus.noLoading, isShowRecapchaWarning: false));
 
   final OTPService otpService = OTPService();
   StreamSubscription? _streamSubscription;
@@ -50,6 +50,12 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   void logLoginPageAppearEvent() {
     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
       event: LogEventsName.instance().loginScreenOpen,
+    );
+  }
+
+  void reelPageAppearEvent() {
+    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().loginReelPageOpen,
     );
   }
 

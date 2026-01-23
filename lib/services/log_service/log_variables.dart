@@ -37,6 +37,7 @@ class LogEventsName{
   // Temporary event names for testing
   String splashscreenStart = 'splashScreenStart';
   String splashscreenEnd = 'splashScreenEnd';
+  String loginReelPageOpen = 'loginReelPageOpen';
   String loginScreenOpen = 'loginScreenOpen';
 
   LogEventsName._privateConstructor();
