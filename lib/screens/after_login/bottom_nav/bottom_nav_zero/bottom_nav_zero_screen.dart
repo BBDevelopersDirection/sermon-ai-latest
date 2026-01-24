@@ -452,29 +452,29 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                           ),
                         ),
                       ),
-                      // SizedBox(width: 16),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     context.read<BottomNavZeroCubit>().shareReel(
-                      //       widget.reelsModel.id,
-                      //     );
-                      //   },
-                      //   child: Container(
-                      //     height: 48,
-                      //     width: 48,
-                      //     decoration: ShapeDecoration(
-                      //       color: Color.fromRGBO(216, 145, 24, 1),
-                      //       shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //       ),
-                      //     ),
-                      //     child: Icon(
-                      //       Icons.share,
-                      //       // size: 16,
-                      //       color: Colors.white,
-                      //     ),
-                      //   ),
-                      // ),
+                      SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () {
+                          context.read<BottomNavZeroCubit>().shareReel(
+                            widget.reelsModel.id,
+                          );
+                        },
+                        child: Container(
+                          height: 48,
+                          width: 48,
+                          decoration: ShapeDecoration(
+                            color: Color.fromRGBO(216, 145, 24, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.share,
+                            // size: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

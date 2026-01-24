@@ -13,7 +13,7 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
   void shareReel(String reelId) {
     SharePlus.instance.share(
       ShareParams(
-        text: 'Watch this video on SermonTv, https://www.direction.com/$reelId',
+        text: 'Watch this video on SermonTv, https://sermontv.usedirection.com/$reelId',
       )
     );
   }
