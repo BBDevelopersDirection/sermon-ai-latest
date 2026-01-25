@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_cubit.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_screen.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/screens/before_login/sign_up/sign_up_screen_reel.dart';
 import '../../reusable/progress_indicator.dart';
 import '../../screens/before_login/login_forgot_signup_cubit.dart';
@@ -66,9 +67,12 @@ class _LoginCheckScreenState extends State<LoginCheckScreen> {
 
   Widget _token_found() {
     return BlocProvider(
-      create: (context) =>
-          BottomNavCubit()
-            ..showRechargePage(isShow: widget.isLoginOrRegesterFlow),
+      create: (context) => BottomNavCubit()
+        ..showRechargePage(
+          isShow:
+              widget.isLoginOrRegesterFlow &&
+              FirebaseRemoteConfigService().shouldShowRechargePage,
+        ),
       child: BottomNavScreen(),
     );
   }

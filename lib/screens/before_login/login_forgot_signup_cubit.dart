@@ -16,7 +16,6 @@ import 'package:sermon/services/firebase/user_data_management/firestore_function
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/firebase_notification_mine.dart';
-import 'package:sermon/services/hive_box/hive_box_variables.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,7 +28,6 @@ import '../../services/firebase/firebase_remote_config.dart';
 import '../../services/hive_box/hive_box_functions.dart';
 import '../../services/log_service/log_service.dart';
 import '../../services/log_service/log_variables.dart';
-import '../../services/shared_pref/shared_preference.dart';
 import '../../services/token_check_service/login_check_screen.dart';
 import 'sign_up/sign_up_second.dart';
 

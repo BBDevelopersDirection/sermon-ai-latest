@@ -61,6 +61,24 @@ android {
             enableSplit = false // Keep all languages in base APK
         }
     }
+
+    splits {
+        abi {
+            isEnable = false // Disable APK ABI splits
+        }
+    }
+
+    bundle {
+        abi {
+            enableSplit = true
+        }
+        density {
+            enableSplit = true
+        }
+        language {
+            enableSplit = false // Keep all languages in base APK
+        }
+    }
 }
 
 flutter {
