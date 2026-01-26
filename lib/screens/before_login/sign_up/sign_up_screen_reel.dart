@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/screens/before_login/login_forgot_signup_cubit.dart';
 import 'package:sermon/screens/before_login/sign_up/sign_up_screen.dart';
 import 'package:sermon/utils/app_assets.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SignUpScreenReel extends StatefulWidget {
   const SignUpScreenReel({super.key});
@@ -18,6 +20,8 @@ class _SignUpScreenReelState extends State<SignUpScreenReel> {
   @override
   void initState() {
     super.initState();
+    WakelockPlus.enable();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _controller = VideoPlayerController.asset(MyAppAssets.video_signup_reel)
       ..initialize().then((_) {
@@ -33,6 +37,8 @@ class _SignUpScreenReelState extends State<SignUpScreenReel> {
   @override
   void dispose() {
     _controller.dispose();
+    WakelockPlus.disable();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 

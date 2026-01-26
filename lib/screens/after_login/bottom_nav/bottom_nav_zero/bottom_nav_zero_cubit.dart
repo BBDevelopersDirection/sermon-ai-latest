@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_state.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:share_plus/share_plus.dart';
@@ -13,7 +14,7 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
   void shareReel(String reelId) {
     SharePlus.instance.share(
       ShareParams(
-        text: 'Watch this video on SermonTv, https://sermontv.usedirection.com/$reelId',
+        text: '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
       )
     );
   }

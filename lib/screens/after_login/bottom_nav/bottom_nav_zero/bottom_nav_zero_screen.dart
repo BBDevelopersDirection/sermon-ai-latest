@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:sermon/main.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
@@ -10,7 +11,7 @@ import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
-import 'package:sermon/utils/app_color.dart';
+import 'package:sermon/utils/app_assets.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -394,86 +395,90 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                 right: 0,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () async {
-                            await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                              event: LogEventsName.instance()
-                                  .watch_full_video_reel,
-                            );
-                            _controller
-                                .pause(); // ⏸ Pause before pushing new screen
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => VideoPlayerUsingId(
-                                  url: widget.reelsModel.fullVideoLink,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 48,
-                                  decoration: ShapeDecoration(
-                                    color: Colors.black.withOpacity(0.8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Text(
-                                        'Watch Full Video',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontFamily: 'Gilroy',
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      SizedBox(width: 6),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
                       GestureDetector(
                         onTap: () {
                           context.read<BottomNavZeroCubit>().shareReel(
                             widget.reelsModel.id,
                           );
                         },
-                        child: Container(
-                          height: 48,
-                          width: 48,
-                          decoration: ShapeDecoration(
-                            color: Color.fromRGBO(216, 145, 24, 1),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: SvgPicture.asset(
+                                MyAppAssets.svg_whatsapp,
+                                // size: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Share',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 52),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () async {
+                                await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                                  event: LogEventsName.instance()
+                                      .watch_full_video_reel,
+                                );
+                                _controller
+                                    .pause(); // ⏸ Pause before pushing new screen
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoPlayerUsingId(
+                                      url: widget.reelsModel.fullVideoLink,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 48,
+                                decoration: ShapeDecoration(
+                                  color: Colors.black.withOpacity(0.8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'Watch Full Video',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontFamily: 'Gilroy',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
-                          child: Icon(
-                            Icons.share,
-                            // size: 16,
-                            color: Colors.white,
-                          ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
