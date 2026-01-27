@@ -9,20 +9,17 @@ enum LoadingStatus {
 
 class LoginForgotSignupState extends Equatable {
   LoadingStatus loadingStatus;
-  bool isShowRecapchaWarning;
 
-  LoginForgotSignupState({required this.loadingStatus, required this.isShowRecapchaWarning});
+  LoginForgotSignupState({required this.loadingStatus});
 
   LoginForgotSignupState copyWith({
     LoadingStatus? loadingStatus,
-    bool? isShowRecapchaWarning,
   }) {
     return LoginForgotSignupState(
       loadingStatus: loadingStatus ?? this.loadingStatus,
-      isShowRecapchaWarning: isShowRecapchaWarning ?? this.isShowRecapchaWarning,
     );
   }
 
   @override
-  List<Object> get props => [loadingStatus, isShowRecapchaWarning];
+  List<Object> get props => [loadingStatus];
 }

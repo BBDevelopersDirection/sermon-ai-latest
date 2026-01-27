@@ -51,6 +51,7 @@ class _BottomNavScreenState extends State<BottomNavScreen>
     setState(() {
       _selectedIndex = index;
     });
+    context.read<BottomNavCubit>().setSelectedIndex(index);
     if (_selectedIndex == 0) {
       MyAppAmplitudeAndFirebaseAnalitics().logEvent(
         event: LogEventsName.instance().reelsScreenButton,
@@ -72,6 +73,7 @@ class _BottomNavScreenState extends State<BottomNavScreen>
     context.read<BottomNavCubit>().saveKeyBottomNav(
       bottomNavScaffoldKey: _scaffoldKey,
     );
+    context.read<BottomNavCubit>().setSelectedIndex(_selectedIndex);
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }

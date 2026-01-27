@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sermon/screens/before_login/login_forgot_signup_cubit.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
@@ -95,15 +94,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<LoginCheckCubit>(
-          create: (context) => LoginCheckCubit()..freshInstallEventLog(),
-        ),
-        BlocProvider<LoginForgotSignupCubit>(
-          create: (context) => LoginForgotSignupCubit(),
-        ),
-      ],
+    return BlocProvider(
+      create: (context) => LoginCheckCubit()..freshInstallEventLog(),
       child: MaterialApp(
         navigatorObservers: [routeObserver],
         navigatorKey: navigatorKey, // Add navigator key here

@@ -18,12 +18,20 @@ import 'bottom_nav_state.dart';
 
 class BottomNavCubit extends Cubit<BottomNavState> {
   BottomNavCubit()
-    : super(BottomNavState(bottomNavScaffoldKey: null, hideBottomBar: false));
+    : super(BottomNavState(
+        bottomNavScaffoldKey: null,
+        hideBottomBar: false,
+        selectedIndex: 0,
+      ));
 
   void saveKeyBottomNav({
     required GlobalKey<ScaffoldState> bottomNavScaffoldKey,
   }) {
     emit(state.copyWith(bottomNavScaffoldKey: bottomNavScaffoldKey));
+  }
+
+  void setSelectedIndex(int index) {
+    emit(state.copyWith(selectedIndex: index));
   }
 
   Future<void> showRechargePage({required bool isShow}) async {

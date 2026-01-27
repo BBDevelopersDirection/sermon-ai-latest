@@ -16,6 +16,7 @@ import 'package:sermon/services/firebase/user_data_management/firestore_function
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/firebase_notification_mine.dart';
+import 'package:sermon/services/hive_box/hive_box_variables.dart';
 import 'package:truecaller_sdk/truecaller_sdk.dart';
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,12 +29,13 @@ import '../../services/firebase/firebase_remote_config.dart';
 import '../../services/hive_box/hive_box_functions.dart';
 import '../../services/log_service/log_service.dart';
 import '../../services/log_service/log_variables.dart';
+import '../../services/shared_pref/shared_preference.dart';
 import '../../services/token_check_service/login_check_screen.dart';
 import 'sign_up/sign_up_second.dart';
 
 class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   LoginForgotSignupCubit()
-    : super(LoginForgotSignupState(loadingStatus: LoadingStatus.noLoading, isShowRecapchaWarning: false));
+    : super(LoginForgotSignupState(loadingStatus: LoadingStatus.noLoading));
 
   final OTPService otpService = OTPService();
   StreamSubscription? _streamSubscription;
@@ -43,18 +45,6 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   Future<void> close() {
     _streamSubscription?.cancel();
     return super.close();
-  }
-
-  void logLoginPageAppearEvent() {
-    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-      event: LogEventsName.instance().loginScreenOpen,
-    );
-  }
-
-  void reelPageAppearEvent() {
-    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-      event: LogEventsName.instance().loginReelPageOpen,
-    );
   }
 
   void send_to_otp_screen({
@@ -122,59 +112,56 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   }
 
   Future<void> showPhoneSelector({
-    required BuildContext context,
-    required TextEditingController mobile_num,
-  }) async {
-    if (await Permission.phone.request().isGranted) {
-      List<String> numbers = [];
+  required BuildContext context,
+  required TextEditingController mobile_num,
+}) async {
+  if (await Permission.phone.request().isGranted) {
+    List<String> numbers = [];
 
-      try {
-        String? mainNumber = await MobileNumber.mobileNumber;
-        List<SimCard>? sims = await MobileNumber.getSimCards;
+    try {
+      String? mainNumber = await MobileNumber.mobileNumber;
+      List<SimCard>? sims = await MobileNumber.getSimCards;
 
-        if (mainNumber != null) numbers.add(mainNumber);
-        if (sims != null) {
-          for (final sim in sims) {
-            if (sim.number != null && sim.number!.isNotEmpty) {
-              numbers.add(sim.number!);
-            }
+      if (mainNumber != null) numbers.add(mainNumber);
+      if (sims != null) {
+        for (final sim in sims) {
+          if (sim.number != null && sim.number!.isNotEmpty) {
+            numbers.add(sim.number!);
           }
         }
-      } catch (e) {
-        AppLogger.e("Error reading numbers: $e");
       }
-
-      /// Keep only last 10 digits
-      numbers = numbers.map((n) {
-        String digits = n.replaceAll(RegExp(r'\D'), '');
-        return digits.length >= 10
-            ? digits.substring(digits.length - 10)
-            : digits;
-      }).toList();
-
-      /// Remove duplicates
-      numbers = numbers.toSet().toList();
-
-      if (numbers.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("No phone numbers found. Enter manually."),
-          ),
-        );
-        return;
-      }
-
-      MyAppDialogs().phoneNumberDialog(
-        context: context,
-        numbers: numbers,
-        onNumberSelected: (selectedNumber) {
-          mobile_num.text = selectedNumber;
-        },
-      );
-    } else {
-      // openAppSettings();
+    } catch (e) {
+      AppLogger.e("Error reading numbers: $e");
     }
+
+    /// Keep only last 10 digits
+    numbers = numbers.map((n) {
+      String digits = n.replaceAll(RegExp(r'\D'), '');
+      return digits.length >= 10 ? digits.substring(digits.length - 10) : digits;
+    }).toList();
+
+    /// Remove duplicates
+    numbers = numbers.toSet().toList();
+
+    if (numbers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No phone numbers found. Enter manually.")),
+      );
+      return;
+    }
+
+    MyAppDialogs().phoneNumberDialog(
+      context: context,
+      numbers: numbers,
+      onNumberSelected: (selectedNumber) {
+        mobile_num.text = selectedNumber;
+      },
+    );
+  } else {
+    // openAppSettings();
   }
+}
+
 
   Future<void> otp_ver_screen({
     required BuildContext context,
