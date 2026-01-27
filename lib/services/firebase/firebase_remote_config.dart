@@ -106,6 +106,8 @@ bool? getBool(String key) {
   String get homeGreetingText => getString('home_greeting_text');
   String get homeSubtitleText => getString('home_subtitle_text');
   String get whatsappErrorMessage => getString('whatsapp_error_message');
+  String get shareButtonMessageText => getString('share_button_message_text');
+  
   int get totalVideoCountUserCanSee => getInt('total_video_count_user_can_see');
   int get totalReelCountUserCanSee => getInt('total_reel_count_user_can_see');
   int get rechargePageDelaySecondsAfterLogin => getInt('recharge_page_delay_seconds_after_login');
