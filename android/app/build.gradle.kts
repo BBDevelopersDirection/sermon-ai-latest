@@ -26,8 +26,8 @@ android {
         applicationId = "com.live.ai.sermon"
         minSdk = 23
         targetSdk = 36
-        versionCode = 45
-        versionName = "1.5.3"
+        versionCode = 46
+        versionName = "1.5.4"
     }
 
 
