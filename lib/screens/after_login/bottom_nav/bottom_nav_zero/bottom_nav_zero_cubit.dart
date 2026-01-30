@@ -4,10 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_state.dart';
+import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/shared_pref/shared_preference.dart';
+import 'package:share_plus/share_plus.dart';
 
 class _UniqueFetchResult {
   final List<ReelsModel> reels;
@@ -26,16 +30,24 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
   static const int _pageSize = 5;
 
   BottomNavZeroCubit({required this.firestoreFunctions})
-      : super(const BottomNavZeroState());
+    : super(const BottomNavZeroState());
+
+  void shareReel(String reelId) {
+    Future.wait([
+      SharePlus.instance.share(
+        ShareParams(
+          text:
+              '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
+        ),
+      ),
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsShareButton,
+      ),
+    ]);
+  }
 
   Future<void> refreshUniqueReels() async {
-    emit(
-      state.copyWith(
-        reels: [],
-        lastDocId: null,
-        hasMore: true,
-      ),
-    );
+    emit(state.copyWith(reels: [], lastDocId: null, hasMore: true));
     await fetchReels(loadMore: false, resetIfExhausted: true);
   }
 
@@ -44,12 +56,16 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
     bool resetIfExhausted = false,
   }) async {
     if (state.isLoading || (!state.hasMore && loadMore)) {
-      AppLogger.d("⏸ Skipping fetch | isLoading: ${state.isLoading}, hasMore: ${state.hasMore}, loadMore: $loadMore");
+      AppLogger.d(
+        "⏸ Skipping fetch | isLoading: ${state.isLoading}, hasMore: ${state.hasMore}, loadMore: $loadMore",
+      );
       return;
     }
 
     emit(state.copyWith(isLoading: true));
-    AppLogger.d("🚀 Fetching reels | loadMore: $loadMore | currentCount: ${state.reels.length}");
+    AppLogger.d(
+      "🚀 Fetching reels | loadMore: $loadMore | currentCount: ${state.reels.length}",
+    );
 
     final userId = await _resolveUserId();
     final seenIds = await SharedPreferenceLogic.getSeenReelIds(userId: userId);
@@ -92,7 +108,9 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
       ),
     );
 
-    AppLogger.d("📊 State updated | totalReels: ${state.reels.length}, hasMore: ${state.hasMore}");
+    AppLogger.d(
+      "📊 State updated | totalReels: ${state.reels.length}, hasMore: ${state.hasMore}",
+    );
   }
 
   Future<_UniqueFetchResult> _collectUniqueReels({

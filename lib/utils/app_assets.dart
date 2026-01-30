@@ -19,8 +19,12 @@ class MyAppAssets{
   static String svg_image_icon_full = 'assets/svg_assets/icon_full.svg';
   static String svg_image_only_icon = 'assets/svg_assets/only_icon.svg';
   static String svg_recharge_now = 'assets/svg_assets/recharge_now.svg';
+  static String svg_whatsapp = 'assets/svg_assets/whatsapp.svg';
 
   // Lottie
   static String lottie_no_internet = 'assets/lottie_assets/no_internet.json';
   static String lottie_payment_in_progress = 'assets/lottie_assets/payment_verify_loader.json';
+
+  // Video Assets
+  static String video_signup_reel = 'assets/video/login_video.mp4';
 }

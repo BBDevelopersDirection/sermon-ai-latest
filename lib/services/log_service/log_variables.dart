@@ -33,6 +33,13 @@ class LogEventsName{
 
   String watch_full_video_reel = 'watchFullVideoReel';
   String reel_watched = 'reelWatched';
+  String reelsShareButton = 'reelsShareButton';
+
+  // Temporary event names for testing
+  String splashscreenStart = 'splashScreenStart';
+  String splashscreenEnd = 'splashScreenEnd';
+  String loginReelPageOpen = 'loginReelPageOpen';
+  String loginScreenOpen = 'loginScreenOpen';
 
   LogEventsName._privateConstructor();
   static LogEventsName instance(){
