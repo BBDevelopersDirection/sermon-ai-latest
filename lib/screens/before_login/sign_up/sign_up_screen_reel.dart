@@ -22,6 +22,7 @@ class _SignUpScreenReelState extends State<SignUpScreenReel> {
     super.initState();
     WakelockPlus.enable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    context.read<LoginForgotSignupCubit>().reelPageAppearEvent();
 
     _controller = VideoPlayerController.asset(MyAppAssets.video_signup_reel)
       ..initialize().then((_) {
@@ -31,7 +32,6 @@ class _SignUpScreenReelState extends State<SignUpScreenReel> {
           ..setVolume(1)
           ..play();
       });
-    context.read<LoginForgotSignupCubit>().reelPageAppearEvent();
   }
 
   @override

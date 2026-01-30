@@ -1,5 +1,3 @@
-
-
 import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +9,11 @@ class SharedPreferenceLogic {
   /// Initialize SharedPreferences instance
   static Future<void> initialize() async {
     _preferences = await SharedPreferences.getInstance();
+  }
+
+  static Future<SharedPreferences> _ensurePrefs() async {
+    _preferences ??= await SharedPreferences.getInstance();
+    return _preferences!;
   }
 
   static String getAppDirectoryPath() {
@@ -99,5 +102,37 @@ class SharedPreferenceLogic {
   static Future<void> saveAmplititudeUserId({required String UserId}) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString(AppSharedPreference.AmplititudeUserId, UserId);
+  }
+
+  static String _seenReelsKey(String userId) {
+    return '${AppSharedPreference.seenReelsPrefix}$userId';
+  }
+
+  static Future<Set<String>> getSeenReelIds({required String userId}) async {
+    final prefs = await _ensurePrefs();
+    final ids = prefs.getStringList(_seenReelsKey(userId)) ?? [];
+    return ids.toSet();
+  }
+
+  static Future<void> setSeenReelIds({
+    required String userId,
+    required Set<String> ids,
+  }) async {
+    final prefs = await _ensurePrefs();
+    await prefs.setStringList(_seenReelsKey(userId), ids.toList());
+  }
+
+  static Future<void> addSeenReelIds({
+    required String userId,
+    required Iterable<String> ids,
+  }) async {
+    final current = await getSeenReelIds(userId: userId);
+    current.addAll(ids);
+    await setSeenReelIds(userId: userId, ids: current);
+  }
+
+  static Future<void> resetSeenReelIds({required String userId}) async {
+    final prefs = await _ensurePrefs();
+    await prefs.remove(_seenReelsKey(userId));
   }
 }

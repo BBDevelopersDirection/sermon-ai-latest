@@ -3,4 +3,5 @@ class AppSharedPreference{
   static String firstInstall = 'firstInstall';
   static String checkCounter = 'checkCounter';
   static String AmplititudeUserId = 'AmplititudeUserId';
+  static String seenReelsPrefix = 'seenReels_';
 }

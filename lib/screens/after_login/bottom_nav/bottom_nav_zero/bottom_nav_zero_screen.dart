@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sermon/main.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
+import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_cubit.dart';
+import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_state.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
@@ -38,7 +40,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   void initState() {
     super.initState();
     _cubit = BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions());
-    _cubit.fetchReels();
+    _cubit.refreshUniqueReels();
 
     WakelockPlus.enable();
 
@@ -86,7 +88,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     }
   }
 
-  @override
+    @override
   void didPushNext() {
     _controllers[_currentPage]?.pause();
     _controllers[_currentPage]?.setVolume(0);
@@ -116,152 +118,161 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => _cubit,
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: BlocBuilder<BottomNavZeroCubit, BottomNavZeroState>(
-          builder: (context, state) {
-            if (state.isLoading && state.reels.isEmpty) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state.reels.isEmpty) {
-              return const Center(
-                child: Text(
-                  "No Reels Found",
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            }
+      child: BlocListener<BottomNavCubit, BottomNavState>(
+        listenWhen: (previous, current) =>
+            previous.selectedIndex != current.selectedIndex,
+        listener: (context, navState) {
+          if (navState.selectedIndex == 0) {
+            _cubit.refreshUniqueReels();
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: BlocBuilder<BottomNavZeroCubit, BottomNavZeroState>(
+            builder: (context, state) {
+              if (state.isLoading && state.reels.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state.reels.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No Reels Found",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              }
 
-            return PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.vertical,
-              physics:
-                  const PageScrollPhysics(), // Snap exactly one page at a time
-              pageSnapping: true,
-              itemCount: state.reels.length,
-              onPageChanged: (index) async {
-                // Pause previous video
-                _pauseController(_currentPage);
+              return PageView.builder(
+                controller: _pageController,
+                scrollDirection: Axis.vertical,
+                physics:
+                    const PageScrollPhysics(), // Snap exactly one page at a time
+                pageSnapping: true,
+                itemCount: state.reels.length,
+                onPageChanged: (index) async {
+                  // Pause previous video
+                  _pauseController(_currentPage);
 
-                // Play current video
-                _playController(index);
-                _currentPage = index;
+                  // Play current video
+                  _playController(index);
+                  _currentPage = index;
 
-                // Check free/restricted index
-                // if (index > _maxFreeIndex) {
-                //   var canUseVideo = await UtilsFunctions().canUseReel(
-                //     index: index,
-                //   );
+                  // Check free/restricted index
+                  // if (index > _maxFreeIndex) {
+                  //   var canUseVideo = await UtilsFunctions().canUseReel(
+                  //     index: index,
+                  //   );
 
-                //   if (!canUseVideo) {
-                //     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                //       event: LogEventsName.instance().subscribePageByReels,
-                //     );
+                  //   if (!canUseVideo) {
+                  //     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                  //       event: LogEventsName.instance().subscribePageByReels,
+                  //     );
 
-                //     // Snap back safely
-                //     Future.delayed(Duration.zero, () {
-                //       if (_pageController.hasClients) {
-                //         _pageController.animateToPage(
-                //           _maxFreeIndex,
-                //           duration: const Duration(milliseconds: 300),
-                //           curve: Curves.easeInOut,
-                //         );
-                //       }
-                //     });
+                  //     // Snap back safely
+                  //     Future.delayed(Duration.zero, () {
+                  //       if (_pageController.hasClients) {
+                  //         _pageController.animateToPage(
+                  //           _maxFreeIndex,
+                  //           duration: const Duration(milliseconds: 300),
+                  //           curve: Curves.easeInOut,
+                  //         );
+                  //       }
+                  //     });
 
-                //     // Pause and mute previous controller
-                //     _controllers[_maxFreeIndex]?.pause();
-                //     _controllers[_maxFreeIndex]?.setVolume(0);
+                  //     // Pause and mute previous controller
+                  //     _controllers[_maxFreeIndex]?.pause();
+                  //     _controllers[_maxFreeIndex]?.setVolume(0);
 
-                //     if (context.mounted) {
-                //       Navigator.of(context).push(
-                //         MaterialPageRoute(
-                //           builder: (context) => BlocProvider(
-                //             create: (context) => PlanPurchaseCubit(),
-                //             child: SubscriptionTrialScreen(
-                //               controller: _controllers[_maxFreeIndex],
-                //             ),
-                //           ),
-                //         ),
-                //       );
-                //     }
-                //     return;
-                //   }
-                // }
+                  //     if (context.mounted) {
+                  //       Navigator.of(context).push(
+                  //         MaterialPageRoute(
+                  //           builder: (context) => BlocProvider(
+                  //             create: (context) => PlanPurchaseCubit(),
+                  //             child: SubscriptionTrialScreen(
+                  //               controller: _controllers[_maxFreeIndex],
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       );
+                  //     }
+                  //     return;
+                  //   }
+                  // }
 
-                Future.microtask(() async {
-                  if (index > 0) {
-                    var canUseVideo = await UtilsFunctions().canUseReel(
-                      index: index,
-                    );
-                    final shouldShowRechargePage =
+                  Future.microtask(() async {
+                    if (index > 0) {
+                      var canUseVideo = await UtilsFunctions().canUseReel(
+                        index: index,
+                      );
+                      final shouldShowRechargePage =
                         FirebaseRemoteConfigService().shouldShowRechargePage;
 
-                    if (!canUseVideo &&
-                        shouldShowRechargePage &&
-                        context.mounted) {
-                      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                        event: LogEventsName.instance().subscribePageByReels,
-                      );
-                      int index =
-                          FirebaseRemoteConfigService()
+                      if (!canUseVideo && shouldShowRechargePage && context.mounted) {
+                        MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                          event: LogEventsName.instance().subscribePageByReels,
+                        );
+                        int index =
+                            FirebaseRemoteConfigService()
+                                        .totalReelCountUserCanSee -
+                                    1 <
+                                0
+                            ? 0
+                            : FirebaseRemoteConfigService()
                                       .totalReelCountUserCanSee -
-                                  1 <
-                              0
-                          ? 0
-                          : FirebaseRemoteConfigService()
-                                    .totalReelCountUserCanSee -
-                                1;
-                      // Snap back safely
-                      Future.delayed(Duration.zero, () {
-                        if (_pageController.hasClients) {
-                          _pageController.animateToPage(
-                            index,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      });
+                                  1;
+                        // Snap back safely
+                        Future.delayed(Duration.zero, () {
+                          if (_pageController.hasClients) {
+                            _pageController.animateToPage(
+                              index,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        });
 
-                      // Pause and mute
-                      final ctrl = _controllers[index];
-                      ctrl?.pause();
-                      ctrl?.setVolume(0);
+                        // Pause and mute
+                        final ctrl = _controllers[index];
+                        ctrl?.pause();
+                        ctrl?.setVolume(0);
 
-                      // Navigate to subscription
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (_) => PlanPurchaseCubit(),
-                            child: SubscriptionTrialScreen(controller: ctrl),
+                        // Navigate to subscription
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider(
+                              create: (_) => PlanPurchaseCubit(),
+                              child: SubscriptionTrialScreen(controller: ctrl),
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     }
+                  });
+
+                  // Fetch more reels if near end
+                  if (index == state.reels.length - 2 && state.hasMore) {
+                    context
+                        .read<BottomNavZeroCubit>()
+                        .fetchReels(loadMore: true);
                   }
-                });
 
-                // Fetch more reels if near end
-                if (index == state.reels.length - 2 && state.hasMore) {
-                  context.read<BottomNavZeroCubit>().fetchReels(loadMore: true);
-                }
-
-                // Log reel watch event
-                MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                  event: LogEventsName.instance().reel_watched,
-                );
-              },
-              itemBuilder: (context, index) {
-                final reel = state.reels[index];
-                return ReelVideoPlayer(
-                  key: ValueKey('${reel.id}_$index'), // ✅ unique key
-                  reelsModel: reel,
-                  index: index,
-                  onControllerReady: _registerController,
-                );
-              },
-            );
-          },
+                  // Log reel watch event
+                  MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+                    event: LogEventsName.instance().reel_watched,
+                  );
+                },
+                itemBuilder: (context, index) {
+                  final reel = state.reels[index];
+                  return ReelVideoPlayer(
+                    key: ValueKey('${reel.id}_$index'), // ✅ unique key
+                    reelsModel: reel,
+                    index: index,
+                    onControllerReady: _registerController,
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -295,11 +306,11 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     _controller =
         VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
           ..initialize().then((_) {
-            if (widget.index == 0) {
-              _controller.setVolume(
-                0,
-              ); // 🔇 Mute before registering the controller
-            }
+            // if (widget.index == 0) {
+            //   _controller.setVolume(
+            //     0,
+            //   ); // 🔇 Mute before registering the controller
+            // }
             widget.onControllerReady(widget.index, _controller);
 
             if (mounted) setState(() {});
