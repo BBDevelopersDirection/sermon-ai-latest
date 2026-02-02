@@ -13,6 +13,7 @@ import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
+import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import 'package:sermon/utils/app_assets.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -411,7 +412,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          context.read<BottomNavZeroCubit>().shareReel(
+                          context.read<LoginCheckCubit>().shareReel(
                             widget.reelsModel.id,
                           );
                         },

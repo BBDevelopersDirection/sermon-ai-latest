@@ -8,6 +8,8 @@ import '../main.dart';
 import '../services/token_check_service/login_check_cubit.dart';
 import '../services/token_check_service/login_check_screen.dart';
 import '../utils/app_assets.dart';
+import '../services/deep_link_service.dart';
+import 'deep_link_content_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,24 +20,37 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Future<void> _changePage() async {
-  await context.read<LoginCheckCubit>().checkForUpdate();
+    await context.read<LoginCheckCubit>().checkForUpdate();
 
-  await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  // Splash END happens here
-  await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-    event: LogEventsName.instance().splashscreenEnd,
-  );
+    // Splash END happens here
+    await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().splashscreenEnd,
+    );
 
-  Navigator.of(context).pushReplacement(
-    MaterialPageRoute(
-      builder: (_) =>
-          LoginCheckScreen(isLoginOrRegesterFlow: false),
-    ),
-  );
-}
+    // Check if there's a pending deep link
+    final deepLinkContent = DeepLinkService().consumePendingDeepLink();
+    
+    if (deepLinkContent != null) {
+      // Navigate to deep link content screen if deep link exists
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => DeepLinkContentScreen(deepLinkContent: deepLinkContent, isFromSplash: true,),
+        ),
+      );
+    } else {
+      // Normal navigation flow
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) =>
+              LoginCheckScreen(isLoginOrRegesterFlow: false),
+        ),
+      );
+    }
+  }
 
   @override
 void initState() {

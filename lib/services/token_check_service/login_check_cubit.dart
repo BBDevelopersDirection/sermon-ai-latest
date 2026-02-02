@@ -8,6 +8,7 @@ import 'package:sermon/reusable/recharge_page.dart';
 import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
 import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../models/playlist_and_episode_model_old.dart';
 import '../../reusable/app_dialogs.dart';
 import '../../reusable/video_player_using_id.dart';
@@ -35,6 +36,20 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
   /// Show or hide the payment-in-progress overlay.
   void emit_show_payment_in_progress({required bool isShow}) {
     emit(state.copyWith(showPaymentInProgress: isShow));
+  }
+
+  void shareReel(String reelId) {
+    Future.wait([
+      SharePlus.instance.share(
+        ShareParams(
+          text:
+              '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
+        ),
+      ),
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsShareButton,
+      ),
+    ]);
   }
 
   void freshInstallEventLog() {

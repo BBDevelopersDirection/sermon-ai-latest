@@ -68,6 +68,22 @@ class ReelsFirestoreFunctions {
       lastDocId: lastDocId,
     );
   }
+
+  Future<ReelsModel?> getReelById({required String reelId}) async {
+    final doc =
+        await _firestore.collection('reels').doc(reelId).get();
+
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      return ReelsModel.fromMap({
+        'id': doc.id,
+        ...data,
+      });
+    } else {
+      AppLogger.w("⚠️ Reel with id $reelId not found");
+      return null;
+    }
+  }
 }
 
 
