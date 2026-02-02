@@ -32,20 +32,6 @@ class BottomNavZeroCubit extends Cubit<BottomNavZeroState> {
   BottomNavZeroCubit({required this.firestoreFunctions})
     : super(const BottomNavZeroState());
 
-  void shareReel(String reelId) {
-    Future.wait([
-      SharePlus.instance.share(
-        ShareParams(
-          text:
-              '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
-        ),
-      ),
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().reelsShareButton,
-      ),
-    ]);
-  }
-
   Future<void> refreshUniqueReels() async {
     emit(state.copyWith(reels: [], lastDocId: null, hasMore: true));
     await fetchReels(loadMore: false, resetIfExhausted: true);

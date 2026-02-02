@@ -16,20 +16,24 @@ import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'firebase_options.dart';
 import 'screens/splash_screen.dart';
+import 'screens/deep_link_content_screen.dart';
 import 'services/firebase_notification_mine.dart';
 import 'services/token_check_service/login_check_cubit.dart';
 import 'utils/app_color.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
+import 'package:sermon/services/deep_link_service.dart';
 
 // Global navigator key for navigation from outside of build context
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure proper initialization
   await SharedPreferenceLogic.initialize();
+
+  // Initialize deep link service
+  await DeepLinkService().initialize();
 
   try {
     await Firebase.initializeApp(
@@ -50,7 +54,7 @@ void main() async {
     await FirebaseRemoteConfigService().initialize();
     AppLogger.d('📡 Firebase Remote Config initialized');
 
-    try{
+    try {
       await FirebaseRemoteConfigService().refresh();
     } catch (e) {
       AppLogger.e('❌ Error refreshing Firebase Remote Config: $e');
@@ -95,6 +99,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _setupDeepLinkListener();
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<LoginCheckCubit>(
@@ -132,6 +138,24 @@ class MyApp extends StatelessWidget {
         // home: const SignUpThirdScreen(),
       ),
     );
+  }
+
+  void _setupDeepLinkListener() {
+    DeepLinkService().deepLinkStream.listen((String link) {
+      AppLogger.d('🔗 Deep link received in MyApp: $link');
+      final deepLinkContent = DeepLinkService().extractPathFromLink(link);
+      if (deepLinkContent != null) {
+        AppLogger.d('📱 Navigating to deep link content: $deepLinkContent');
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => DeepLinkContentScreen(
+              deepLinkContent: deepLinkContent,
+              isFromSplash: false,
+            ),
+          ),
+        );
+      }
+    });
   }
 }
 
