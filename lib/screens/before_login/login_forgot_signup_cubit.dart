@@ -279,7 +279,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               TcSdk.setCodeChallenge(codeChallenge);
 
               /// ✅ Finally trigger the login box here
-              TcSdk.getAuthorizationCode();
+              TcSdk.getAuthorizationCode;
             } else {
               ScaffoldMessenger.of(
                 context,
@@ -406,7 +406,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
       // Step 5: Request authorization code (⚠️ this is a method call, not a property)
       // Attempting to isolate the call to prevent NoSuchMethodError
-      await Future.value(TcSdk.getAuthorizationCode());
+      await Future.value(TcSdk.getAuthorizationCode);
     } catch (e) {
       AppLogger.e('❌ Exception: $e');
     }

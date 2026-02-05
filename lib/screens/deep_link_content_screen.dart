@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,6 +9,7 @@ import 'package:sermon/services/firebase/models/meels_model.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
+import 'package:sermon/services/reel_video_download.dart';
 import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import 'package:sermon/services/token_check_service/login_check_screen.dart';
 import 'package:sermon/utils/app_assets.dart';
@@ -118,6 +121,7 @@ class ReelVideoPlayer extends StatefulWidget {
 class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   late VideoPlayerController _controller;
   bool _showPlayPause = false;
+  late Future<File> _reelFileFuture;
 
   @override
   void initState() {
@@ -125,16 +129,39 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
 
     AppLogger.d("video reel: ${widget.reelsModel.reelLink}");
 
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
-          ..initialize().then((_) {
-            _controller
-              ..setLooping(true)
-              ..setVolume(1.0)
-              ..play();
+    _initializePlayer();
 
-            if (mounted) setState(() {});
-          });
+    /// Start background download for share
+    _reelFileFuture = ReelVideoDownloader().getCachedOrDownload(
+      videoUrl: widget.reelsModel.reelLink,
+      reelId: widget.reelsModel.id,
+    );
+  }
+
+  Future<void> _initializePlayer() async {
+    final File? cachedFile =
+        await ReelVideoDownloader().getCachedFile(widget.reelsModel.id);
+
+    if (cachedFile != null && cachedFile.existsSync()) {
+      /// ✅ Play from local file
+      _controller = VideoPlayerController.file(cachedFile);
+      AppLogger.d("Playing reel from cache");
+    } else {
+      /// 🌐 Play from network
+      _controller = VideoPlayerController.networkUrl(
+        Uri.parse(widget.reelsModel.reelLink),
+      );
+      AppLogger.d("Playing reel from network");
+    }
+
+    await _controller.initialize();
+
+    _controller
+      ..setLooping(true)
+      ..setVolume(1.0)
+      ..play();
+
+    if (mounted) setState(() {});
   }
 
   @override
@@ -181,98 +208,103 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
           if (_showPlayPause)
             Center(
               child: Icon(
-                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                _controller.value.isPlaying
+                    ? Icons.pause
+                    : Icons.play_arrow,
                 color: Colors.white,
                 size: 70,
               ),
             ),
 
           /// Bottom actions
-          Positioned(
-            bottom: 40,
-            left: 16,
-            right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                /// Share
-                GestureDetector(
-                  onTap: () {
-                    context.read<LoginCheckCubit>().shareReel(
-                      widget.reelsModel.id,
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 30,
-                        width: 30,
-                        child: SvgPicture.asset(MyAppAssets.svg_whatsapp),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Share',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontFamily: 'Gilroy',
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+          // Positioned(
+          //   bottom: 40,
+          //   left: 16,
+          //   right: 16,
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.end,
+          //     children: [
+          //       /// Share
+          //       GestureDetector(
+          //         onTap: () {
+          //           context.read<LoginCheckCubit>().shareReel(
+          //             reelId: widget.reelsModel.id,
+          //             videoFuture: _reelFileFuture,
+          //           );
+          //         },
+          //         child: Column(
+          //           children: [
+          //             SizedBox(
+          //               height: 30,
+          //               width: 30,
+          //               child: SvgPicture.asset(MyAppAssets.svg_whatsapp),
+          //             ),
+          //             const SizedBox(height: 4),
+          //             const Text(
+          //               'Share',
+          //               style: TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 12,
+          //                 fontFamily: 'Gilroy',
+          //                 fontWeight: FontWeight.w500,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
 
-                const SizedBox(height: 52),
+          //       const SizedBox(height: 52),
 
-                /// Watch full video
-                GestureDetector(
-                  onTap: () async {
-                    await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                      event: LogEventsName.instance().watch_full_video_reel,
-                    );
+          //       /// Watch full video
+          //       GestureDetector(
+          //         onTap: () async {
+          //           await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+          //             event:
+          //                 LogEventsName.instance().watch_full_video_reel,
+          //           );
 
-                    _controller.pause();
+          //           _controller.pause();
 
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => VideoPlayerUsingId(
-                          url: widget.reelsModel.fullVideoLink,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Watch Full Video',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontFamily: 'Gilroy',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(width: 6),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          //           Navigator.of(context).push(
+          //             MaterialPageRoute(
+          //               builder: (_) => VideoPlayerUsingId(
+          //                 url: widget.reelsModel.fullVideoLink,
+          //               ),
+          //             ),
+          //           );
+          //         },
+          //         child: Container(
+          //           height: 48,
+          //           decoration: BoxDecoration(
+          //             color: Colors.black.withOpacity(0.8),
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //           child: const Row(
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Text(
+          //                 'Watch Full Video',
+          //                 style: TextStyle(
+          //                   color: Colors.white,
+          //                   fontSize: 16,
+          //                   fontFamily: 'Gilroy',
+          //                   fontWeight: FontWeight.w600,
+          //                 ),
+          //               ),
+          //               SizedBox(width: 6),
+          //               Icon(
+          //                 Icons.arrow_forward_ios,
+          //                 size: 16,
+          //                 color: Colors.white,
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        
         ],
       ),
     );
