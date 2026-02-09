@@ -37,7 +37,7 @@ android {
         minSdk = 23
         targetSdk = 36
         versionCode = 48
-        versionName = "1.5.5.1"
+        versionName = "1.5.6"
     }
 
     // Added for firebase Auth Browser redirect bug
