@@ -1,8 +1,10 @@
+import 'package:apivideo_player/apivideo_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sermon/main.dart';
+import 'package:sermon/reusable/hlc_video_player_using_id.dart';
 import 'package:sermon/reusable/video_player_using_id.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_cubit.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_state.dart';
@@ -89,7 +91,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     }
   }
 
-    @override
+  @override
   void didPushNext() {
     _controllers[_currentPage]?.pause();
     _controllers[_currentPage]?.setVolume(0);
@@ -206,9 +208,11 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                         index: index,
                       );
                       final shouldShowRechargePage =
-                        FirebaseRemoteConfigService().shouldShowRechargePage;
+                          FirebaseRemoteConfigService().shouldShowRechargePage;
 
-                      if (!canUseVideo && shouldShowRechargePage && context.mounted) {
+                      if (!canUseVideo &&
+                          shouldShowRechargePage &&
+                          context.mounted) {
                         MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                           event: LogEventsName.instance().subscribePageByReels,
                         );
@@ -252,9 +256,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 
                   // Fetch more reels if near end
                   if (index == state.reels.length - 2 && state.hasMore) {
-                    context
-                        .read<BottomNavZeroCubit>()
-                        .fetchReels(loadMore: true);
+                    context.read<BottomNavZeroCubit>().fetchReels(
+                      loadMore: true,
+                    );
                   }
 
                   // Log reel watch event
@@ -267,8 +271,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                   return ReelVideoPlayer(
                     key: ValueKey('${reel.id}_$index'), // ✅ unique key
                     reelsModel: reel,
-                    index: index,
-                    onControllerReady: _registerController,
+                    // onControllerReady: _registerController,
                   );
                 },
               );
@@ -282,222 +285,194 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 
 class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
-  final int index;
-  final Function(int, VideoPlayerController) onControllerReady;
 
-  const ReelVideoPlayer({
-    super.key,
-    required this.reelsModel,
-    required this.index,
-    required this.onControllerReady,
-  });
+  const ReelVideoPlayer({super.key, required this.reelsModel});
 
   @override
   State<ReelVideoPlayer> createState() => _ReelVideoPlayerState();
 }
 
 class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
-  late VideoPlayerController _controller;
+  late ApiVideoPlayerController _videoController;
   bool _showPlayPause = false;
 
   @override
   void initState() {
     super.initState();
-    AppLogger.d("video reel: ${widget.reelsModel.reelLink}");
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
-          ..initialize().then((_) {
-            // if (widget.index == 0) {
-            //   _controller.setVolume(
-            //     0,
-            //   ); // 🔇 Mute before registering the controller
-            // }
-            widget.onControllerReady(widget.index, _controller);
 
-            if (mounted) setState(() {});
-          })
-          ..setLooping(true);
-  }
+    _videoController = ApiVideoPlayerController(
+      videoOptions: VideoOptions(videoId: widget.reelsModel.id),
+    );
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _togglePlayPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
-    } else {
-      _controller.play();
-    }
-    setState(() => _showPlayPause = true);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _showPlayPause = false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _videoController.play();
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  void dispose() {
+    _videoController.dispose();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
       children: [
-        GestureDetector(
-          onTap: _togglePlayPause,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              /// Background video
-              FittedBox(
-                fit: BoxFit.contain,
-                child: SizedBox(
-                  width: _controller.value.size.width,
-                  height: _controller.value.size.height,
-                  child: VideoPlayer(_controller),
+        Stack(
+          fit: StackFit.expand,
+          children: [
+            /// Background video
+            Positioned.fill(
+              child: ApiVideoPlayer(
+                controller: _videoController,
+                fit: BoxFit.cover,
+                style: const PlayerStyle(
+                  controlsBarStyle: null,
+                  settingsBarStyle: null,
+                  timeSliderStyle: null,
+                ),
+              ),
+            ),
+
+            /// Play/Pause overlay
+            if (_showPlayPause)
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     setState(() {
+                    //       _isMuted = !_isMuted;
+                    //       _controller.setVolume(
+                    //         _isMuted ? 0 : 1,
+                    //       ); // 🔊 Toggle
+                    //     });
+                    //   },
+                    //   child: Container(
+                    //     padding: const EdgeInsets.all(8),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.black54,
+                    //       shape: BoxShape.circle,
+                    //     ),
+                    //     child: Icon(
+                    //       _isMuted ? Icons.volume_off : Icons.volume_up,
+                    //       color: Colors.white,
+                    //       size: 28,
+                    //     ),
+                    //   ),
+                    // ),
+                    // Icon(
+                    //   _controller.value.isPlaying
+                    //       ? Icons.pause
+                    //       : Icons.play_arrow,
+                    //   color: Colors.white,
+                    //   size: 70,
+                    // ),
+                  ],
                 ),
               ),
 
-              /// Play/Pause overlay
-              if (_showPlayPause)
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     setState(() {
-                      //       _isMuted = !_isMuted;
-                      //       _controller.setVolume(
-                      //         _isMuted ? 0 : 1,
-                      //       ); // 🔊 Toggle
-                      //     });
-                      //   },
-                      //   child: Container(
-                      //     padding: const EdgeInsets.all(8),
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.black54,
-                      //       shape: BoxShape.circle,
-                      //     ),
-                      //     child: Icon(
-                      //       _isMuted ? Icons.volume_off : Icons.volume_up,
-                      //       color: Colors.white,
-                      //       size: 28,
-                      //     ),
-                      //   ),
-                      // ),
-                      Icon(
-                        _controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 70,
-                      ),
-                    ],
-                  ),
-                ),
-
-              /// Watch full sermon button at bottom
-              Positioned(
-                bottom: 40,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          context.read<LoginCheckCubit>().shareReel(
-                            widget.reelsModel.id,
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: SvgPicture.asset(
-                                MyAppAssets.svg_whatsapp,
-                                // size: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Share',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 52),
-                      Row(
+            /// Watch full sermon button at bottom
+            Positioned(
+              bottom: 40,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        context.read<LoginCheckCubit>().shareReel(
+                          widget.reelsModel.id,
+                        );
+                      },
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                                  event: LogEventsName.instance()
-                                      .watch_full_video_reel,
-                                );
-                                _controller
-                                    .pause(); // ⏸ Pause before pushing new screen
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoPlayerUsingId(
-                                      url: widget.reelsModel.fullVideoLink,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 48,
-                                decoration: ShapeDecoration(
-                                  color: Colors.black.withOpacity(0.8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'Watch Full Video',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontFamily: 'Gilroy',
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          SizedBox(
+                            height: 30,
+                            width: 30,
+                            child: SvgPicture.asset(
+                              MyAppAssets.svg_whatsapp,
+                              // size: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Share',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontFamily: 'Gilroy',
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 52),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              await MyAppAmplitudeAndFirebaseAnalitics()
+                                  .logEvent(
+                                    event: LogEventsName.instance()
+                                        .watch_full_video_reel,
+                                  );
+                              // _controller
+                              //     .pause(); // ⏸ Pause before pushing new screen
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => HlcVideoPlayerUsingId(
+                                    videoId: widget.reelsModel.id,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 48,
+                              decoration: ShapeDecoration(
+                                color: Colors.black.withOpacity(0.8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'Watch Full Video',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontFamily: 'Gilroy',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(width: 6),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
