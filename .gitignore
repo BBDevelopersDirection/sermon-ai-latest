@@ -48,6 +48,12 @@ android/app/build/
 android/app/release/
 android/app/profile/
 android/app/debug/
+# Keystore files (contains sensitive information, should not be committed)
+android/key.properties
+android/upload-keystore.jks
+*.jks
+*.keystore
+
 
 # Local Properties (contains SDK paths, should not be committed)
 android/local.properties
