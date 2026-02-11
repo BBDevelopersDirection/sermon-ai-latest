@@ -25,7 +25,9 @@ import 'package:sermon/reusable/logger_service.dart';
 
 class SubscriptionTrialScreen extends StatefulWidget {
   final VideoPlayerController? controller;
-  SubscriptionTrialScreen({super.key, this.controller});
+  /// When provided (e.g. from reels using apivideo), called on back to resume playback.
+  final VoidCallback? onResumePlayback;
+  SubscriptionTrialScreen({super.key, this.controller, this.onResumePlayback});
 
   @override
   State<SubscriptionTrialScreen> createState() =>
@@ -35,6 +37,10 @@ class SubscriptionTrialScreen extends StatefulWidget {
 class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
   Future<bool> _onWillPop(BuildContext context) async {
     AppLogger.d("Back button pressed! Run cleanup or analytics here.");
+    if (widget.onResumePlayback != null) {
+      widget.onResumePlayback!();
+      return true;
+    }
     if (widget.controller != null && !widget.controller!.value.isPlaying) {
       widget.controller!.play();
       widget.controller!.setVolume(1);

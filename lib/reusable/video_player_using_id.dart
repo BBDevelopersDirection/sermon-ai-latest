@@ -78,8 +78,8 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
         UtilsFunctions().increaseVideoCount(),
       ]);
 
-      // ---------- NEW API VIDEO CONTROLLER -----------
-      print('video url is: ${widget.url}');
+      // ---------- API VIDEO CONTROLLER -----------
+      AppLogger.d("video url is: ${widget.url}");
       apiVideoController = ApiVideoPlayerController(
         autoplay: true,
         videoOptions: VideoOptions(videoId: extractVideoId(widget.url)),
@@ -92,8 +92,12 @@ class _VideoPlayerUsingIdState extends State<VideoPlayerUsingId> {
     });
   }
 
+  /// Extracts api.video video ID from URL, or returns [url] if it has no "/vod/" (raw id).
   String extractVideoId(String url) {
-    return url.split("/vod/")[1].split("/").first;
+    if (url.contains('/vod/')) {
+      return url.split('/vod/')[1].split('/').first;
+    }
+    return url.trim();
   }
 
   @override

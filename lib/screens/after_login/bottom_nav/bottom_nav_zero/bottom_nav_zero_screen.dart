@@ -15,7 +15,7 @@ import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 import 'package:sermon/services/token_check_service/login_check_cubit.dart';
 import 'package:sermon/utils/app_assets.dart';
-import 'package:video_player/video_player.dart';
+import 'package:apivideo_player/apivideo_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../../reusable/logger_service.dart';
@@ -35,7 +35,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   final PageController _pageController = PageController();
   late BottomNavZeroCubit _cubit;
   int _currentPage = 0;
-  final Map<int, VideoPlayerController> _controllers = {};
+  final Map<int, ApiVideoPlayerController> _controllers = {};
 
   @override
   void initState() {
@@ -80,7 +80,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     }
   }
 
-  void _registerController(int index, VideoPlayerController controller) {
+  void _registerController(int index, ApiVideoPlayerController controller) {
     _controllers[index] = controller;
     if (index == _currentPage) {
       controller.play();
@@ -89,7 +89,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     }
   }
 
-    @override
+  @override
   void didPushNext() {
     _controllers[_currentPage]?.pause();
     _controllers[_currentPage]?.setVolume(0);
@@ -109,6 +109,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     for (final c in _controllers.values) {
       c.dispose();
     }
+    _controllers.clear();
 
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -206,9 +207,11 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                         index: index,
                       );
                       final shouldShowRechargePage =
-                        FirebaseRemoteConfigService().shouldShowRechargePage;
+                          FirebaseRemoteConfigService().shouldShowRechargePage;
 
-                      if (!canUseVideo && shouldShowRechargePage && context.mounted) {
+                      if (!canUseVideo &&
+                          shouldShowRechargePage &&
+                          context.mounted) {
                         MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                           event: LogEventsName.instance().subscribePageByReels,
                         );
@@ -237,12 +240,17 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                         ctrl?.pause();
                         ctrl?.setVolume(0);
 
-                        // Navigate to subscription
+                        // Navigate to subscription (reels use apivideo; resume via callback)
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => BlocProvider(
                               create: (_) => PlanPurchaseCubit(),
-                              child: SubscriptionTrialScreen(controller: ctrl),
+                              child: SubscriptionTrialScreen(
+                                onResumePlayback: () {
+                                  ctrl?.play();
+                                  ctrl?.setVolume(0.5);
+                                },
+                              ),
                             ),
                           ),
                         );
@@ -252,9 +260,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 
                   // Fetch more reels if near end
                   if (index == state.reels.length - 2 && state.hasMore) {
-                    context
-                        .read<BottomNavZeroCubit>()
-                        .fetchReels(loadMore: true);
+                    context.read<BottomNavZeroCubit>().fetchReels(
+                      loadMore: true,
+                    );
                   }
 
                   // Log reel watch event
@@ -280,10 +288,18 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   }
 }
 
+/// Extracts api.video video ID from reel URL or returns [fallbackVideoId].
+String _extractReelVideoId(String reelLink, String fallbackVideoId) {
+  if (reelLink.contains('/vod/')) {
+    return reelLink.split('/vod/')[1].split('/').first;
+  }
+  return fallbackVideoId;
+}
+
 class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
   final int index;
-  final Function(int, VideoPlayerController) onControllerReady;
+  final Function(int, ApiVideoPlayerController) onControllerReady;
 
   const ReelVideoPlayer({
     super.key,
@@ -297,26 +313,36 @@ class ReelVideoPlayer extends StatefulWidget {
 }
 
 class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
-  late VideoPlayerController _controller;
+  late ApiVideoPlayerController _controller;
+  bool _isInitialized = false;
   bool _showPlayPause = false;
+  bool _isPlaying = false;
 
   @override
   void initState() {
     super.initState();
     AppLogger.d("video reel: ${widget.reelsModel.reelLink}");
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
-          ..initialize().then((_) {
-            // if (widget.index == 0) {
-            //   _controller.setVolume(
-            //     0,
-            //   ); // 🔇 Mute before registering the controller
-            // }
-            widget.onControllerReady(widget.index, _controller);
-
-            if (mounted) setState(() {});
-          })
-          ..setLooping(true);
+    final videoId = _extractReelVideoId(
+      widget.reelsModel.reelLink,
+      widget.reelsModel.videoId,
+    );
+    _controller = ApiVideoPlayerController(
+      videoOptions: VideoOptions(videoId: videoId),
+      autoplay: false,
+      onPlay: () {
+        if (mounted) setState(() => _isPlaying = true);
+      },
+      onPause: () {
+        if (mounted) setState(() => _isPlaying = false);
+      },
+    );
+    _controller.initialize().then((_) async {
+      if (!mounted) return;
+      await _controller.setIsLooping(true);
+      if (!mounted) return;
+      widget.onControllerReady(widget.index, _controller);
+      setState(() => _isInitialized = true);
+    });
   }
 
   @override
@@ -326,7 +352,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   }
 
   void _togglePlayPause() {
-    if (_controller.value.isPlaying) {
+    if (_isPlaying) {
       _controller.pause();
     } else {
       _controller.play();
@@ -339,7 +365,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
+    if (!_isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -351,52 +377,21 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              /// Background video
-              FittedBox(
-                fit: BoxFit.contain,
-                child: SizedBox(
-                  width: _controller.value.size.width,
-                  height: _controller.value.size.height,
-                  child: VideoPlayer(_controller),
+              /// Background video (apivideo_player, no built-in controls)
+              Positioned.fill(
+                child: ApiVideoPlayer(
+                  controller: _controller,
+                  child: Container(),
                 ),
               ),
 
               /// Play/Pause overlay
               if (_showPlayPause)
                 Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     setState(() {
-                      //       _isMuted = !_isMuted;
-                      //       _controller.setVolume(
-                      //         _isMuted ? 0 : 1,
-                      //       ); // 🔊 Toggle
-                      //     });
-                      //   },
-                      //   child: Container(
-                      //     padding: const EdgeInsets.all(8),
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.black54,
-                      //       shape: BoxShape.circle,
-                      //     ),
-                      //     child: Icon(
-                      //       _isMuted ? Icons.volume_off : Icons.volume_up,
-                      //       color: Colors.white,
-                      //       size: 28,
-                      //     ),
-                      //   ),
-                      // ),
-                      Icon(
-                        _controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 70,
-                      ),
-                    ],
+                  child: Icon(
+                    _isPlaying ? Icons.pause : Icons.play_arrow,
+                    color: Colors.white,
+                    size: 70,
                   ),
                 ),
 
@@ -421,10 +416,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                             SizedBox(
                               height: 30,
                               width: 30,
-                              child: SvgPicture.asset(
-                                MyAppAssets.svg_whatsapp,
-                                // size: 16,
-                              ),
+                              child: SvgPicture.asset(MyAppAssets.svg_whatsapp),
                             ),
                             const SizedBox(height: 4),
                             const Text(
@@ -445,12 +437,12 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                                  event: LogEventsName.instance()
-                                      .watch_full_video_reel,
-                                );
-                                _controller
-                                    .pause(); // ⏸ Pause before pushing new screen
+                                await MyAppAmplitudeAndFirebaseAnalitics()
+                                    .logEvent(
+                                      event: LogEventsName.instance()
+                                          .watch_full_video_reel,
+                                    );
+                                _controller.pause();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => VideoPlayerUsingId(
