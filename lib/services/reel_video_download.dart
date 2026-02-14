@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sermon/reusable/logger_service.dart';
 
 class ReelVideoDownloader {
   final Dio _dio = Dio();
@@ -12,10 +13,17 @@ class ReelVideoDownloader {
     void Function(int, int)? onProgress,
   }) async {
     final dir = await getTemporaryDirectory();
-    final filePath = '${dir.path}/reel_$reelId.mp4';
+
+    final reelDir = Directory('${dir.path}/reels_cache');
+
+    if (!await reelDir.exists()) {
+      await reelDir.create(recursive: true);
+    }
+
+    final filePath = '${reelDir.path}/reel_$reelId.mp4';
     final file = File(filePath);
 
-    // 🚀 FAST PATH — already downloaded
+    // 🚀 FAST PATH
     if (await file.exists() && await file.length() > 0) {
       return file;
     }
@@ -34,9 +42,22 @@ class ReelVideoDownloader {
   }
 
   Future<File?> getCachedFile(String reelId) async {
-  final dir = await getApplicationDocumentsDirectory();
-  final file = File('${dir.path}/reels/$reelId.mp4');
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/reels/$reelId.mp4');
 
-  return file.existsSync() ? file : null;
-}
+    return file.existsSync() ? file : null;
+  }
+
+  Future<void> clearAllCachedReels() async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final reelDir = Directory('${dir.path}/reels_cache');
+
+      if (await reelDir.exists()) {
+        await reelDir.delete(recursive: true);
+      }
+    } catch (e) {
+      AppLogger.e('Error clearing reel cache: $e');
+    }
+  }
 }

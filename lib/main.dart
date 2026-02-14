@@ -11,6 +11,7 @@ import 'package:sermon/screens/before_login/login_forgot_signup_cubit.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
+import 'package:sermon/services/reel_video_download.dart';
 import 'package:sermon/services/shared_pref/shared_preference.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/reusable/logger_service.dart';
@@ -34,6 +35,9 @@ void main() async {
 
   // Initialize deep link service
   await DeepLinkService().initialize();
+
+  // To clear cache
+  await ReelVideoDownloader().clearAllCachedReels();
 
   try {
     await Firebase.initializeApp(

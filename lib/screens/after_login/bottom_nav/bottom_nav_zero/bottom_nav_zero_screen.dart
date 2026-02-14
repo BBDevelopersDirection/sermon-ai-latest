@@ -40,6 +40,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   final PageController _pageController = PageController();
   late BottomNavZeroCubit _cubit;
   int _currentPage = 0;
+  bool _isScrollLocked = false;
   final Map<int, VideoPlayerController> _controllers = {};
 
   @override
@@ -77,6 +78,14 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
     if (_controllers.containsKey(index)) {
       _controllers[index]!.pause();
     }
+  }
+
+  void _setScrollLock(bool value) {
+    if (_isScrollLocked == value) return;
+
+    setState(() {
+      _isScrollLocked = value;
+    });
   }
 
   void _playController(int index) {
@@ -151,8 +160,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
               return PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
-                physics:
-                    const PageScrollPhysics(), // Snap exactly one page at a time
+                physics: _isScrollLocked
+                    ? const NeverScrollableScrollPhysics()
+                    : const PageScrollPhysics(),
                 pageSnapping: true,
                 itemCount: state.reels.length,
                 onPageChanged: (index) async {
@@ -276,6 +286,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                     reelsModel: reel,
                     index: index,
                     onControllerReady: _registerController,
+                    onDownloadStateChanged: _setScrollLock,
                   );
                 },
               );
@@ -291,12 +302,14 @@ class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
   final int index;
   final Function(int, VideoPlayerController) onControllerReady;
+  final Function(bool) onDownloadStateChanged;
 
   const ReelVideoPlayer({
     super.key,
     required this.reelsModel,
     required this.index,
     required this.onControllerReady,
+    required this.onDownloadStateChanged,
   });
 
   @override
@@ -310,9 +323,8 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   // 🔥 SHARE DOWNLOAD STATE
   File? _cachedVideo;
   bool _isDownloading = false;
-  bool _downloadFailed = false;
 
-  bool get _showShareLoader => _isDownloading && _cachedVideo == null;
+  bool get _showShareLoader => _isDownloading;
 
   @override
   void initState() {
@@ -325,17 +337,19 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
             if (mounted) setState(() {});
           })
           ..setLooping(true);
-
-    // 🚀 PRE-DOWNLOAD VIDEO
-    _preDownloadVideo();
   }
 
-  Future<void> _preDownloadVideo() async {
-    if (_isDownloading) return;
+  Future<void> _onShareTap() async {
+    if (_cachedVideo != null) {
+      _shareWithVideo();
+      return;
+    }
+
+    widget.onDownloadStateChanged(true); // 🔒 LOCK SCROLL
+    context.read<BottomNavCubit>().setVideoCaching(value: true);
 
     setState(() {
       _isDownloading = true;
-      _downloadFailed = false;
     });
 
     try {
@@ -349,16 +363,20 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
       setState(() {
         _cachedVideo = file;
       });
-    } catch (_) {
+
+      _shareWithVideo();
+    } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _downloadFailed = true;
-      });
+
+      _shareLinkOnly();
     } finally {
       if (!mounted) return;
+
       setState(() {
         _isDownloading = false;
       });
+      widget.onDownloadStateChanged(false); // 🔓 UNLOCK SCROLL
+      context.read<BottomNavCubit>().setVideoCaching(value: false);
     }
   }
 
@@ -381,14 +399,6 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     });
   }
 
-  void _onShareTap() {
-    if (_cachedVideo != null) {
-      _shareWithVideo();
-    } else {
-      _shareLinkOnly();
-    }
-  }
-
   void _shareWithVideo() {
     SharePlus.instance.share(
       ShareParams(
@@ -401,6 +411,34 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
 
     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
       event: LogEventsName.instance().reelsShareButton,
+    );
+  }
+
+  Future<void> _onWatchFullVideoTap() async {
+    // 🚫 Block if downloading
+    if (_isDownloading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please wait, video is downloading..."),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // ✅ Otherwise proceed
+    await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().watch_full_video_reel,
+    );
+
+    _controller.pause();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            VideoPlayerUsingId(url: widget.reelsModel.fullVideoLink),
+      ),
     );
   }
 
@@ -459,7 +497,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: _showShareLoader ? null : _onShareTap,
+                        onTap: _isDownloading ? null : _onShareTap,
                         child: Column(
                           children: [
                             AnimatedSwitcher(
@@ -524,21 +562,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                await MyAppAmplitudeAndFirebaseAnalitics()
-                                    .logEvent(
-                                      event: LogEventsName.instance()
-                                          .watch_full_video_reel,
-                                    );
-
-                                _controller.pause();
-
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoPlayerUsingId(
-                                      url: widget.reelsModel.fullVideoLink,
-                                    ),
-                                  ),
-                                );
+                                _onWatchFullVideoTap();
                               },
                               child: Container(
                                 height: 48,
