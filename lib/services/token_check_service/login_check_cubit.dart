@@ -1,13 +1,18 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
 import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
 import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon/services/reel_video_download.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../models/playlist_and_episode_model_old.dart';
 import '../../reusable/app_dialogs.dart';
@@ -38,19 +43,46 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     emit(state.copyWith(showPaymentInProgress: isShow));
   }
 
-  void shareReel(String reelId) {
-    Future.wait([
-      SharePlus.instance.share(
-        ShareParams(
-          text:
-              '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
-        ),
+  // void shareReel(String reelId) {
+  //   Future.wait([
+  //     SharePlus.instance.share(
+  //       ShareParams(
+  //         text:
+  //             '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
+  //       ),
+  //     ),
+  //     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+  //       event: LogEventsName.instance().reelsShareButton,
+  //     ),
+  //   ]);
+  // }
+
+  Future<void> shareReel({
+  required String reelId,
+  required Future<File> videoFuture,
+}) async {
+  try {
+    final videoFile = await videoFuture; // ⚡ usually instant
+
+    await SharePlus.instance.share(
+      ShareParams(
+        text:
+            '${FirebaseRemoteConfigService().shareButtonMessageText}\n'
+            'https://sermontv.usedirection.com/$reelId',
+        files: [
+          XFile(videoFile.path, mimeType: 'video/mp4'),
+        ],
       ),
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().reelsShareButton,
-      ),
-    ]);
+    );
+
+    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().reelsShareButton,
+    );
+  } catch (e, s) {
+    AppLogger.e('Share failed');
   }
+}
+
 
   void freshInstallEventLog() {
     if (SharedPreferenceLogic.isFreshInstall()) {

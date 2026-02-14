@@ -51,8 +51,8 @@ class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
   }
 
   Future<bool> _checkIf30DaysSubscription() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid ??
-        HiveBoxFunctions().getUuid();
+    final userId =
+        FirebaseAuth.instance.currentUser?.uid ?? HiveBoxFunctions().getUuid();
 
     final utilityModel = await UtilsFunctions().getFirebaseUtility(
       userId: userId,
@@ -100,7 +100,6 @@ class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
     );
   }
 }
-
 
 class PaywallScreen30Days extends StatelessWidget {
   final VideoPlayerController? controller;

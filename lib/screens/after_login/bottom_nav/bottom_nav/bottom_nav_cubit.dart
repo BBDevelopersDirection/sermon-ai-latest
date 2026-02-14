@@ -11,6 +11,8 @@ import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/firebase/video_management/video_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon/services/log_service/log_service.dart';
+import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
 
@@ -21,6 +23,7 @@ class BottomNavCubit extends Cubit<BottomNavState> {
     : super(BottomNavState(
         bottomNavScaffoldKey: null,
         hideBottomBar: false,
+        isVideoCaching: false,
         selectedIndex: 0,
       ));
 
@@ -30,9 +33,37 @@ class BottomNavCubit extends Cubit<BottomNavState> {
     emit(state.copyWith(bottomNavScaffoldKey: bottomNavScaffoldKey));
   }
 
-  void setSelectedIndex(int index) {
+  void setSelectedIndex({required BuildContext context, required int index}) {
+    if(state.isVideoCaching){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please wait, video is downloading..."),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    if (index == 0) {
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsScreenButton,
+      );
+    } else if (index == 1) {
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().homeScreenButton,
+      );
+    } else if (index == 2) {
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().profileScreenButton,
+      );
+    }
     emit(state.copyWith(selectedIndex: index));
   }
+
+  void setVideoCaching({required bool value}) {
+  emit(state.copyWith(isVideoCaching: value));
+}
+
 
   Future<void> showRechargePage({required bool isShow}) async {
     if (!isShow) return;
