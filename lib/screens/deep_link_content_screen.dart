@@ -37,6 +37,7 @@ class _DeepLinkContentScreenState extends State<DeepLinkContentScreen> {
   initState() {
     super.initState();
     _fetchReel();
+    _eventTracking();
   }
 
   Future<void> _fetchReel() async {
@@ -55,6 +56,12 @@ class _DeepLinkContentScreenState extends State<DeepLinkContentScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void _eventTracking() async {
+    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().shared_reel_watched,
+    );
   }
 
   void _navigateBack() {
@@ -139,8 +146,9 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
   }
 
   Future<void> _initializePlayer() async {
-    final File? cachedFile =
-        await ReelVideoDownloader().getCachedFile(widget.reelsModel.id);
+    final File? cachedFile = await ReelVideoDownloader().getCachedFile(
+      widget.reelsModel.id,
+    );
 
     if (cachedFile != null && cachedFile.existsSync()) {
       /// ✅ Play from local file
@@ -208,9 +216,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
           if (_showPlayPause)
             Center(
               child: Icon(
-                _controller.value.isPlaying
-                    ? Icons.pause
-                    : Icons.play_arrow,
+                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
                 color: Colors.white,
                 size: 70,
               ),
@@ -304,7 +310,6 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
           //     ],
           //   ),
           // ),
-        
         ],
       ),
     );

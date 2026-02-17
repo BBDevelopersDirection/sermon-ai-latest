@@ -399,8 +399,8 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     });
   }
 
-  void _shareWithVideo() {
-    SharePlus.instance.share(
+  Future<void> _shareWithVideo() async {
+    final result = await SharePlus.instance.share(
       ShareParams(
         files: [XFile(_cachedVideo!.path, mimeType: 'video/mp4')],
         text:
@@ -409,9 +409,14 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
       ),
     );
 
-    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-      event: LogEventsName.instance().reelsShareButton,
-    );
+    if (result.status == ShareResultStatus.success) {
+      AppLogger.i("User selected a share target");
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsShareButton,
+      );
+    } else if (result.status == ShareResultStatus.dismissed) {
+      AppLogger.e("User dismissed share sheet");
+    }
   }
 
   Future<void> _onWatchFullVideoTap() async {
