@@ -33,6 +33,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure proper initialization
   await SharedPreferenceLogic.initialize();
 
+  final appDocumentDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDir.path);
+  final hiveBoxService = HiveBoxFunctions();
+  await hiveBoxService.init();
+
   // Initialize deep link service
   await DeepLinkService().initialize();
 
@@ -87,11 +92,6 @@ void main() async {
   //     projectId: "s3uew6gddm",
   //     logLevel: LogLevel.None // Note: Use "LogLevel.Verbose" value while testing to debug initialization issues.
   // );
-
-  final appDocumentDir = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDir.path);
-  final hiveBoxService = HiveBoxFunctions();
-  await hiveBoxService.init();
 
   runApp(MyApp());
 

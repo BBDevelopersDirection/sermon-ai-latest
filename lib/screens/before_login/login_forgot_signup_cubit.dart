@@ -221,7 +221,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             return;
           }
           await FirestoreFunctions().ensureCreatedDateExists(userId: value.uid);
-          Future.wait([
+          await Future.wait([
             MyAppAmplitudeAndFirebaseAnalitics().logEvent(
               event: LogEventsName.instance().loginFirebase,
             ),
@@ -237,6 +237,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             ),
             NotificationService.instance.requestPermissionAndGetToken(),
           ]);
+          // Set Linkrunner user for attribution after sign-in
+          await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(value.uid);
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) =>
@@ -523,7 +525,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
-
+      // Set Linkrunner user for attribution after sign-in
+      await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(data.uid);
       // Navigate to login check screen
       Navigator.of(navigatorKey.currentContext!).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -648,7 +651,12 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               ),
             ),
           ]);
-
+          final uid = isTruecaller
+              ? await HiveBoxFunctions().getUuidByPhone(
+                  phoneNumber: unverifiedMobNum,
+                )
+              : FirebaseAuth.instance.currentUser!.uid;
+          await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(uid);
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) =>

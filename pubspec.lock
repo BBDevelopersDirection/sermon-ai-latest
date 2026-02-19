@@ -736,6 +736,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  linkrunner:
+    dependency: "direct main"
+    description:
+      name: linkrunner
+      sha256: f96548907677f2fa93a3aa114e3a5ca3fd23f8ff9e9416825d661d57684e6bd2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.6.3"
   lints:
     dependency: transitive
     description:
