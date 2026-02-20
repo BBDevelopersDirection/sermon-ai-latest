@@ -5,9 +5,6 @@ import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_scre
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/screens/before_login/sign_up/sign_up_screen_reel.dart';
 import '../../reusable/progress_indicator.dart';
-import '../../screens/before_login/login_forgot_signup_cubit.dart';
-import '../../screens/before_login/sign_up/sign_up_screen.dart';
-import '../firebase_notification_mine.dart';
 import 'login_check_cubit.dart';
 import 'login_check_state.dart';
 

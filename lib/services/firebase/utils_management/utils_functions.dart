@@ -2,17 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/src/response.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/network/endpoints.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/firebase/subscription_management/subscription_function.dart';
-import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 
 import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import '../firestore_variables.dart';
 
 class UtilsFunctions {
@@ -61,8 +58,9 @@ class UtilsFunctions {
     required dynamic newValue,
   }) async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null && HiveBoxFunctions().getUuid().isEmpty)
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
       return; // User not logged in
+    }
 
     final docRef = FirebaseFirestore.instance
         .collection(FirestoreVariables.utilitiesCollection)
@@ -94,8 +92,9 @@ class UtilsFunctions {
   Future<bool> canUseReel({required int index}) async {
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null && HiveBoxFunctions().getUuid().isEmpty)
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
       return false; // User not logged in
+    }
 
     final utility = await getFirebaseUtility(
       userId: user?.uid ?? HiveBoxFunctions().getUuid(),
@@ -110,8 +109,9 @@ class UtilsFunctions {
 
   Future<void> increaseVideoCount() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null && HiveBoxFunctions().getUuid().isEmpty)
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
       return; // User not logged in
+    }
 
     final utility = await getFirebaseUtility(
       userId: user?.uid ?? HiveBoxFunctions().getUuid(),
@@ -130,8 +130,9 @@ class UtilsFunctions {
   Future<void> setRechargeTrue() async {
     AppLogger.d("inside set recharge true");
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null && HiveBoxFunctions().getUuid().isEmpty)
+    if (user == null && HiveBoxFunctions().getUuid().isEmpty) {
       return; // User not logged in
+    }
     AppLogger.d("User Exsists");
     // Set isRecharged to true
     Future.wait([

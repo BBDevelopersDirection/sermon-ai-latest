@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:lottie/lottie.dart'; // Add in pubspec.yaml for animations
 import 'package:sermon/services/firebase/firestore_variables.dart';
-import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/utils/app_assets.dart';

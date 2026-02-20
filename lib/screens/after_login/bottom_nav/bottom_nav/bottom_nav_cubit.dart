@@ -1,15 +1,11 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/main.dart';
-import 'package:sermon/models/video_data_model.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
-import 'package:sermon/services/firebase/video_management/video_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';

@@ -6,7 +6,7 @@ class BottomNavState extends Equatable {
   final bool hideBottomBar;
   final bool isVideoCaching;
   final int selectedIndex;
-  BottomNavState({
+  const BottomNavState({
     required this.bottomNavScaffoldKey,
     required this.isVideoCaching,
     required this.hideBottomBar,

@@ -28,6 +28,18 @@ class ReelVideoDownloader {
       return file;
     }
 
+    return await downloadReelAndAddToCache(
+      videoUrl: videoUrl,
+      filePath: filePath,
+      onProgress: onProgress,
+    );
+  }
+
+  Future<File> downloadReelAndAddToCache({
+    required String videoUrl,
+    required String filePath,
+    void Function(int, int)? onProgress,
+  }) async {
     await _dio.download(
       videoUrl,
       filePath,
@@ -38,7 +50,7 @@ class ReelVideoDownloader {
       ),
     );
 
-    return file;
+    return File(filePath);
   }
 
   Future<File?> getCachedFile(String reelId) async {

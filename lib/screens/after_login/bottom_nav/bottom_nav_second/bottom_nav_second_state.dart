@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:sermon/services/firebase/models/utility_model.dart';
 
-import '../../../../services/firebase/models/transition_model.dart';
 
 class BottomNavSecondState extends Equatable {
   UtilityModel? utilityModel;

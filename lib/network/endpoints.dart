@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:sermon/main.dart';
 import 'package:sermon/services/firebase/models/user_models.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
@@ -36,7 +35,7 @@ class MyAppEndpoints {
         'contact': firebaseUser.phoneNumber,
         'userId': firebaseUser.uid,
       };
-      AppLogger.d("data is: ${data}");
+      AppLogger.d("data is: $data");
       return await MyAppDio.instance().post(
         '/$razorPayUrl/create-customer',
         data: data,

@@ -26,7 +26,7 @@ class _CustomScaffoldState extends State<MyScaffold>
     });
   }
 
-  initStateFunc() {
+  void initStateFunc() {
     _checkCurrentNetworkState();
     connectivitySubscription = Connectivity().onConnectivityChanged.listen(
       _updateConnectionStatus,

@@ -9,8 +9,6 @@ import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_second/bottom_n
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_screen.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_cubit.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
-import '../../../../services/log_service/log_service.dart';
-import '../../../../services/log_service/log_variables.dart';
 import '../../../../utils/app_color.dart';
 import '../../../../services/firebase_notification_mine.dart';
 import '../bottom_nav_first/bottom_nav_first_screen.dart';
