@@ -16,19 +16,19 @@ class SignUpThirdScreen extends StatefulWidget {
 
 class _SignUpThirdScreenState extends State<SignUpThirdScreen> {
   late TextEditingController name;
-  late TextEditingController email;
+  // late TextEditingController email;
 
   @override
   void initState() {
     name = TextEditingController();
-    email = TextEditingController();
+    // email = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     name.dispose();
-    email.dispose();
+    // email.dispose();
     super.dispose();
   }
 
@@ -84,29 +84,29 @@ class _SignUpThirdScreenState extends State<SignUpThirdScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  controller: email,
-                  keyboardType: TextInputType.emailAddress,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'[a-zA-Z0-9@._\-+]'),
-                    ),
-                  ],
-                  decoration: InputDecoration(
-                    hintText: 'Enter email (optional)',
-                    hintStyle: const TextStyle(color: Colors.white60),
-                    filled: true,
-                    fillColor: const Color.fromRGBO(41, 41, 56, 1),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 16, horizontal: 16),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                // TextField(
+                //   style: const TextStyle(color: Colors.white),
+                //   controller: email,
+                //   keyboardType: TextInputType.emailAddress,
+                //   inputFormatters: [
+                //     FilteringTextInputFormatter.allow(
+                //       RegExp(r'[a-zA-Z0-9@._\-+]'),
+                //     ),
+                //   ],
+                //   decoration: InputDecoration(
+                //     hintText: 'Enter email (optional)',
+                //     hintStyle: const TextStyle(color: Colors.white60),
+                //     filled: true,
+                //     fillColor: const Color.fromRGBO(41, 41, 56, 1),
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: BorderSide.none,
+                //     ),
+                //     contentPadding: const EdgeInsets.symmetric(
+                //         vertical: 16, horizontal: 16),
+                //   ),
+                // ),
+                // const SizedBox(height: 24),
                 SizedBox(
                     width: double.infinity,
                     child: BlocBuilder<LoginForgotSignupCubit,
@@ -130,7 +130,8 @@ class _SignUpThirdScreenState extends State<SignUpThirdScreen> {
                                   .userRegistrationSignUpButton(
                                       context: context,
                                       name: name.text,
-                                      email: email.text,
+                                      // email: email.text,
+                                      email: "",
                                       unverifiedMobNum: widget.number);
                             },
                             child: state.loadingStatus == LoadingStatus.noLoading

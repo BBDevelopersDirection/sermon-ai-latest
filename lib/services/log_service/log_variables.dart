@@ -42,6 +42,13 @@ class LogEventsName{
   String loginReelPageOpen = 'loginReelPageOpen';
   String loginScreenOpen = 'loginScreenOpen';
 
+  // Otp Events Logs
+  String invalidVerificationCode = 'invalidVerificationCode';
+  String sessionExpired = 'sessionExpired';
+  String tooManyRequests = 'tooManyRequests';
+  String quotaExceeded = 'otpSmsQuotaExceeded';
+  String unknownError = 'unknownError';
+
   LogEventsName._privateConstructor();
   static LogEventsName instance(){
     return LogEventsName._privateConstructor();
