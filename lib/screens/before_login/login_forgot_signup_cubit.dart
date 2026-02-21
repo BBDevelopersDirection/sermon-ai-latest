@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,7 +32,12 @@ import 'sign_up/sign_up_second.dart';
 
 class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
   LoginForgotSignupCubit()
-    : super(LoginForgotSignupState(loadingStatus: LoadingStatus.noLoading, isShowRecapchaWarning: false));
+    : super(
+        LoginForgotSignupState(
+          loadingStatus: LoadingStatus.noLoading,
+          isShowRecapchaWarning: false,
+        ),
+      );
 
   final OTPService otpService = OTPService();
   StreamSubscription? _streamSubscription;
@@ -109,12 +113,12 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
         },
         onAutoRetrievalTimeout: () {
           emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
-          MyAppDialogs().info_dialog(
-            context: context,
-            title: "Sorry",
-            body: 'OTP auto retrieval timeout.',
-          );
-          AppLogger.d("OTP auto retrieval timeout.");
+          // MyAppDialogs().info_dialog(
+          //   context: context,
+          //   title: "Sorry",
+          //   body: 'OTP auto retrieval timeout.',
+          // );
+          // AppLogger.d("OTP auto retrieval timeout.");
         },
       );
       // Show an error message or handle invalid input
@@ -125,7 +129,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     required BuildContext context,
     required TextEditingController mobile_num,
   }) async {
-    if (await Permission.phone.request().isGranted) {
+    if (await Permission.phone.request().isGranted &&
+        mobile_num.text.trim().isEmpty) {
       List<String> numbers = [];
 
       try {
@@ -155,16 +160,17 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       /// Remove duplicates
       numbers = numbers.toSet().toList();
 
-      if (numbers.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("No phone numbers found. Enter manually."),
-          ),
-        );
-        return;
-      }
+      // if (numbers.isEmpty) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(
+      //       content: Text("No phone numbers found. Enter manually."),
+      //     ),
+      //   );
+      //   return;
+      // }
 
       MyAppDialogs().phoneNumberDialog(
+        // ignore: use_build_context_synchronously
         context: context,
         numbers: numbers,
         onNumberSelected: (selectedNumber) {
@@ -192,7 +198,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
     } else {
       try {
         emit(state.copyWith(loadingStatus: LoadingStatus.otpLoading));
-        final result = await otpService.verifyOTP(smsCode: controller.text);
+        await otpService.verifyOTP(smsCode: controller.text);
         emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
 
         final user = FirebaseAuth.instance.currentUser;
@@ -221,7 +227,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             return;
           }
           await FirestoreFunctions().ensureCreatedDateExists(userId: value.uid);
-          Future.wait([
+          await Future.wait([
             MyAppAmplitudeAndFirebaseAnalitics().logEvent(
               event: LogEventsName.instance().loginFirebase,
             ),
@@ -237,6 +243,10 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             ),
             NotificationService.instance.requestPermissionAndGetToken(),
           ]);
+          // Set Linkrunner user for attribution after sign-in
+          await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(
+            value.uid,
+          );
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) =>
@@ -245,18 +255,39 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
             (route) => false,
           );
         });
-      } catch (e) {
-        // AppLogger.d("OTP verification failed: $e");
+      } on FirebaseAuthException catch (e) {
+        final FirebaseOtpException exception = otpService
+            .handleFirebaseOtpError(e: e, context: context);
         emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+
         MyAppDialogs().info_dialog(
           context: context,
           title: 'Failed',
-          body: e.toString().contains('verification-id-null')
-              ? 'Please request OTP first.'
-              : 'Invalid OTP. Please try again.',
+          body: exception.message,
+          onOkCallback: exception.isNavigateToLogin
+              ? () {
+                  Navigator.of(context).pop();
+                }
+              : null,
         );
-        MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-          event: LogEventsName.instance().otpEntryIncorrect,
+        if (exception.eventLog != null) {
+          MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+            event: exception.eventLog!,
+          );
+        }
+
+        if (exception.isNavigateToLogin) {
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        emit(state.copyWith(loadingStatus: LoadingStatus.noLoading));
+        MyAppDialogs().info_dialog(
+          context: context,
+          title: "Error",
+          body: 'Something went wrong. Please try again.',
+          onOkCallback: () {
+            Navigator.of(context).pop();
+          },
         );
       }
     }
@@ -279,7 +310,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               TcSdk.setCodeChallenge(codeChallenge);
 
               /// ✅ Finally trigger the login box here
-              TcSdk.getAuthorizationCode();
+              TcSdk.getAuthorizationCode;
             } else {
               ScaffoldMessenger.of(
                 context,
@@ -406,7 +437,7 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
 
       // Step 5: Request authorization code (⚠️ this is a method call, not a property)
       // Attempting to isolate the call to prevent NoSuchMethodError
-      await Future.value(TcSdk.getAuthorizationCode());
+      await Future.value(TcSdk.getAuthorizationCode);
     } catch (e) {
       AppLogger.e('❌ Exception: $e');
     }
@@ -523,7 +554,8 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
       );
       // Save login details to Hive
       await HiveBoxFunctions().saveLoginDetails(data);
-
+      // Set Linkrunner user for attribution after sign-in
+      await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(data.uid);
       // Navigate to login check screen
       Navigator.of(navigatorKey.currentContext!).pushAndRemoveUntil(
         MaterialPageRoute(
@@ -648,7 +680,10 @@ class LoginForgotSignupCubit extends Cubit<LoginForgotSignupState> {
               ),
             ),
           ]);
-
+          final uid = isTruecaller
+              ? HiveBoxFunctions().getUuidByPhone(phoneNumber: unverifiedMobNum)
+              : FirebaseAuth.instance.currentUser!.uid;
+          await MyAppAmplitudeAndFirebaseAnalitics().setLinkrunnerUserId(uid);
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) =>

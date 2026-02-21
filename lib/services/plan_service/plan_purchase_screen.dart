@@ -1,11 +1,7 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/reusable/app_dialogs.dart';
 import 'package:sermon/reusable/progress_indicator.dart';
-import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_state.dart';
@@ -19,13 +15,11 @@ import 'package:sermon/utils/app_assets.dart';
 import 'package:video_player/video_player.dart';
 
 import '../firebase/utils_management/utils_functions.dart';
-import '../razorpay_service.dart';
-import 'widgets/header_close_button.dart';
 import 'package:sermon/reusable/logger_service.dart';
 
 class SubscriptionTrialScreen extends StatefulWidget {
   final VideoPlayerController? controller;
-  SubscriptionTrialScreen({super.key, this.controller});
+  const SubscriptionTrialScreen({super.key, this.controller});
 
   @override
   State<SubscriptionTrialScreen> createState() =>
@@ -51,8 +45,8 @@ class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
   }
 
   Future<bool> _checkIf30DaysSubscription() async {
-    final userId = FirebaseAuth.instance.currentUser?.uid ??
-        HiveBoxFunctions().getUuid();
+    final userId =
+        FirebaseAuth.instance.currentUser?.uid ?? HiveBoxFunctions().getUuid();
 
     final utilityModel = await UtilsFunctions().getFirebaseUtility(
       userId: userId,
@@ -100,7 +94,6 @@ class _SubscriptionTrialScreenState extends State<SubscriptionTrialScreen> {
     );
   }
 }
-
 
 class PaywallScreen30Days extends StatelessWidget {
   final VideoPlayerController? controller;

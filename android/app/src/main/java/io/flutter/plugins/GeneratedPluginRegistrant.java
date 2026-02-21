@@ -96,6 +96,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin in_app_update, de.ffuf.in_app_update.InAppUpdatePlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new io.linkrunner.flutter.LinkrunnerPlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin linkrunner, io.linkrunner.flutter.LinkrunnerPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new com.amorenew.mobile_number.MobileNumberPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin mobile_number, com.amorenew.mobile_number.MobileNumberPlugin", e);

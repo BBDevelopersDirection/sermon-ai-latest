@@ -155,5 +155,6 @@ class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
         body: "Error while creating Subscription",
       );
     }
+    return null;
   }
 }

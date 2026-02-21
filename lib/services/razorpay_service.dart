@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:flutter/material.dart';
 import 'package:sermon/services/firebase/models/transition_model.dart';
 import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';

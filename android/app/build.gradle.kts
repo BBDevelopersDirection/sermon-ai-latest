@@ -36,8 +36,8 @@ android {
         applicationId = "com.live.ai.sermon"
         minSdk = 23
         targetSdk = 36
-        versionCode = 48
-        versionName = "1.5.6"
+        versionCode = 52
+        versionName = "1.5.7"
     }
 
     // Added for firebase Auth Browser redirect bug
@@ -131,7 +131,5 @@ dependencies {
 
     // Google Play Services for Amplitude App Set ID
     implementation("com.google.android.gms:play-services-appset:16.0.2")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
-
-apply(plugin = "com.google.gms.google-services")

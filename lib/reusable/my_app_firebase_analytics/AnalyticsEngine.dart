@@ -10,12 +10,14 @@ class AnalyticsEngine {
 
   final _analytics = FirebaseAnalytics.instance;
 
-  Future<void> logFirebaseEvent({required String FirebaseEventName}) async {
+  Future<void> logFirebaseEvent({
+    required String FirebaseEventName,
+    Map<String, Object>? parameters,
+  }) async {
     try {
-      // await _analytics.setAnalyticsCollectionEnabled(true);
-
       await _analytics.logEvent(
         name: FirebaseEventName,
+        parameters: parameters,
       );
       if (isDebugMode() || kDebugMode) {
         AppLogger.d('Firebase Analytics Event Logged: $FirebaseEventName');

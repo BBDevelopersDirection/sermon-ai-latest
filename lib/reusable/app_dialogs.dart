@@ -54,9 +54,9 @@ class MyAppDialogs {
         .toList();
 
     if (numbers.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No phone numbers available.")),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text("No phone numbers available.")),
+      // );
       return;
     }
 

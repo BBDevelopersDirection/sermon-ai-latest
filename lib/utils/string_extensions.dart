@@ -4,6 +4,6 @@ extension StringExtensions on String {
     final cleanStr = replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
     
     // Append @gmail.com
-    return '${cleanStr}@gmail.com';
+    return '$cleanStr@gmail.com';
   }
 }

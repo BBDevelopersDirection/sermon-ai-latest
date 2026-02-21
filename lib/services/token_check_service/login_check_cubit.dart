@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:sermon/reusable/logger_service.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/analytic_logger.dart';
 import 'package:sermon/reusable/my_app_firebase_analytics/event_name.dart';
 import 'package:sermon/reusable/recharge_page.dart';
-import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
 import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:share_plus/share_plus.dart';
@@ -38,19 +40,46 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     emit(state.copyWith(showPaymentInProgress: isShow));
   }
 
-  void shareReel(String reelId) {
-    Future.wait([
-      SharePlus.instance.share(
-        ShareParams(
-          text:
-              '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
-        ),
+  // void shareReel(String reelId) {
+  //   Future.wait([
+  //     SharePlus.instance.share(
+  //       ShareParams(
+  //         text:
+  //             '${FirebaseRemoteConfigService().shareButtonMessageText} https://sermontv.usedirection.com/$reelId',
+  //       ),
+  //     ),
+  //     MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+  //       event: LogEventsName.instance().reelsShareButton,
+  //     ),
+  //   ]);
+  // }
+
+  Future<void> shareReel({
+  required String reelId,
+  required Future<File> videoFuture,
+}) async {
+  try {
+    final videoFile = await videoFuture; // ⚡ usually instant
+
+    await SharePlus.instance.share(
+      ShareParams(
+        text:
+            '${FirebaseRemoteConfigService().shareButtonMessageText}\n'
+            'https://sermontv.usedirection.com/$reelId',
+        files: [
+          XFile(videoFile.path, mimeType: 'video/mp4'),
+        ],
       ),
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().reelsShareButton,
-      ),
-    ]);
+    );
+
+    MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().reelsShareButton,
+    );
+  } catch (e) {
+    AppLogger.e('Share failed');
   }
+}
+
 
   void freshInstallEventLog() {
     if (SharedPreferenceLogic.isFreshInstall()) {
@@ -209,49 +238,49 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
     required BuildContext context,
     required int index,
   }) async {
-    String? analytic_name;
+    String? analyticName;
     if (index == 0) {
-      analytic_name = MyAppLogEventsName.instance().series1;
+      analyticName = MyAppLogEventsName.instance().series1;
     } else if (index == 1) {
-      analytic_name = MyAppLogEventsName.instance().series2;
+      analyticName = MyAppLogEventsName.instance().series2;
     } else if (index == 2) {
-      analytic_name = MyAppLogEventsName.instance().series3;
+      analyticName = MyAppLogEventsName.instance().series3;
     } else if (index == 3) {
-      analytic_name = MyAppLogEventsName.instance().series4;
+      analyticName = MyAppLogEventsName.instance().series4;
     } else if (index == 4) {
-      analytic_name = MyAppLogEventsName.instance().series5;
+      analyticName = MyAppLogEventsName.instance().series5;
     } else if (index == 5) {
-      analytic_name = MyAppLogEventsName.instance().series6;
+      analyticName = MyAppLogEventsName.instance().series6;
     } else if (index == 6) {
-      analytic_name = MyAppLogEventsName.instance().series7;
+      analyticName = MyAppLogEventsName.instance().series7;
     } else if (index == 7) {
-      analytic_name = MyAppLogEventsName.instance().series8;
+      analyticName = MyAppLogEventsName.instance().series8;
     } else if (index == 8) {
-      analytic_name = MyAppLogEventsName.instance().series9;
+      analyticName = MyAppLogEventsName.instance().series9;
     } else if (index == 9) {
-      analytic_name = MyAppLogEventsName.instance().series10;
+      analyticName = MyAppLogEventsName.instance().series10;
     } else if (index == 10) {
-      analytic_name = MyAppLogEventsName.instance().series11;
+      analyticName = MyAppLogEventsName.instance().series11;
     } else if (index == 11) {
-      analytic_name = MyAppLogEventsName.instance().series12;
+      analyticName = MyAppLogEventsName.instance().series12;
     } else if (index == 12) {
-      analytic_name = MyAppLogEventsName.instance().series13;
+      analyticName = MyAppLogEventsName.instance().series13;
     } else if (index == 13) {
-      analytic_name = MyAppLogEventsName.instance().series14;
+      analyticName = MyAppLogEventsName.instance().series14;
     } else if (index == 14) {
-      analytic_name = MyAppLogEventsName.instance().series15;
+      analyticName = MyAppLogEventsName.instance().series15;
     } else if (index == 15) {
-      analytic_name = MyAppLogEventsName.instance().series16;
+      analyticName = MyAppLogEventsName.instance().series16;
     } else if (index == 16) {
-      analytic_name = MyAppLogEventsName.instance().series17;
+      analyticName = MyAppLogEventsName.instance().series17;
     } else if (index == 17) {
-      analytic_name = MyAppLogEventsName.instance().series18;
+      analyticName = MyAppLogEventsName.instance().series18;
     } else if (index == 18) {
-      analytic_name = MyAppLogEventsName.instance().series19;
+      analyticName = MyAppLogEventsName.instance().series19;
     } else if (index == 19) {
-      analytic_name = MyAppLogEventsName.instance().series20;
+      analyticName = MyAppLogEventsName.instance().series20;
     } else {
-      analytic_name = 'Unknown Series';
+      analyticName = 'Unknown Series';
     }
 
     Navigator.of(context).push(
@@ -264,7 +293,7 @@ class LoginCheckCubit extends Cubit<LoginCheckState> {
       ),
     );
 
-    await MyAppAnalitics.instanse().logEvent(event: analytic_name);
+    await MyAppAnalitics.instanse().logEvent(event: analyticName);
   }
 
   Future<void> reportOnWhatsapp() async {

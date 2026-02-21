@@ -9,8 +9,6 @@ import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_second/bottom_n
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_screen.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_cubit.dart';
 import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
-import '../../../../services/log_service/log_service.dart';
-import '../../../../services/log_service/log_variables.dart';
 import '../../../../utils/app_color.dart';
 import '../../../../services/firebase_notification_mine.dart';
 import '../bottom_nav_first/bottom_nav_first_screen.dart';
@@ -26,15 +24,14 @@ class BottomNavScreen extends StatefulWidget {
 
 class _BottomNavScreenState extends State<BottomNavScreen>
     with WidgetsBindingObserver {
-  int _selectedIndex = 0;
   late SectionDetail? _sliderVideos;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // List of screen widgets to show based on the index
   final List<Widget> _screens = [
-
     BlocProvider(
-      create: (context) => BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions()),
+      create: (context) =>
+          BottomNavZeroCubit(firestoreFunctions: ReelsFirestoreFunctions()),
       child: BottomNavZeroScreen(),
     ),
     BlocProvider(
@@ -48,23 +45,7 @@ class _BottomNavScreenState extends State<BottomNavScreen>
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    context.read<BottomNavCubit>().setSelectedIndex(index);
-    if (_selectedIndex == 0) {
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().reelsScreenButton,
-      );
-    } else if(_selectedIndex == 1) {
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().homeScreenButton,
-      );
-    } else if(_selectedIndex == 2) {
-      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-        event: LogEventsName.instance().profileScreenButton,
-      );
-    }
+    context.read<BottomNavCubit>().setSelectedIndex(context: context, index: index);
   }
 
   @override
@@ -73,7 +54,10 @@ class _BottomNavScreenState extends State<BottomNavScreen>
     context.read<BottomNavCubit>().saveKeyBottomNav(
       bottomNavScaffoldKey: _scaffoldKey,
     );
-    context.read<BottomNavCubit>().setSelectedIndex(_selectedIndex);
+    context.read<BottomNavCubit>().setSelectedIndex(
+      context: context,
+      index: context.read<BottomNavCubit>().state.selectedIndex,
+    );
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -116,7 +100,7 @@ class _BottomNavScreenState extends State<BottomNavScreen>
             key: _scaffoldKey,
             body: AnimatedSwitcher(
               duration: Duration(milliseconds: 300),
-              child: _screens[_selectedIndex],
+              child: _screens[context.read<BottomNavCubit>().state.selectedIndex],
             ),
             bottomNavigationBar: state.hideBottomBar
                 ? null
@@ -125,27 +109,36 @@ class _BottomNavScreenState extends State<BottomNavScreen>
                     elevation: 0,
                     selectedFontSize: 0,
                     unselectedFontSize: 0,
-                    currentIndex: _selectedIndex,
+                    currentIndex: context.read<BottomNavCubit>().state.selectedIndex,
                     type: BottomNavigationBarType.fixed,
                     showSelectedLabels: false,
                     showUnselectedLabels: false,
                     onTap: _onItemTapped,
                     items: [
                       BottomNavigationBarItem(
-                        icon: _selectedIndex == 0
-                            ? BottomNavContainer(asset: IconlyLight.home, isActive: true)
+                        icon: context.read<BottomNavCubit>().state.selectedIndex == 0
+                            ? BottomNavContainer(
+                                asset: IconlyLight.home,
+                                isActive: true,
+                              )
                             : BottomNavContainer(asset: IconlyLight.home),
                         label: '',
                       ),
                       BottomNavigationBarItem(
-                        icon: _selectedIndex == 1
-                            ? BottomNavContainer(asset: IconlyLight.video, isActive: true)
+                        icon: context.read<BottomNavCubit>().state.selectedIndex == 1
+                            ? BottomNavContainer(
+                                asset: IconlyLight.video,
+                                isActive: true,
+                              )
                             : BottomNavContainer(asset: IconlyLight.video),
                         label: '',
                       ),
                       BottomNavigationBarItem(
-                        icon: _selectedIndex == 2
-                            ? BottomNavContainer(asset: IconlyLight.profile, isActive: true)
+                        icon: context.read<BottomNavCubit>().state.selectedIndex == 2
+                            ? BottomNavContainer(
+                                asset: IconlyLight.profile,
+                                isActive: true,
+                              )
                             : BottomNavContainer(asset: IconlyLight.profile),
                         label: '',
                       ),

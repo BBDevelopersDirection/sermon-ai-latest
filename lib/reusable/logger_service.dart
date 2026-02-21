@@ -15,16 +15,16 @@ class AppLogger {
   );
 
   static void d(String message) {
-    if (isDebugMode() || kDebugMode) _logger.d('🐛 ${message}\n');
+    if (isDebugMode() || kDebugMode) _logger.d('🐛 $message\n');
   }
 
   static void i(String message) {
-    if (isDebugMode() || kDebugMode) _logger.i('🐛 ${message}\n');
+    if (isDebugMode() || kDebugMode) _logger.i('🐛 $message\n');
   }
 
   static void w(String message, [dynamic error, StackTrace? stackTrace]) {
     if (isDebugMode() || kDebugMode) {
-      _logger.w('🐛 ${message}\n', error: error, stackTrace: stackTrace);
+      _logger.w('🐛 $message\n', error: error, stackTrace: stackTrace);
     }
   }
 

@@ -25,15 +25,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.initState();
     mobile_num = TextEditingController();
     context.read<LoginForgotSignupCubit>().logLoginPageAppearEvent();
-    mobile_num.addListener(() {
-      if (mobile_num.text.length >= 10) {
+    // mobile_num.addListener(() {
+      // if (mobile_num.text.length >= 10) {
         // Dismiss the keyboard
-        FocusScope.of(context).unfocus();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.read<LoginForgotSignupCubit>().send_to_otp_screen(
-            context: context,
-            controller: mobile_num,
-          );
+        // FocusScope.of(context).unfocus();
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+          // context.read<LoginForgotSignupCubit>().send_to_otp_screen(
+            // context: context,
+            // controller: mobile_num,
+          // );
           // context
           //                         .read<LoginForgotSignupCubit>()
           //                         .userRegisteration(
@@ -41,9 +41,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           //                           fullName: '',
           //                           email: '',
           //                         );
-        });
-      }
-    });
+        // });
+      // }
+    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LoginForgotSignupCubit>().verifyViaTruecaller(context);

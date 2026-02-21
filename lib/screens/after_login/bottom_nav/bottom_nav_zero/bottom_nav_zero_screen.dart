@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,8 +15,10 @@ import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
 import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
-import 'package:sermon/services/token_check_service/login_check_cubit.dart';
+import 'package:sermon/services/reel_video_download.dart';
 import 'package:sermon/utils/app_assets.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -35,6 +39,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   final PageController _pageController = PageController();
   late BottomNavZeroCubit _cubit;
   int _currentPage = 0;
+  bool _isScrollLocked = false;
   final Map<int, VideoPlayerController> _controllers = {};
 
   @override
@@ -69,36 +74,59 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   }
 
   void _pauseController(int index) {
-    if (_controllers.containsKey(index)) {
-      _controllers[index]!.pause();
-    }
+    final ctrl = _controllers[index];
+    if (ctrl != null && ctrl.value.isInitialized) ctrl.pause();
+  }
+
+  void _setScrollLock(bool value) {
+    if (_isScrollLocked == value) return;
+
+    setState(() {
+      _isScrollLocked = value;
+    });
   }
 
   void _playController(int index) {
-    if (_controllers.containsKey(index)) {
-      _controllers[index]!.play();
-    }
+    final ctrl = _controllers[index];
+    if (ctrl != null && ctrl.value.isInitialized) ctrl.play();
   }
 
-  void _registerController(int index, VideoPlayerController controller) {
-    _controllers[index] = controller;
-    if (index == _currentPage) {
-      controller.play();
-    } else {
-      controller.pause();
+  VideoPlayerController _getOrCreateController(int index, String url) {
+    if (!_controllers.containsKey(index)) {
+      final ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+      ctrl.setLooping(true);
+      ctrl.initialize().then((_) {
+        if (mounted) setState(() {});
+        if (index == _currentPage) ctrl.play();
+      });
+      _controllers[index] = ctrl;
     }
+    return _controllers[index]!;
   }
 
-    @override
+  void _disposeAllControllers() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    _controllers.clear();
+  }
+
+  @override
   void didPushNext() {
-    _controllers[_currentPage]?.pause();
-    _controllers[_currentPage]?.setVolume(0);
+    final ctrl = _controllers[_currentPage];
+    if (ctrl != null && ctrl.value.isInitialized) {
+      ctrl.pause();
+      ctrl.setVolume(0);
+    }
   }
 
   @override
   void didPopNext() {
-    _controllers[_currentPage]?.play();
-    _controllers[_currentPage]?.setVolume(0.5);
+    final ctrl = _controllers[_currentPage];
+    if (ctrl != null && ctrl.value.isInitialized) {
+      ctrl.play();
+      ctrl.setVolume(0.5);
+    }
   }
 
   @override
@@ -124,6 +152,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
             previous.selectedIndex != current.selectedIndex,
         listener: (context, navState) {
           if (navState.selectedIndex == 0) {
+            _disposeAllControllers();
             _cubit.refreshUniqueReels();
           }
         },
@@ -146,8 +175,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
               return PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
-                physics:
-                    const PageScrollPhysics(), // Snap exactly one page at a time
+                physics: _isScrollLocked
+                    ? const NeverScrollableScrollPhysics()
+                    : const PageScrollPhysics(),
                 pageSnapping: true,
                 itemCount: state.reels.length,
                 onPageChanged: (index) async {
@@ -206,9 +236,11 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                         index: index,
                       );
                       final shouldShowRechargePage =
-                        FirebaseRemoteConfigService().shouldShowRechargePage;
+                          FirebaseRemoteConfigService().shouldShowRechargePage;
 
-                      if (!canUseVideo && shouldShowRechargePage && context.mounted) {
+                      if (!canUseVideo &&
+                          shouldShowRechargePage &&
+                          context.mounted) {
                         MyAppAmplitudeAndFirebaseAnalitics().logEvent(
                           event: LogEventsName.instance().subscribePageByReels,
                         );
@@ -252,9 +284,9 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 
                   // Fetch more reels if near end
                   if (index == state.reels.length - 2 && state.hasMore) {
-                    context
-                        .read<BottomNavZeroCubit>()
-                        .fetchReels(loadMore: true);
+                    context.read<BottomNavZeroCubit>().fetchReels(
+                      loadMore: true,
+                    );
                   }
 
                   // Log reel watch event
@@ -264,11 +296,13 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                 },
                 itemBuilder: (context, index) {
                   final reel = state.reels[index];
+                  final ctrl = _getOrCreateController(index, reel.reelLink);
                   return ReelVideoPlayer(
-                    key: ValueKey('${reel.id}_$index'), // ✅ unique key
+                    key: ValueKey('${reel.id}_$index'),
                     reelsModel: reel,
                     index: index,
-                    onControllerReady: _registerController,
+                    controller: ctrl,
+                    onDownloadStateChanged: _setScrollLock,
                   );
                 },
               );
@@ -283,13 +317,15 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
   final int index;
-  final Function(int, VideoPlayerController) onControllerReady;
+  final VideoPlayerController controller;
+  final Function(bool) onDownloadStateChanged;
 
   const ReelVideoPlayer({
     super.key,
     required this.reelsModel,
     required this.index,
-    required this.onControllerReady,
+    required this.controller,
+    required this.onDownloadStateChanged,
   });
 
   @override
@@ -297,49 +333,133 @@ class ReelVideoPlayer extends StatefulWidget {
 }
 
 class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
-  late VideoPlayerController _controller;
   bool _showPlayPause = false;
 
-  @override
-  void initState() {
-    super.initState();
-    AppLogger.d("video reel: ${widget.reelsModel.reelLink}");
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
-          ..initialize().then((_) {
-            // if (widget.index == 0) {
-            //   _controller.setVolume(
-            //     0,
-            //   ); // 🔇 Mute before registering the controller
-            // }
-            widget.onControllerReady(widget.index, _controller);
+  File? _cachedVideo;
+  bool _isDownloading = false;
 
-            if (mounted) setState(() {});
-          })
-          ..setLooping(true);
+  bool get _showShareLoader => _isDownloading;
+
+  Future<void> _onShareTap() async {
+    if (_cachedVideo != null) {
+      _shareWithVideo();
+      return;
+    }
+
+    widget.onDownloadStateChanged(true); // 🔒 LOCK SCROLL
+    context.read<BottomNavCubit>().setVideoCaching(value: true);
+
+    setState(() {
+      _isDownloading = true;
+    });
+
+    try {
+      final file = await ReelVideoDownloader().getReel(
+        widget.reelsModel.id,
+        widget.reelsModel.reelLink,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _cachedVideo = file;
+      });
+
+      _shareWithVideo();
+    } catch (e) {
+      if (!mounted) return;
+
+      _shareLinkOnly();
+    } finally {
+      if (!mounted) return;
+
+      setState(() {
+        _isDownloading = false;
+      });
+      widget.onDownloadStateChanged(false); // 🔓 UNLOCK SCROLL
+      context.read<BottomNavCubit>().setVideoCaching(value: false);
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
   void _togglePlayPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
+    if (widget.controller.value.isPlaying) {
+      widget.controller.pause();
     } else {
-      _controller.play();
+      widget.controller.play();
     }
+
     setState(() => _showPlayPause = true);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _showPlayPause = false);
     });
   }
 
+  Future<void> _shareWithVideo() async {
+    final result = await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(_cachedVideo!.path, mimeType: 'video/mp4')],
+        text:
+            '${FirebaseRemoteConfigService().shareButtonMessageText}\n'
+            'https://sermontv.usedirection.com/${widget.reelsModel.id}',
+      ),
+    );
+
+    if (result.status == ShareResultStatus.success) {
+      AppLogger.i("User selected a share target");
+      MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+        event: LogEventsName.instance().reelsShareButton,
+      );
+    } else if (result.status == ShareResultStatus.dismissed) {
+      AppLogger.e("User dismissed share sheet");
+    }
+  }
+
+  Future<void> _onWatchFullVideoTap() async {
+    // 🚫 Block if downloading
+    if (_isDownloading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please wait, video is downloading..."),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    // ✅ Otherwise proceed
+    await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
+      event: LogEventsName.instance().watch_full_video_reel,
+    );
+
+    widget.controller.pause();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) =>
+            VideoPlayerUsingId(url: widget.reelsModel.fullVideoLink),
+      ),
+    );
+  }
+
+  void _shareLinkOnly() {
+    SharePlus.instance.share(
+      ShareParams(
+        text:
+            '${FirebaseRemoteConfigService().shareButtonMessageText}\n'
+            'https://sermontv.usedirection.com/${widget.reelsModel.id}',
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
+    if (!widget.controller.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -351,56 +471,27 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              /// Background video
               FittedBox(
                 fit: BoxFit.contain,
                 child: SizedBox(
-                  width: _controller.value.size.width,
-                  height: _controller.value.size.height,
-                  child: VideoPlayer(_controller),
+                  width: widget.controller.value.size.width,
+                  height: widget.controller.value.size.height,
+                  child: VideoPlayer(widget.controller),
                 ),
               ),
 
-              /// Play/Pause overlay
               if (_showPlayPause)
                 Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     setState(() {
-                      //       _isMuted = !_isMuted;
-                      //       _controller.setVolume(
-                      //         _isMuted ? 0 : 1,
-                      //       ); // 🔊 Toggle
-                      //     });
-                      //   },
-                      //   child: Container(
-                      //     padding: const EdgeInsets.all(8),
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.black54,
-                      //       shape: BoxShape.circle,
-                      //     ),
-                      //     child: Icon(
-                      //       _isMuted ? Icons.volume_off : Icons.volume_up,
-                      //       color: Colors.white,
-                      //       size: 28,
-                      //     ),
-                      //   ),
-                      // ),
-                      Icon(
-                        _controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.white,
-                        size: 70,
-                      ),
-                    ],
+                  child: Icon(
+                    widget.controller.value.isPlaying
+                        ? Icons.pause
+                        : Icons.play_arrow,
+                    color: Colors.white,
+                    size: 70,
                   ),
                 ),
 
-              /// Watch full sermon button at bottom
+              /// SHARE + WATCH BUTTONS
               Positioned(
                 bottom: 40,
                 left: 0,
@@ -411,81 +502,89 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          context.read<LoginCheckCubit>().shareReel(
-                            widget.reelsModel.id,
-                          );
-                        },
+                        onTap: _isDownloading ? null : _onShareTap,
                         child: Column(
                           children: [
-                            SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: SvgPicture.asset(
-                                MyAppAssets.svg_whatsapp,
-                                // size: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Share',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w500,
-                              ),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: _showShareLoader
+                                  ? Shimmer.fromColors(
+                                      baseColor: Colors.white.withOpacity(0.3),
+                                      highlightColor: Colors.white.withOpacity(
+                                        0.8,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Container(
+                                            height: 12,
+                                            width: 36,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: SvgPicture.asset(
+                                            MyAppAssets.svg_whatsapp,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Share',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontFamily: 'Gilroy',
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 52),
+                      const SizedBox(height: 52),
                       Row(
                         children: [
                           Expanded(
                             child: GestureDetector(
                               onTap: () async {
-                                await MyAppAmplitudeAndFirebaseAnalitics().logEvent(
-                                  event: LogEventsName.instance()
-                                      .watch_full_video_reel,
-                                );
-                                _controller
-                                    .pause(); // ⏸ Pause before pushing new screen
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => VideoPlayerUsingId(
-                                      url: widget.reelsModel.fullVideoLink,
-                                    ),
-                                  ),
-                                );
+                                _onWatchFullVideoTap();
                               },
                               child: Container(
                                 height: 48,
-                                decoration: ShapeDecoration(
+                                decoration: BoxDecoration(
                                   color: Colors.black.withOpacity(0.8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Text(
-                                      'Watch Full Video',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontFamily: 'Gilroy',
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SizedBox(width: 6),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 16,
+                                child: const Center(
+                                  child: Text(
+                                    'Watch Full Video',
+                                    style: TextStyle(
                                       color: Colors.white,
+                                      fontSize: 16,
+                                      fontFamily: 'Gilroy',
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
