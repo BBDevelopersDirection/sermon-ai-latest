@@ -1,7 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sermon/services/firebase/models/transition_model.dart';
-import 'package:sermon/services/firebase/models/utility_model.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import '../../../../services/firebase/utils_management/utils_functions.dart';
 import 'package:sermon/reusable/logger_service.dart';

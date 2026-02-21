@@ -34,12 +34,20 @@ class LogEventsName{
   String watch_full_video_reel = 'watchFullVideoReel';
   String reel_watched = 'reelWatched';
   String reelsShareButton = 'reelsShareButton';
+  String shared_reel_watched = 'sharedReelWatched';
 
   // Temporary event names for testing
   String splashscreenStart = 'splashScreenStart';
   String splashscreenEnd = 'splashScreenEnd';
   String loginReelPageOpen = 'loginReelPageOpen';
   String loginScreenOpen = 'loginScreenOpen';
+
+  // Otp Events Logs
+  String invalidVerificationCode = 'invalidVerificationCode';
+  String sessionExpired = 'sessionExpired';
+  String tooManyRequests = 'tooManyRequests';
+  String quotaExceeded = 'otpSmsQuotaExceeded';
+  String unknownError = 'unknownError';
 
   LogEventsName._privateConstructor();
   static LogEventsName instance(){

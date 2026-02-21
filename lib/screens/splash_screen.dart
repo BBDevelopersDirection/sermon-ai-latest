@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sermon/services/log_service/log_service.dart';
 import 'package:sermon/services/log_service/log_variables.dart';
 
-import '../main.dart';
 import '../services/token_check_service/login_check_cubit.dart';
 import '../services/token_check_service/login_check_screen.dart';
 import '../utils/app_assets.dart';

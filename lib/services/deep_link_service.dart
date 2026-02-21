@@ -1,6 +1,5 @@
 import 'package:sermon/reusable/logger_service.dart';
 import 'package:app_links/app_links.dart';
-import 'package:sermon/services/log_service/log_service.dart';
 import 'dart:async';
 
 class DeepLinkService {

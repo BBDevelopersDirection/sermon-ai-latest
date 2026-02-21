@@ -15,13 +15,13 @@ class MyAppAnalitics {
   Future<void> logEvent({required String event}) async {
     try{
   await AnalyticsEngine.instance.logFirebaseEvent(FirebaseEventName: event);
-  AppLogger.d('Logged firebase event: ${event}');
+  AppLogger.d('Logged firebase event: $event');
 
 
   _facebookAppEvents.logEvent(name: event);
-  AppLogger.d('Logged Facebook event: ${event}');
+  AppLogger.d('Logged Facebook event: $event');
     }catch (e){
-      AppLogger.e('Error while logging firebase event: ${event}');
+      AppLogger.e('Error while logging firebase event: $event');
     }
   }
 }

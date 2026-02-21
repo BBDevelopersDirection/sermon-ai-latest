@@ -78,8 +78,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (details) {},
+      onDidReceiveNotificationResponse: (details) {}, settings: initializationSettings,
     );
 
     _isFlutterLocalNotificationsInitialized = true;
@@ -141,10 +140,10 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      message.hashCode,
-      title,
-      body,
-      notificationDetails,
+      id: message.hashCode,
+      title: title ?? 'Notification',
+      body: body ?? '',
+      notificationDetails: notificationDetails,
       payload: message.data.isNotEmpty ? message.data.toString() : null,
     );
   }

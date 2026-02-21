@@ -5,7 +5,7 @@ import '../utils/app_assets.dart';
 
 class PulsingIconAnim extends StatefulWidget {
   Color? appLogoColor;
-  PulsingIconAnim({this.appLogoColor});
+  PulsingIconAnim({super.key, this.appLogoColor});
 
   @override
   _AnimatedImageScreenState createState() => _AnimatedImageScreenState();
