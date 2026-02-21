@@ -74,9 +74,8 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   }
 
   void _pauseController(int index) {
-    if (_controllers.containsKey(index)) {
-      _controllers[index]!.pause();
-    }
+    final ctrl = _controllers[index];
+    if (ctrl != null && ctrl.value.isInitialized) ctrl.pause();
   }
 
   void _setScrollLock(bool value) {
@@ -88,30 +87,46 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
   }
 
   void _playController(int index) {
-    if (_controllers.containsKey(index)) {
-      _controllers[index]!.play();
-    }
+    final ctrl = _controllers[index];
+    if (ctrl != null && ctrl.value.isInitialized) ctrl.play();
   }
 
-  void _registerController(int index, VideoPlayerController controller) {
-    _controllers[index] = controller;
-    if (index == _currentPage) {
-      controller.play();
-    } else {
-      controller.pause();
+  VideoPlayerController _getOrCreateController(int index, String url) {
+    if (!_controllers.containsKey(index)) {
+      final ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+      ctrl.setLooping(true);
+      ctrl.initialize().then((_) {
+        if (mounted) setState(() {});
+        if (index == _currentPage) ctrl.play();
+      });
+      _controllers[index] = ctrl;
     }
+    return _controllers[index]!;
+  }
+
+  void _disposeAllControllers() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    _controllers.clear();
   }
 
   @override
   void didPushNext() {
-    _controllers[_currentPage]?.pause();
-    _controllers[_currentPage]?.setVolume(0);
+    final ctrl = _controllers[_currentPage];
+    if (ctrl != null && ctrl.value.isInitialized) {
+      ctrl.pause();
+      ctrl.setVolume(0);
+    }
   }
 
   @override
   void didPopNext() {
-    _controllers[_currentPage]?.play();
-    _controllers[_currentPage]?.setVolume(0.5);
+    final ctrl = _controllers[_currentPage];
+    if (ctrl != null && ctrl.value.isInitialized) {
+      ctrl.play();
+      ctrl.setVolume(0.5);
+    }
   }
 
   @override
@@ -137,6 +152,7 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
             previous.selectedIndex != current.selectedIndex,
         listener: (context, navState) {
           if (navState.selectedIndex == 0) {
+            _disposeAllControllers();
             _cubit.refreshUniqueReels();
           }
         },
@@ -280,11 +296,12 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
                 },
                 itemBuilder: (context, index) {
                   final reel = state.reels[index];
+                  final ctrl = _getOrCreateController(index, reel.reelLink);
                   return ReelVideoPlayer(
-                    key: ValueKey('${reel.id}_$index'), // ✅ unique key
+                    key: ValueKey('${reel.id}_$index'),
                     reelsModel: reel,
                     index: index,
-                    onControllerReady: _registerController,
+                    controller: ctrl,
                     onDownloadStateChanged: _setScrollLock,
                   );
                 },
@@ -300,14 +317,14 @@ class _BottomNavZeroScreenState extends State<BottomNavZeroScreen>
 class ReelVideoPlayer extends StatefulWidget {
   final ReelsModel reelsModel;
   final int index;
-  final Function(int, VideoPlayerController) onControllerReady;
+  final VideoPlayerController controller;
   final Function(bool) onDownloadStateChanged;
 
   const ReelVideoPlayer({
     super.key,
     required this.reelsModel,
     required this.index,
-    required this.onControllerReady,
+    required this.controller,
     required this.onDownloadStateChanged,
   });
 
@@ -316,27 +333,12 @@ class ReelVideoPlayer extends StatefulWidget {
 }
 
 class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
-  late VideoPlayerController _controller;
   bool _showPlayPause = false;
 
-  // 🔥 SHARE DOWNLOAD STATE
   File? _cachedVideo;
   bool _isDownloading = false;
 
   bool get _showShareLoader => _isDownloading;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.reelsModel.reelLink))
-          ..initialize().then((_) {
-            widget.onControllerReady(widget.index, _controller);
-            if (mounted) setState(() {});
-          })
-          ..setLooping(true);
-  }
 
   Future<void> _onShareTap() async {
     if (_cachedVideo != null) {
@@ -381,15 +383,14 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 
   void _togglePlayPause() {
-    if (_controller.value.isPlaying) {
-      _controller.pause();
+    if (widget.controller.value.isPlaying) {
+      widget.controller.pause();
     } else {
-      _controller.play();
+      widget.controller.play();
     }
 
     setState(() => _showPlayPause = true);
@@ -436,7 +437,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
       event: LogEventsName.instance().watch_full_video_reel,
     );
 
-    _controller.pause();
+    widget.controller.pause();
 
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -458,7 +459,7 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
+    if (!widget.controller.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -473,16 +474,16 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
               FittedBox(
                 fit: BoxFit.contain,
                 child: SizedBox(
-                  width: _controller.value.size.width,
-                  height: _controller.value.size.height,
-                  child: VideoPlayer(_controller),
+                  width: widget.controller.value.size.width,
+                  height: widget.controller.value.size.height,
+                  child: VideoPlayer(widget.controller),
                 ),
               ),
 
               if (_showPlayPause)
                 Center(
                   child: Icon(
-                    _controller.value.isPlaying
+                    widget.controller.value.isPlaying
                         ? Icons.pause
                         : Icons.play_arrow,
                     color: Colors.white,
