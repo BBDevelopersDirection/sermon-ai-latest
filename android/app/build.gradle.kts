@@ -36,8 +36,8 @@ android {
         applicationId = "com.live.ai.sermon"
         minSdk = 23
         targetSdk = 36
-        versionCode = 50
-        versionName = "1.5.6.1"
+        versionCode = 52
+        versionName = "1.5.7"
     }
 
     // Added for firebase Auth Browser redirect bug
