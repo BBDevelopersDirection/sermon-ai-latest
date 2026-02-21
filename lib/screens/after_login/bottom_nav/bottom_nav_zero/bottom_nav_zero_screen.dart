@@ -354,9 +354,9 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     });
 
     try {
-      final file = await ReelVideoDownloader().getCachedOrDownload(
-        videoUrl: widget.reelsModel.reelLink,
-        reelId: widget.reelsModel.id,
+      final file = await ReelVideoDownloader().getReel(
+        widget.reelsModel.id,
+        widget.reelsModel.reelLink,
       );
 
       if (!mounted) return;

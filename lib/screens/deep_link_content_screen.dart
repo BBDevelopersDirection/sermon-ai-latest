@@ -134,9 +134,9 @@ class _ReelVideoPlayerState extends State<ReelVideoPlayer> {
     _initializePlayer();
 
     /// Start background download for share
-    _reelFileFuture = ReelVideoDownloader().getCachedOrDownload(
-      videoUrl: widget.reelsModel.reelLink,
-      reelId: widget.reelsModel.id,
+    _reelFileFuture = ReelVideoDownloader().getReel(
+      widget.reelsModel.id,
+      widget.reelsModel.reelLink,
     );
   }
 
