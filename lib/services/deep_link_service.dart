@@ -1,4 +1,4 @@
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 import 'package:app_links/app_links.dart';
 import 'dart:async';
 

@@ -2,9 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/screens/before_login/login_forgot_signup_state.dart';
-import 'package:sermon/services/plan_service/widgets/trial_image_row.dart';
-import 'package:sermon/utils/app_assets.dart';
+import 'package:sermon_tv/screens/before_login/login_forgot_signup_state.dart';
+import 'package:sermon_tv/services/plan_service/widgets/trial_image_row.dart';
+import 'package:sermon_tv/utils/app_assets.dart';
 
 import '../../../reusable/my_scaffold_widget.dart';
 import '../login_forgot_signup_cubit.dart';

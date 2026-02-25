@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:sermon/services/firebase/models/meels_model.dart';
+import 'package:sermon_tv/services/firebase/models/meels_model.dart';
 
 class BottomNavZeroState extends Equatable {
   final List<ReelsModel> reels;

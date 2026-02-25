@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sermon/models/video_data_model.dart';
+import 'package:sermon_tv/models/video_data_model.dart';
 
 import '../../../../../reusable/progress_indicator.dart';
 import '../../../../../reusable/video_player_using_id.dart';

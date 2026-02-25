@@ -1,5 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
 
 class AppOpener {
   // Launches a URL

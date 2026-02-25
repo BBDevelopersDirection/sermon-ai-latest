@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/src/response.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sermon/network/endpoints.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
-import 'package:sermon/services/firebase/models/user_models.dart';
-import 'package:sermon/services/firebase/models/utility_model.dart';
-import 'package:sermon/services/firebase/subscription_management/subscription_function.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/network/endpoints.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/firebase/models/user_models.dart';
+import 'package:sermon_tv/services/firebase/models/utility_model.dart';
+import 'package:sermon_tv/services/firebase/subscription_management/subscription_function.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
 
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 import '../firestore_variables.dart';
 
 class UtilsFunctions {

@@ -1,21 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/reusable/progress_indicator.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
-import 'package:sermon/services/plan_service/plan_purchase_state.dart';
-import 'package:sermon/services/plan_service/widgets/footer.dart';
-import 'package:sermon/services/plan_service/widgets/footer_text.dart';
-import 'package:sermon/services/plan_service/widgets/subscription_button.dart';
-import 'package:sermon/services/plan_service/widgets/trail_message.dart';
-import 'package:sermon/services/plan_service/widgets/trial_image_row.dart';
-import 'package:sermon/services/plan_service/widgets/trial_price_info.dart';
-import 'package:sermon/utils/app_assets.dart';
+import 'package:sermon_tv/reusable/progress_indicator.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_cubit.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_state.dart';
+import 'package:sermon_tv/services/plan_service/widgets/footer.dart';
+import 'package:sermon_tv/services/plan_service/widgets/footer_text.dart';
+import 'package:sermon_tv/services/plan_service/widgets/subscription_button.dart';
+import 'package:sermon_tv/services/plan_service/widgets/trail_message.dart';
+import 'package:sermon_tv/services/plan_service/widgets/trial_image_row.dart';
+import 'package:sermon_tv/services/plan_service/widgets/trial_price_info.dart';
+import 'package:sermon_tv/utils/app_assets.dart';
 import 'package:video_player/video_player.dart';
 
 import '../firebase/utils_management/utils_functions.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class SubscriptionTrialScreen extends StatefulWidget {
   final VideoPlayerController? controller;

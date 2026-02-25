@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sermon/main.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/services/firebase/firestore_variables.dart';
-import 'package:sermon/services/firebase/models/subscription_model.dart';
+import 'package:sermon_tv/main.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
+import 'package:sermon_tv/services/firebase/firestore_variables.dart';
+import 'package:sermon_tv/services/firebase/models/subscription_model.dart';
 
 class SubscriptionFirestoreFunction {
   Future<SubscriptionStatus> getFirebaseUserSubscriptionStatus({

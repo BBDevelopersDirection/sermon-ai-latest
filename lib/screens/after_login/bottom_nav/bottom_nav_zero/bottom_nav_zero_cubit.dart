@@ -2,12 +2,12 @@ import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_state.dart';
-import 'package:sermon/services/firebase/models/meels_model.dart';
-import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import 'package:sermon/services/shared_pref/shared_preference.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
+import 'package:sermon_tv/screens/after_login/bottom_nav/bottom_nav_zero/bottom_nav_zero_state.dart';
+import 'package:sermon_tv/services/firebase/models/meels_model.dart';
+import 'package:sermon_tv/services/firebase/reels_management/reels_functions.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/shared_pref/shared_preference.dart';
 
 class _UniqueFetchResult {
   final List<ReelsModel> reels;

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import 'package:sermon/services/firebase/firestore_variables.dart';
+import 'package:sermon_tv/services/firebase/firestore_variables.dart';
 import 'package:uuid/uuid.dart';
 
 import '../firebase/models/user_models.dart';

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sermon/services/firebase/firestore_variables.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/firebase/firestore_variables.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
 
 import '../../../models/video_data_model.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sermon/services/firebase/models/meels_model.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/services/firebase/models/meels_model.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class ReelsResult {
   final List<ReelsModel> reels;

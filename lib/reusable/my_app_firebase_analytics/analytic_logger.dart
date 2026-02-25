@@ -1,5 +1,5 @@
 import 'package:facebook_app_events/facebook_app_events.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 import 'AnalyticsEngine.dart';
 

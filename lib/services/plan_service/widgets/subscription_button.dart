@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/services/plan_service/plan_purchase_state.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_state.dart';
 
 import '../plan_purchase_cubit.dart';
 

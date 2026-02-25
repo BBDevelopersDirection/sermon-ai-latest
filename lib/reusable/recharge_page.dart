@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sermon/reusable/MyAppElevatedButton.dart';
-import 'package:sermon/services/token_check_service/login_check_cubit.dart';
-import 'package:sermon/services/token_check_service/login_check_state.dart';
-import 'package:sermon/utils/app_assets.dart';
+import 'package:sermon_tv/reusable/MyAppElevatedButton.dart';
+import 'package:sermon_tv/services/token_check_service/login_check_cubit.dart';
+import 'package:sermon_tv/services/token_check_service/login_check_state.dart';
+import 'package:sermon_tv/utils/app_assets.dart';
 
 import 'my_app_firebase_analytics/analytic_logger.dart';
 

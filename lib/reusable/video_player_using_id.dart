@@ -3,15 +3,15 @@ import 'package:apivideo_player/apivideo_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/reusable/pulsing_icon_anim.dart';
-import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
-import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
-import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
-import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/pulsing_icon_anim.dart';
+import 'package:sermon_tv/services/firebase/utils_management/utils_functions.dart';
+import 'package:sermon_tv/services/log_service/log_service.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_cubit.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_screen.dart';
 
 class VideoPlayerUsingId extends StatefulWidget {
   final String url; // this will be the api.video videoId or video URL

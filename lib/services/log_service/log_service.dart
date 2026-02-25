@@ -9,10 +9,10 @@ import 'package:amplitude_flutter/configuration.dart';
 import 'package:amplitude_flutter/constants.dart';
 import 'package:amplitude_flutter/default_tracking.dart';
 import 'package:amplitude_flutter/events/base_event.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/services/firebase/models/user_models.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import 'package:sermon/services/shared_pref/shared_preference.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
+import 'package:sermon_tv/services/firebase/models/user_models.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/shared_pref/shared_preference.dart';
 
 import '../../reusable/my_app_firebase_analytics/AnalyticsEngine.dart';
 

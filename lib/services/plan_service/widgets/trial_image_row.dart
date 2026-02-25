@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
-import 'package:sermon/services/plan_service/widgets/header_close_button.dart';
+import 'package:sermon_tv/services/plan_service/widgets/header_close_button.dart';
 
 class TrialImageRow extends StatelessWidget {
   final List<String> imagePaths;

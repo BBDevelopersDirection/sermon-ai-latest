@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
+import 'package:sermon_tv/services/log_service/log_service.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
 
 import '../services/token_check_service/login_check_cubit.dart';
 import '../services/token_check_service/login_check_screen.dart';

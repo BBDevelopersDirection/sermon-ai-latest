@@ -3,21 +3,21 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/main.dart';
-import 'package:sermon/reusable/app_dialogs.dart';
-import 'package:sermon/reusable/payment_in_progress_page.dart';
-import 'package:sermon/network/endpoints.dart';
-import 'package:sermon/services/firebase/models/user_models.dart';
-import 'package:sermon/services/firebase/user_data_management/firestore_functions.dart';
-import 'package:sermon/services/firebase/utils_management/utils_functions.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
-import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
-import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
-import 'package:sermon/services/plan_service/plan_purchase_state.dart';
-import 'package:sermon/services/razorpay_service.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/main.dart';
+import 'package:sermon_tv/reusable/app_dialogs.dart';
+import 'package:sermon_tv/reusable/payment_in_progress_page.dart';
+import 'package:sermon_tv/network/endpoints.dart';
+import 'package:sermon_tv/services/firebase/models/user_models.dart';
+import 'package:sermon_tv/services/firebase/user_data_management/firestore_functions.dart';
+import 'package:sermon_tv/services/firebase/utils_management/utils_functions.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/log_service/log_service.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
+import 'package:sermon_tv/services/plan_service/models/CreateCustomerResponseModel.dart';
+import 'package:sermon_tv/services/plan_service/plan_purchase_state.dart';
+import 'package:sermon_tv/services/razorpay_service.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class PlanPurchaseCubit extends Cubit<PlanPurchaseState> {
   PlanPurchaseCubit()

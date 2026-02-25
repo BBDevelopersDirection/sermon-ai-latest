@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:sermon/reusable/app_dialogs.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
+import 'package:sermon_tv/reusable/app_dialogs.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
 
 class OTPService {
   final FirebaseAuth _auth = FirebaseAuth.instance;

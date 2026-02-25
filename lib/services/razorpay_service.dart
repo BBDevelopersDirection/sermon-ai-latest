@@ -1,13 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:sermon/services/firebase/models/transition_model.dart';
-import 'package:sermon/services/firebase/transictions_management/transistion_function.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/firebase/models/transition_model.dart';
+import 'package:sermon_tv/services/firebase/transictions_management/transistion_function.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
 import 'package:uuid/uuid.dart';
 
 import 'log_service/log_service.dart';
 import 'log_service/log_variables.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class RazorpayService {
   final Razorpay _razorpay = Razorpay();

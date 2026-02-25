@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:sermon/reusable/logger_service.dart';
-import 'package:sermon/services/firebase/models/meels_model.dart';
-import 'package:sermon/services/firebase/reels_management/reels_functions.dart';
-import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
-import 'package:sermon/services/reel_video_download.dart';
-import 'package:sermon/services/token_check_service/login_check_screen.dart';
-import 'package:sermon/utils/app_color.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
+import 'package:sermon_tv/services/firebase/models/meels_model.dart';
+import 'package:sermon_tv/services/firebase/reels_management/reels_functions.dart';
+import 'package:sermon_tv/services/log_service/log_service.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
+import 'package:sermon_tv/services/reel_video_download.dart';
+import 'package:sermon_tv/services/token_check_service/login_check_screen.dart';
+import 'package:sermon_tv/utils/app_color.dart';
 import 'package:video_player/video_player.dart';
 
 class DeepLinkContentScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:sermon/services/firebase/models/utility_model.dart';
+import 'package:sermon_tv/services/firebase/models/utility_model.dart';
 
 
 class BottomNavSecondState extends Equatable {

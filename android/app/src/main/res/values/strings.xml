@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">SermonTV: Watch latest sermons</string>
-    <string name="facebook_app_id">1304767424184950</string>
-    <string name="fb_login_protocol_scheme">fb1304767424184950</string>
-    <string name="facebook_client_token">88eb504a4c181675315b5eb03bcbe3de</string>
-    <string name="truecaller_sdk">3slrqzii0cok0znf7rzznat-km0yinxoaqs4gcsl3x8</string>
-</resources>

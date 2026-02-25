@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/grid_view_of_videos.dart';
-import 'package:sermon/utils/app_color.dart';
+import 'package:sermon_tv/screens/after_login/bottom_nav/bottom_nav_first/widgets/grid_view_of_videos.dart';
+import 'package:sermon_tv/utils/app_color.dart';
 
 import '../../../../../reusable/my_scaffold_widget.dart';
 

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
 
 import '../../../reusable/logger_service.dart';
 import '../firestore_variables.dart';

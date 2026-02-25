@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:sermon/main.dart';
-import 'package:sermon/services/firebase/models/user_models.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
-import 'package:sermon/services/plan_service/models/CreateCustomerResponseModel.dart';
-import 'package:sermon/utils/string_extensions.dart';
+import 'package:sermon_tv/main.dart';
+import 'package:sermon_tv/services/firebase/models/user_models.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/plan_service/models/CreateCustomerResponseModel.dart';
+import 'package:sermon_tv/utils/string_extensions.dart';
 
 import 'dio_client.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class MyAppEndpoints {
   MyAppEndpoints._();

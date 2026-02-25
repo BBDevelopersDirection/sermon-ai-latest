@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sermon/utils/app_color.dart';
+import 'package:sermon_tv/utils/app_color.dart';
 
 class MyAppDialogs {
   void info_dialog({

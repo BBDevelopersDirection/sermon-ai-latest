@@ -1,12 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/models/video_data_model.dart';
-import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/carasol_slider.dart';
-import 'package:sermon/screens/after_login/bottom_nav/bottom_nav_first/widgets/section_to_show.dart';
-import 'package:sermon/services/firebase/video_management/video_functions.dart';
-import 'package:sermon/services/firebase/firebase_remote_config.dart';
-import 'package:sermon/services/token_check_service/login_check_cubit.dart';
+import 'package:sermon_tv/models/video_data_model.dart';
+import 'package:sermon_tv/screens/after_login/bottom_nav/bottom_nav_first/widgets/carasol_slider.dart';
+import 'package:sermon_tv/screens/after_login/bottom_nav/bottom_nav_first/widgets/section_to_show.dart';
+import 'package:sermon_tv/services/firebase/video_management/video_functions.dart';
+import 'package:sermon_tv/services/firebase/firebase_remote_config.dart';
+import 'package:sermon_tv/services/token_check_service/login_check_cubit.dart';
 import '../../../../reusable/my_scaffold_widget.dart';
 import '../../../../utils/app_color.dart';
 

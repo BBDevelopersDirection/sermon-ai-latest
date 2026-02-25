@@ -2,8 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/reusable/my_scaffold_widget.dart';
-import 'package:sermon/services/token_check_service/login_check_cubit.dart';
+import 'package:sermon_tv/reusable/my_scaffold_widget.dart';
+import 'package:sermon_tv/services/token_check_service/login_check_cubit.dart';
 
 import '../../../../../models/playlist_and_episode_model_old.dart';
 import '../../../../../reusable/pulsing_icon_anim.dart';

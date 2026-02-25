@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sermon/services/hive_box/hive_box_functions.dart';
+import 'package:sermon_tv/services/hive_box/hive_box_functions.dart';
 import '../../../../services/firebase/utils_management/utils_functions.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 import 'bottom_nav_second_state.dart';
 
 class BottomNavSecondCubit extends Cubit<BottomNavSecondState> {

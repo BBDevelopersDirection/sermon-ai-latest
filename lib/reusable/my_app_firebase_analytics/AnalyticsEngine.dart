@@ -1,7 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:sermon/main.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/main.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 
 class AnalyticsEngine {
   AnalyticsEngine._();

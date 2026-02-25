@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/screens/before_login/login_forgot_signup_cubit.dart';
-import 'package:sermon/screens/before_login/login_forgot_signup_state.dart';
+import 'package:sermon_tv/screens/before_login/login_forgot_signup_cubit.dart';
+import 'package:sermon_tv/screens/before_login/login_forgot_signup_state.dart';
 
 import '../../../reusable/my_scaffold_widget.dart';
 

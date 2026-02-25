@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sermon/reusable/logger_service.dart';
+import 'package:sermon_tv/reusable/logger_service.dart';
 import 'package:lottie/lottie.dart'; // Add in pubspec.yaml for animations
-import 'package:sermon/services/firebase/firestore_variables.dart';
-import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/log_service/log_variables.dart';
-import 'package:sermon/utils/app_assets.dart';
+import 'package:sermon_tv/services/firebase/firestore_variables.dart';
+import 'package:sermon_tv/services/log_service/log_service.dart';
+import 'package:sermon_tv/services/log_service/log_variables.dart';
+import 'package:sermon_tv/utils/app_assets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/token_check_service/login_check_cubit.dart';
 import '../services/firebase/firebase_remote_config.dart';
