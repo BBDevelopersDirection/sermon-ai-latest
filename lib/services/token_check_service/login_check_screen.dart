@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_cubit.dart';
 import 'package:sermon/screens/after_login/bottom_nav/bottom_nav/bottom_nav_screen.dart';
+import 'package:sermon/screens/before_login/sign_up/sign_up_screen.dart';
 import 'package:sermon/services/firebase/firebase_remote_config.dart';
 import 'package:sermon/screens/before_login/sign_up/sign_up_screen_reel.dart';
 import '../../reusable/progress_indicator.dart';
-import '../../screens/before_login/login_forgot_signup_cubit.dart';
-import '../../screens/before_login/sign_up/sign_up_screen.dart';
-import '../firebase_notification_mine.dart';
 import 'login_check_cubit.dart';
 import 'login_check_state.dart';
 
@@ -78,7 +76,7 @@ class _LoginCheckScreenState extends State<LoginCheckScreen> {
   }
 
   Widget _token_not_found() {
-    return SignUpScreenReel();
+    return SignUpScreen();
     // return BlocProvider(
     //   create: (context) => BottomNavCubit(),
     //   child: BottomNavScreen(),

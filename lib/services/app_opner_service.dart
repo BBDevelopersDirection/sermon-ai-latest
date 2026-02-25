@@ -4,18 +4,18 @@ import 'package:sermon/services/firebase/firebase_remote_config.dart';
 class AppOpener {
   // Launches a URL
   static Future<void> launchAppUsingUrl({required String link}) async {
-    final Uri _url = Uri.parse(link);
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
+    final Uri url = Uri.parse(link);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
   }
 
   // Launches a URL
   static Future<void> launchPrivacyPolicy() async {
     final privacyPolicyUrl = FirebaseRemoteConfigService().privacyPolicyUrl;
-    final Uri _url = Uri.parse(privacyPolicyUrl);
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
+    final Uri url = Uri.parse(privacyPolicyUrl);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
   }
 

@@ -9,8 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sermon/screens/before_login/login_forgot_signup_cubit.dart';
 import 'package:sermon/services/log_service/log_service.dart';
-import 'package:sermon/services/plan_service/plan_purchase_cubit.dart';
-import 'package:sermon/services/plan_service/plan_purchase_screen.dart';
+import 'package:sermon/services/reel_video_download.dart';
 import 'package:sermon/services/shared_pref/shared_preference.dart';
 import 'package:sermon/services/hive_box/hive_box_functions.dart';
 import 'package:sermon/reusable/logger_service.dart';
@@ -32,8 +31,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Ensure proper initialization
   await SharedPreferenceLogic.initialize();
 
+  final appDocumentDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDir.path);
+  final hiveBoxService = HiveBoxFunctions();
+  await hiveBoxService.init();
+
   // Initialize deep link service
   await DeepLinkService().initialize();
+
+  // To clear cache
+  await ReelVideoDownloader().clearAllCachedReels();
 
   try {
     await Firebase.initializeApp(
@@ -83,11 +90,6 @@ void main() async {
   //     projectId: "s3uew6gddm",
   //     logLevel: LogLevel.None // Note: Use "LogLevel.Verbose" value while testing to debug initialization issues.
   // );
-
-  final appDocumentDir = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDir.path);
-  final hiveBoxService = HiveBoxFunctions();
-  await hiveBoxService.init();
 
   runApp(MyApp());
 

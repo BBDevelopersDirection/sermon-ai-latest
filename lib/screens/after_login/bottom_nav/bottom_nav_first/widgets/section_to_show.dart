@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sermon/models/video_data_model.dart';
 
 import '../../../../../reusable/progress_indicator.dart';
-import '../../../../../reusable/pulsing_icon_anim.dart';
 import '../../../../../reusable/video_player_using_id.dart';
 
 class SectionToShow extends StatelessWidget {
